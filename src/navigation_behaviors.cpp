@@ -12,7 +12,7 @@
  */
 SetLocations::SetLocations(const std::string &name, const BT::NodeConfiguration &config) : BT::SyncActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -34,8 +34,8 @@ BT::NodeStatus SetLocations::tick()
 {
     // Read YAML file
     std::string yaml_file;
-    ros::param::get("location_file", yaml_file);
-    ROS_INFO("%s", yaml_file.c_str());
+    // ros::param::get("location_file", yaml_file);
+    // ROS_INFO("%s", yaml_file.c_str());
     YAML::Node locations = YAML::LoadFile(yaml_file)["path_locations"];
     for (YAML::const_iterator it = locations.begin(); it != locations.end(); ++it)
     {
@@ -47,11 +47,11 @@ BT::NodeStatus SetLocations::tick()
     int num_locs = path_queue_->GetQueue().size();
     if (num_locs == 0)
     {
-        ROS_ERROR("[%s] No path locations found!", this->name().c_str());
+        // ROS_ERROR("[%s] No path locations found!", this->name().c_str());
         return BT::NodeStatus::FAILURE;
     }
     setOutput("num_locs", num_locs);
-    ROS_INFO("[%s] Found %d locations.", this->name().c_str(), num_locs);
+    // ROS_INFO("[%s] Found %d locations.", this->name().c_str(), num_locs);
 
     YAML::Node fixed_locations = YAML::LoadFile(yaml_file)["fixed_locations"];
     std::array<float, 3> entry_basket_change_location = (fixed_locations["empty_basket_location"]).as<std::array<float, 3>>();
@@ -91,7 +91,7 @@ BT::PortsList SetLocations::providedPorts()
  */
 GetLocationFromQueue::GetLocationFromQueue(const std::string &name, const BT::NodeConfiguration &config) : BT::SyncActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -113,7 +113,7 @@ BT::NodeStatus GetLocationFromQueue::tick()
 {
     if (path_queue_->GetQueue().empty())
     {
-        ROS_ERROR("[%s] No more locations!", this->name().c_str());
+        // ROS_ERROR("[%s] No more locations!", this->name().c_str());
         return BT::NodeStatus::FAILURE;
     }
     else
@@ -148,15 +148,15 @@ BT::PortsList GetLocationFromQueue::providedPorts()
  * @param name The name of the behavior
  * @param config The node configuration
  */
-GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config) : BT::StatefulActionNode(name, config),
-                                                                                   client_("/summit_xl/move_base", true)
-{
-    client_.waitForServer();
-    std::string yaml_file;
-    ros::param::get("location_file", yaml_file);
-    locations_ = YAML::LoadFile(yaml_file)["path_locations"];
-    ROS_LOG_INIT(this->name().c_str());
-}
+// GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config) : BT::StatefulActionNode(name, config),
+//                                                                                    client_("/summit_xl/move_base", true)
+// {
+//     client_.waitForServer();
+//     std::string yaml_file;
+//     ros::param::get("location_file", yaml_file);
+//     locations_ = YAML::LoadFile(yaml_file)["path_locations"];
+//     ROS_LOG_INIT(this->name().c_str());
+// }
 
 /**
  * @brief Set the Manipulator object
@@ -176,15 +176,15 @@ void GoToPose::init(Manipulator manipulator)
  */
 BT::NodeStatus GoToPose::onStart()
 {
-    LOG_NAV_START(this->name());
-    manipulator_.MoveToDrivingPosition();
-    BT::Optional<PathLocation> loc = getInput<PathLocation>("loc");
-    ROS_INFO("[%s] next goal: x=%.2f y=%.2f w=%.2f", this->name().c_str(), loc->x, loc->y, loc->orientation);
-    goal_.target_pose.header.frame_id = "summit_xl_map";
-    goal_.target_pose.pose.position.x = loc->x;
-    goal_.target_pose.pose.position.y = loc->y;
-    goal_.target_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, loc->orientation);
-    client_.sendGoal(goal_);
+    // LOG_NAV_START(this->name());
+    // manipulator_.MoveToDrivingPosition();
+    // BT::Optional<PathLocation> loc = getInput<PathLocation>("loc");
+    // ROS_INFO("[%s] next goal: x=%.2f y=%.2f w=%.2f", this->name().c_str(), loc->x, loc->y, loc->orientation);
+    // goal_.target_pose.header.frame_id = "summit_xl_map";
+    // goal_.target_pose.pose.position.x = loc->x;
+    // goal_.target_pose.pose.position.y = loc->y;
+    // goal_.target_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, loc->orientation);
+    // client_.sendGoal(goal_);
     return BT::NodeStatus::RUNNING;
 }
 
@@ -195,23 +195,23 @@ BT::NodeStatus GoToPose::onStart()
  */
 BT::NodeStatus GoToPose::onRunning()
 {
-    actionlib::SimpleClientGoalState state = client_.getState();
-    if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
-    {
-        ROS_DEBUG("[%s] reached goal", this->name().c_str());
-        LOG_NAV_STOP(this->name());
-        return BT::NodeStatus::SUCCESS;
-    }
-    else if (state == actionlib::SimpleClientGoalState::ACTIVE || state == actionlib::SimpleClientGoalState::PENDING)
-    {
-        return BT::NodeStatus::RUNNING;
-    }
-    else
-    {
-        LOG_NAV_STOP(this->name());
-        ROS_ERROR("[%s] Failed to reach goal!", this->name().c_str());
-        return BT::NodeStatus::FAILURE;
-    }
+    // actionlib::SimpleClientGoalState state = client_.getState();
+    // if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
+    // {
+    //     ROS_DEBUG("[%s] reached goal", this->name().c_str());
+    //     LOG_NAV_STOP(this->name());
+    //     return BT::NodeStatus::SUCCESS;
+    // }
+    // else if (state == actionlib::SimpleClientGoalState::ACTIVE || state == actionlib::SimpleClientGoalState::PENDING)
+    // {
+    //     return BT::NodeStatus::RUNNING;
+    // }
+    // else
+    // {
+    //     LOG_NAV_STOP(this->name());
+    //     ROS_ERROR("[%s] Failed to reach goal!", this->name().c_str());
+    //     return BT::NodeStatus::FAILURE;
+    // }
 }
 
 /**
@@ -277,7 +277,7 @@ void SaveCurrentLocation::init(TomatoQueue &tomato_queue)
  */
 BT::NodeStatus SaveCurrentLocation::tick()
 {
-    geometry_msgs::PoseStamped current_location = ba_helper::GetCurrentPoseInMapFrame(BASE_FRAME);
+    geometry_msgs::msg::PoseStamped current_location = ba_helper::GetCurrentPoseInMapFrame(BASE_FRAME);
     float rotation = ba_helper::ConvertQuaternionToAngle(current_location.pose.orientation);
     if (tomato_queue_->GetReachableTomatoes().size() > 0)
     {
@@ -315,7 +315,7 @@ BT::PortsList SaveCurrentLocation::providedPorts()
  */
 WriteBasketChangeLocationToQueue::WriteBasketChangeLocationToQueue(const std::string &name, const BT::NodeConfiguration &config) : BT::SyncActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -362,7 +362,7 @@ BT::PortsList WriteBasketChangeLocationToQueue::providedPorts()
  */
 WriteChargingLocationToQueue::WriteChargingLocationToQueue(const std::string &name, const BT::NodeConfiguration &config) : BT::SyncActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**

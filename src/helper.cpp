@@ -18,7 +18,7 @@ float ba_helper::ConvertDegreesToRadians(float degrees)
  * @param quat The quaternion to transform
  * @return float The angle in radians
  */
-float ba_helper::ConvertQuaternionToAngle(geometry_msgs::Quaternion quat)
+float ba_helper::ConvertQuaternionToAngle(geometry_msgs::msg::Quaternion quat)
 {
     float axis = 0;
     axis += quat.x * quat.x;
@@ -51,11 +51,11 @@ float ba_helper::CalculateGripperParameterFromDesiredAirgap(float airgap)
 /**
  * @brief Gets the current armbase location in the map frame
  *
- * @return geometry_msgs::Point The current armbase location
+ * @return geometry_msgs::msg::Point The current armbase location
  */
-geometry_msgs::Point ba_helper::GetCurrentArmbaseLocation(void)
+geometry_msgs::msg::Point ba_helper::GetCurrentArmbaseLocation(void)
 {
-    geometry_msgs::PoseStamped manipulator_base_map = GetCurrentPoseInMapFrame(ARM_BASE_FRAME);
+    geometry_msgs::msg::PoseStamped manipulator_base_map = GetCurrentPoseInMapFrame(ARM_BASE_FRAME);
     return manipulator_base_map.pose.position;
 }
 
@@ -69,29 +69,35 @@ geometry_msgs::Point ba_helper::GetCurrentArmbaseLocation(void)
  * @param R The roll angle
  * @param P The pith angle
  * @param Y The yaw angle
- * @return geometry_msgs::PoseStamped The current position in the map frame
+ * @return geometry_msgs::msg::PoseStamped The current position in the map frame
  */
-geometry_msgs::PoseStamped ba_helper::GetCurrentPoseInMapFrame(const char source_frame[],
+geometry_msgs::msg::PoseStamped ba_helper::GetCurrentPoseInMapFrame(const char source_frame[],
                                                                float x, float y, float z,
                                                                float roll, float pitch, float yaw)
 {
-    tf::TransformListener listener;
+    // tf2_ros::TransformListener listener;
 
-    listener.waitForTransform(MAP_FRAME, source_frame, ros::Time(0), ros::Duration(3.0));
-    geometry_msgs::PoseStamped current_position_base_frame;
-    geometry_msgs::PoseStamped current_position_map_frame;
+    // listener.waitForTransform(MAP_FRAME, source_frame, ros::Time(0), ros::Duration(3.0));
+    geometry_msgs::msg::PoseStamped current_position_base_frame;
+    geometry_msgs::msg::PoseStamped current_position_map_frame;
 
     current_position_base_frame.pose.position.x = x;
     current_position_base_frame.pose.position.y = y;
     current_position_base_frame.pose.position.z = z;
 
-    current_position_base_frame.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(roll, pitch, yaw);
+    // current_position_base_frame.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(roll, pitch, yaw);
+
+    tf2::Quaternion tf2_quat;
+    tf2_quat.setRPY(roll, pitch, yaw);
+    geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
+
+    current_position_base_frame.pose.orientation = msg_quat;
 
     current_position_base_frame.header.frame_id = source_frame;
-    current_position_base_frame.header.stamp = ros::Time();
-    listener.transformPose(MAP_FRAME, current_position_base_frame, current_position_map_frame);
+    // current_position_base_frame.header.stamp = ros::Time();
+    // listener.transformPose(MAP_FRAME, current_position_base_frame, current_position_map_frame);
     current_position_map_frame.header.frame_id = MAP_FRAME;
-    current_position_map_frame.header.stamp = ros::Time();
+    // current_position_map_frame.header.stamp = ros::Time();
 
     return current_position_map_frame;
 }

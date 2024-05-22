@@ -12,7 +12,7 @@
  */
 DequeueTomato::DequeueTomato(const std::string &name, const BT::NodeConfiguration &config) : BT::SyncActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -22,7 +22,7 @@ DequeueTomato::DequeueTomato(const std::string &name, const BT::NodeConfiguratio
  */
 void DequeueTomato::init(TomatoQueue &tqueue)
 {
-    tomato_queue_ = &tqueue;
+    // tomato_queue_ = &tqueue;
 }
 
 /**
@@ -32,13 +32,13 @@ void DequeueTomato::init(TomatoQueue &tqueue)
  */
 BT::NodeStatus DequeueTomato::tick()
 {
-    TomatoCoordinates next_tomato = tomato_queue_->GetNextReachableTomato();
-    setOutput("target_x", next_tomato.x);
-    setOutput("target_y", next_tomato.y);
-    setOutput("target_z", next_tomato.z);
+    // TomatoCoordinates next_tomato = tomato_queue_->GetNextReachableTomato();
+    // setOutput("target_x", next_tomato.x);
+    // setOutput("target_y", next_tomato.y);
+    // setOutput("target_z", next_tomato.z);
 
-    float airgap = ba_helper::CalculateGripperParameterFromDesiredAirgap(2 * next_tomato.r);
-    setOutput("gripper_airgap", (float)airgap);
+    // float airgap = ba_helper::CalculateGripperParameterFromDesiredAirgap(2 * next_tomato.r);
+    // setOutput("gripper_airgap", (float)airgap);
 
     return BT::NodeStatus::SUCCESS;
 }
@@ -68,15 +68,15 @@ BT::PortsList DequeueTomato::providedPorts()
  * @param frame The selected frame
  * @return geometry_msgs::PoseStamped The robots pose
  */
-geometry_msgs::PoseStamped DequeueTomato::TransformTomatoToPose(TomatoCoordinates tomato, std::string frame)
+geometry_msgs::msg::PoseStamped DequeueTomato::TransformTomatoToPose(TomatoCoordinates tomato, std::string frame)
 {
-    geometry_msgs::PoseStamped result;
+    geometry_msgs::msg::PoseStamped result;
     result.header.frame_id = frame;
-    result.header.stamp = ros::Time();
+    // result.header.stamp = ros::Time();
     result.pose.position.x = tomato.x;
     result.pose.position.y = tomato.y;
     result.pose.position.z = tomato.z;
-    result.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+    // result.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
     return result;
 }
 
@@ -95,7 +95,7 @@ geometry_msgs::PoseStamped DequeueTomato::TransformTomatoToPose(TomatoCoordinate
 FilterTomatoQueue::FilterTomatoQueue(const std::string &name, const BT::NodeConfiguration &config)
     : BT::SyncActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -116,31 +116,31 @@ void FilterTomatoQueue::init(TomatoQueue &tomato_queue)
 BT::NodeStatus FilterTomatoQueue::tick()
 {
     LOG_MANI_START(this->name());
-    geometry_msgs::PoseStamped manipulator_base_local;
-    geometry_msgs::PoseStamped manipulator_base_map;
-    tf::TransformListener listener;
-    listener.waitForTransform(MAP_FRAME, ARM_BASE_FRAME, ros::Time(0), ros::Duration(3.0));
+    geometry_msgs::msg::PoseStamped manipulator_base_local;
+    geometry_msgs::msg::PoseStamped manipulator_base_map;
+    // tf::TransformListener listener;
+    // listener.waitForTransform(MAP_FRAME, ARM_BASE_FRAME, ros::Time(0), ros::Duration(3.0));
     manipulator_base_local.pose.position.x =
         manipulator_base_local.pose.position.y =
             manipulator_base_local.pose.position.z = 0.0;
     manipulator_base_local.header.frame_id = ARM_BASE_FRAME;
-    manipulator_base_local.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
-    manipulator_base_local.header.stamp = ros::Time();
-    listener.transformPose(MAP_FRAME, manipulator_base_local, manipulator_base_map);
-    int number_of_reachables = tomato_queue_->GetReachableTomatoCount(manipulator_base_map.pose.position.x,
-                                                            manipulator_base_map.pose.position.y,
-                                                            manipulator_base_map.pose.position.z, UR5_WORKING_RADIUS);
+    // manipulator_base_local.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+    // manipulator_base_local.header.stamp = ros::Time();
+    //listener.transformPose(MAP_FRAME, manipulator_base_local, manipulator_base_map);
+    // int number_of_reachables = tomato_queue_->GetReachableTomatoCount(manipulator_base_map.pose.position.x,
+    //                                                        manipulator_base_map.pose.position.y,
+    //                                                        manipulator_base_map.pose.position.z, UR5_WORKING_RADIUS);
 
-    ROS_INFO("[%s] Printing queue!", this->name().c_str());
-    tomato_queue_->PrintQueue();
-    if (number_of_reachables == 0)
-    {
-        ROS_ERROR("[%s] No more locations!", this->name().c_str());
-        LOG_MANI_STOP(this->name());
-        return BT::NodeStatus::FAILURE;
-    }
-    ROS_INFO("Currently reachable tomatoes: %d", number_of_reachables);
-    setOutput("num_tomatoes", number_of_reachables);
+    // ROS_INFO("[%s] Printing queue!", this->name().c_str());
+    // tomato_queue_->PrintQueue();
+    // if (number_of_reachables == 0)
+    // {
+        // ROS_ERROR("[%s] No more locations!", this->name().c_str());
+    //     LOG_MANI_STOP(this->name());
+    //    return BT::NodeStatus::FAILURE;
+    // }
+    // ROS_INFO("Currently reachable tomatoes: %d", number_of_reachables);
+    // setOutput("num_tomatoes", number_of_reachables);
     LOG_MANI_STOP(this->name());
     return BT::NodeStatus::SUCCESS;
 }
@@ -165,13 +165,13 @@ BT::PortsList FilterTomatoQueue::providedPorts()
  * @param name The name of the behavior
  * @param config The node configuration
  */
-ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config)
-    : BT::StatefulActionNode(name, config),
-      client_("/summit_xl/move_group", true)
-{
-    client_.waitForServer();
-    ROS_LOG_INIT(this->name().c_str());
-}
+// ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config)
+//     : BT::StatefulActionNode(name, config),
+//       client_("/summit_xl/move_group", true)
+// {
+//     client_.waitForServer();
+//     ROS_LOG_INIT(this->name().c_str());
+// }
 
 /**
  * @brief Set the Manipulator object
@@ -192,24 +192,24 @@ void ManipulatorGraspTomato::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorGraspTomato::onStart()
 {
     LOG_MANI_START(this->name());
-    BT::Optional<float> tomato_map_x = getInput<float>("target_x");
-    BT::Optional<float> tomato_map_y = getInput<float>("target_y");
-    BT::Optional<float> tomato_map_z = getInput<float>("target_z");
+    BT::Expected<float> tomato_map_x = getInput<float>("target_x");
+    BT::Expected<float> tomato_map_y = getInput<float>("target_y");
+    BT::Expected<float> tomato_map_z = getInput<float>("target_z");
     if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
     {
-        ROS_ERROR("GOT NO POSE!");
+        // ROS_ERROR("GOT NO POSE!");
         return BT::NodeStatus::FAILURE;
     }
-    geometry_msgs::Point armlink_loc = ba_helper::GetCurrentArmbaseLocation();
+    geometry_msgs::msg::Point armlink_loc = ba_helper::GetCurrentArmbaseLocation();
     float phi = atan2(tomato_map_y.value() - armlink_loc.y, tomato_map_x.value() - armlink_loc.x);
-    geometry_msgs::PoseStamped tomato;
+    geometry_msgs::msg::PoseStamped tomato;
     tomato.header.frame_id = MAP_FRAME;
     tomato.pose.position.x = tomato_map_x.value() - sin(phi) * 0;
     tomato.pose.position.y = tomato_map_y.value() - cos(phi) * 0;
     tomato.pose.position.z = tomato_map_z.value();
-    tomato.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+    // tomato.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
 
-    manipulator_.MoveGripperToTomato(tomato);
+    // manipulator_.MoveGripperToTomato(tomato);
     return BT::NodeStatus::RUNNING;
 }
 
@@ -220,12 +220,12 @@ BT::NodeStatus ManipulatorGraspTomato::onStart()
  */
 BT::NodeStatus ManipulatorGraspTomato::onRunning()
 {
-    BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
-    if (state != BT::NodeStatus::RUNNING)
-    {   
-        LOG_MANI_STOP(this->name());
-    }
-    return state;
+    // BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
+    // if (state != BT::NodeStatus::RUNNING)
+    // {   
+    //     LOG_MANI_STOP(this->name());
+    // }
+    // return state;
 }
 
 /**
@@ -258,7 +258,7 @@ BT::PortsList ManipulatorGraspTomato::providedPorts()
 ManipulatorPregrasp::ManipulatorPregrasp(const std::string &name, const BT::NodeConfiguration &config)
     : BT::StatefulActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -280,25 +280,25 @@ void ManipulatorPregrasp::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorPregrasp::onStart()
 {
     LOG_MANI_START(this->name());
-    BT::Optional<float> tomato_map_x = getInput<float>("target_x");
-    BT::Optional<float> tomato_map_y = getInput<float>("target_y");
-    BT::Optional<float> tomato_map_z = getInput<float>("target_z");
-    BT::Optional<float> pregresp_offset = getInput<float>("pregrasp_offset");
+    BT::Expected<float> tomato_map_x = getInput<float>("target_x");
+    BT::Expected<float> tomato_map_y = getInput<float>("target_y");
+    BT::Expected<float> tomato_map_z = getInput<float>("target_z");
+    BT::Expected<float> pregresp_offset = getInput<float>("pregrasp_offset");
     if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
     {
-        ROS_ERROR("GOT NO POSE!");
+        // ROS_ERROR("GOT NO POSE!");
         return BT::NodeStatus::FAILURE;
     }
-    geometry_msgs::PoseStamped tomato;
+    geometry_msgs::msg::PoseStamped tomato;
     tomato.header.frame_id = MAP_FRAME;
-    geometry_msgs::Point armlink_loc = ba_helper::GetCurrentArmbaseLocation();
+    geometry_msgs::msg::Point armlink_loc = ba_helper::GetCurrentArmbaseLocation();
     float phi = atan2(tomato_map_y.value() - armlink_loc.y, tomato_map_x.value() - armlink_loc.x);
     tomato.pose.position.x = tomato_map_x.value() - sin(phi) * 0;
     tomato.pose.position.y = tomato_map_y.value() - cos(phi) * 0;
     tomato.pose.position.z = tomato_map_z.value();
-    tomato.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+    // tomato.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
 
-    manipulator_.MoveGripperToPregraspPose(tomato, pregresp_offset.value());
+    // manipulator_.MoveGripperToPregraspPose(tomato, pregresp_offset.value());
     return BT::NodeStatus::RUNNING;
 }
 
@@ -350,7 +350,7 @@ BT::PortsList ManipulatorPregrasp::providedPorts()
 ManipulatorPostgraspRetreat::ManipulatorPostgraspRetreat(const std::string &name, const BT::NodeConfiguration &config)
     : BT::StatefulActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -422,7 +422,7 @@ BT::PortsList ManipulatorPostgraspRetreat::providedPorts()
 ManipulatorDropTomato::ManipulatorDropTomato(const std::string &name)
     : BT::StatefulActionNode(name, {})
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -442,7 +442,7 @@ void ManipulatorDropTomato::init(Manipulator manipulator)
  */
 void ManipulatorDropTomato::init(TomatoQueue &tomato_queue)
 {
-    tomato_queue_ = &tomato_queue;
+    // tomato_queue_ = &tomato_queue;
 }
 
 /**
@@ -454,8 +454,8 @@ void ManipulatorDropTomato::init(TomatoQueue &tomato_queue)
 BT::NodeStatus ManipulatorDropTomato::onStart()
 {
     LOG_MANI_START(this->name());
-    manipulator_.DropTomatoInBasket();
-    ROS_INFO("going to drop tomato in basket");
+    // manipulator_.DropTomatoInBasket();
+    // ROS_INFO("going to drop tomato in basket");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -469,8 +469,8 @@ BT::NodeStatus ManipulatorDropTomato::onRunning()
     BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
     if (state == BT::NodeStatus::SUCCESS)
     {   
-        tomato_queue_->SetTomatoAsPicked();
-        tomato_queue_->AddTomatoToBasketQueue();
+        // tomato_queue_->SetTomatoAsPicked();
+        // tomato_queue_->AddTomatoToBasketQueue();
     }
     if(state != BT::NodeStatus::RUNNING){
         LOG_MANI_STOP(this->name());
@@ -498,7 +498,7 @@ void ManipulatorDropTomato::onHalted() {}
 ManipulatorScanPose::ManipulatorScanPose(const std::string &name)
     : BT::StatefulActionNode(name, {})
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -520,8 +520,8 @@ void ManipulatorScanPose::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorScanPose::onStart()
 {
     LOG_MANI_START(this->name());
-    manipulator_.MoveToScanningPosition();
-    ROS_INFO("moving EE to scan position");
+    // manipulator_.MoveToScanningPosition();
+    // ROS_INFO("moving EE to scan position");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -532,12 +532,12 @@ BT::NodeStatus ManipulatorScanPose::onStart()
  */
 BT::NodeStatus ManipulatorScanPose::onRunning()
 {
-    BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
-    if (state != BT::NodeStatus::RUNNING)
-    {   
-        LOG_MANI_STOP(this->name());
-    }
-    return state;
+    // BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
+    // if (state != BT::NodeStatus::RUNNING)
+    // {   
+    //     LOG_MANI_STOP(this->name());
+    // }
+    // return state;
 }
 
 /**

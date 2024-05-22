@@ -1,26 +1,26 @@
 #pragma region includes
 
-#include "ros/ros.h"
-#include "ros/message.h"
+#include "rclcpp/rclcpp.hpp"
+// #include "ros/message.h"
 #include "ros_logs.h"
-#include <ros/package.h>
+// #include <ros/package.h>
 #include <stdio.h>
 #include <math.h>
 #include <iostream>
 #include "ba_interfaces.h"
 
 
-#include "behaviortree_cpp_v3/behavior_tree.h"
+#include "behaviortree_cpp/behavior_tree.h"
 #include "manipulator.h"
 
-#include "behaviortree_cpp_v3/behavior_tree.h"
-#include <actionlib/client/simple_action_client.h>
-#include <gazebo_msgs/SpawnModel.h>
+#include "behaviortree_cpp/behavior_tree.h"
+// #include <actionlib/client/simple_action_client.h>
+// #include <gazebo_msgs/SpawnModel.h>
 
 #pragma endregion
 
 #define CRITICAL_BATTERY_LEVEL 40
-typedef actionlib::SimpleActionClient<moveit_msgs::MoveGroupAction> MoveGroupClient;
+// typedef actionlib::SimpleActionClient<moveit_msgs::MoveGroupAction> MoveGroupClient;
 
 #pragma region RobotInitializer
 
@@ -32,15 +32,15 @@ class RobotInitializer : public BT::SyncActionNode, public IBAInitManipulatorNod
 {
 public:
     RobotInitializer(const std::string &name, const BT::NodeConfiguration &config);
-    void init(ros::NodeHandle node_handle) override;
+    // void init(ros::NodeHandle node_handle) override;
     void init(Manipulator manipulator) override;
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 
 private:
     Manipulator manipulator_;
-    ros::NodeHandle node_handle_;
-    moveit::core::MoveItErrorCode SetInitialPosition();
+    // ros::NodeHandle node_handle_;
+    // moveit::core::MoveItErrorCode SetInitialPosition();
     void LaunchBasket();
 };
 
@@ -56,18 +56,18 @@ class BatteryCheck : public BT::ConditionNode, public IBAInitNodeHandle
 {
 public:
     BatteryCheck(const std::string &name, const BT::NodeConfiguration &config);
-    void init(ros::NodeHandle node_handle) override;
+    // void init(ros::NodeHandle node_handle) override;
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 
 private:
-    ros::NodeHandle node_handle_;
-    ros::Timer timer_;
+    // ros::NodeHandle node_handle_;
+    // ros::Timer timer_;
     bool battery_empty_;
     float timer_duration_;
     double start_;
 
-    void TimerCallback(const ros::TimerEvent &timer_event);
+    // void TimerCallback(const ros::TimerEvent &timer_event);
 };
 
 #pragma endregion

@@ -2,18 +2,18 @@
 
 #include "behaviortree_cpp/behavior_tree.h"
 // #include <actionlib/client/simple_action_client.h>
-#include "rclcpp_action/rclcpp_action.hpp"
-#include "rclcpp_components/register_node_macro.hpp"
-#include <move_base_msgs/MoveBaseAction.h>
+//#include "rclcpp_action/rclcpp_action.hpp"
+// #include "rclcpp_components/register_node_macro.hpp"
+// #include <move_base_msgs/MoveBaseAction.h>
 #include "yaml-cpp/yaml.h"
 #include <rclcpp/rclcpp.hpp>
 #include <tf2/LinearMath/Quaternion.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "path_queue.h"
 #include "ba_interfaces.h"
 #include "manipulator.h"
 
-#include <tf/tf.h>
+// #include <tf/tf.h>
 
 #include "ros_logs.h"
 
@@ -30,7 +30,7 @@
 
 #pragma endregion
 
-typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
+// typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
 #pragma region SetLocations
 
@@ -90,8 +90,8 @@ public:
   static BT::PortsList providedPorts();
 
 private:
-  MoveBaseClient client_;
-  move_base_msgs::MoveBaseGoal goal_;
+  // MoveBaseClient client_;
+  // move_base_msgs::MoveBaseGoal goal_;
   YAML::Node locations_;
   Manipulator manipulator_;
 };

@@ -26,8 +26,8 @@ enum LogType{log_start, log_stop};
 class BATimeLogger
 {
     public:
-    static void LogScan(geometry_msgs::PoseStamped pose, float radius);
-    static void LogValidate(geometry_msgs::PoseStamped pose, float raduis);
+    static void LogScan(geometry_msgs::msg::PoseStamped pose, float radius);
+    static void LogValidate(geometry_msgs::msg::PoseStamped pose, float raduis);
     static void LogMoveBase(std::string source, LogType type);
     static void LogMoveGroup(std::string source, LogType type);
     static void LogPlanArm(std::string source, LogType type);
@@ -38,7 +38,7 @@ class BATimeLogger
     static std::ofstream file_movegroup;
     static std::ofstream file_scan;
     static std::ofstream file_validate;
-    static std::ofstream file_imageprocessing;
+    // static std::ofstream file_imageprocessing;
     static void LogFile(std::string source, LogType type, std::ofstream &file);
 };
 

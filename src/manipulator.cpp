@@ -8,23 +8,23 @@
  * @brief Construct a new Manipulator:: Manipulator object
  * 
  */
-Manipulator::Manipulator()
-{
-    Manipulator::InitializeSummitXlPoses();
-    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
-    manipulator_ = new moveit::planning_interface::MoveGroupInterface(manipulator_options_);
-    manipulator_->allowReplanning(true);
-}
+// Manipulator::Manipulator()
+// {
+//     Manipulator::InitializeSummitXlPoses();
+//     moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
+//     manipulator_ = new moveit::planning_interface::MoveGroupInterface(manipulator_options_);
+//     manipulator_->allowReplanning(true);
+// }
 
 /**
  * @brief Set the NodeHandle reference object
  * 
  * @param node_handle Reference to the NodeHandle 
  */
-void Manipulator::init(ros::NodeHandle &node_handle)
-{
-    node_handle_ = node_handle;
-}
+// void Manipulator::init(ros::NodeHandle &node_handle)
+// {
+//     node_handle_ = node_handle;
+// }
 
 /**
  * @brief Gets the current status of the node
@@ -34,24 +34,24 @@ void Manipulator::init(ros::NodeHandle &node_handle)
  */
 BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
 {
-    actionlib::SimpleClientGoalState state = manipulator_->getMoveGroupClient().getState();
-    if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
-    {
-        ROS_DEBUG("[%s] reached Pose", name);
-        return BT::NodeStatus::SUCCESS;
-    }
-    else if (state == actionlib::SimpleClientGoalState::ACTIVE ||
-             state == actionlib::SimpleClientGoalState::PENDING ||
-             state == actionlib::SimpleClientGoalState::LOST)
-    {
-        ROS_DEBUG("[%s] moving to Pose", name);
-        return BT::NodeStatus::RUNNING;
-    }
-    else
-    {
-        ROS_ERROR("[%s] Failed to reach Pose!", name);
-        return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
-    }
+    // actionlib::SimpleClientGoalState state = manipulator_->getMoveGroupClient().getState();
+    // if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
+    // {
+    //     ROS_DEBUG("[%s] reached Pose", name);
+    //     return BT::NodeStatus::SUCCESS;
+    // }
+    // else if (state == actionlib::SimpleClientGoalState::ACTIVE ||
+    //          state == actionlib::SimpleClientGoalState::PENDING ||
+    //          state == actionlib::SimpleClientGoalState::LOST)
+    // {
+    //     ROS_DEBUG("[%s] moving to Pose", name);
+    //     return BT::NodeStatus::RUNNING;
+    // }
+    // else
+    // {
+    //     ROS_ERROR("[%s] Failed to reach Pose!", name);
+    //     return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
+    // }
 }
 
 /**
@@ -61,29 +61,29 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
  * @param offset The offset to the end pose
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_msgs::PoseStamped &tomato_pose, float offset)
-{
+// moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_msgs::PoseStamped &tomato_pose, float offset)
+// {
 
-    manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
-    tf::TransformListener listener;
+//     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
+//     tf::TransformListener listener;
 
-    listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
+//     listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
 
-    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
-    float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
-    geometry_msgs::PoseStamped tomato_base_footprint;
-    listener.transformPose(BASE_FRAME, tomato_pose, tomato_base_footprint);
-    tomato_base_footprint.pose.position.z += TCP_OFFSET_Z;
-    float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
-    tomato_base_footprint.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI / 6, angle);
+//     moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
+//     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
+//     geometry_msgs::PoseStamped tomato_base_footprint;
+//     listener.transformPose(BASE_FRAME, tomato_pose, tomato_base_footprint);
+//     tomato_base_footprint.pose.position.z += TCP_OFFSET_Z;
+//     float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
+//     tomato_base_footprint.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI / 6, angle);
 
-    tomato_base_footprint.pose.position.x -= cos(angle) * (offset+TCP_OFFSET_XY);
-    tomato_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
-    manipulator_->setPoseReferenceFrame(tomato_base_footprint.header.frame_id);
-    manipulator_->setPoseTarget(tomato_base_footprint);
-    manipulator_->setPlanningTime(5);
-    return manipulator_->asyncMove();
-}
+//     tomato_base_footprint.pose.position.x -= cos(angle) * (offset+TCP_OFFSET_XY);
+//     tomato_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
+//     manipulator_->setPoseReferenceFrame(tomato_base_footprint.header.frame_id);
+//     manipulator_->setPoseTarget(tomato_base_footprint);
+//     manipulator_->setPlanningTime(5);
+//     return manipulator_->asyncMove();
+// }
 
 /**
  * @brief Moves the gripper to the tomato
@@ -91,23 +91,23 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
  * @param tomato_pose The endpose to reach
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::PoseStamped &tomato_pose)
-{
-    manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_SMALL);
-    tf::TransformListener listener;
-    listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
-    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
-    float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
-    geometry_msgs::PoseStamped tomato_base_footprint;
-    listener.transformPose(BASE_FRAME, tomato_pose, tomato_base_footprint);
-    float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
-    tomato_base_footprint.pose.position.x -= cos(angle) * TCP_OFFSET_XY;
-    tomato_base_footprint.pose.position.y -= sin(angle) * TCP_OFFSET_XY;
-    tomato_base_footprint.pose.position.z += TCP_OFFSET_Z;
-    tomato_base_footprint.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI / 6, angle);
-    MoveLinear(tomato_base_footprint.pose, false);
-    return moveit::core::MoveItErrorCode::SUCCESS;
-}
+// moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::PoseStamped &tomato_pose)
+// {
+//     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_SMALL);
+//     tf::TransformListener listener;
+//     listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
+//     moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
+//     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
+//     geometry_msgs::PoseStamped tomato_base_footprint;
+//     listener.transformPose(BASE_FRAME, tomato_pose, tomato_base_footprint);
+//     float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
+//     tomato_base_footprint.pose.position.x -= cos(angle) * TCP_OFFSET_XY;
+//     tomato_base_footprint.pose.position.y -= sin(angle) * TCP_OFFSET_XY;
+//     tomato_base_footprint.pose.position.z += TCP_OFFSET_Z;
+//     tomato_base_footprint.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI / 6, angle);
+//     MoveLinear(tomato_base_footprint.pose, false);
+//     return moveit::core::MoveItErrorCode::SUCCESS;
+// }
 
 /**
  * @brief Moves the gripper linearly
@@ -116,19 +116,19 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::Po
  * @param check_collision Bool whether to check for collisions or not
  * @return double Return a value that is between 0.0 and 1.0 indicating the fraction of the path achieved as described by the waypoints. Return -1.0 in case of error.
  */
-double Manipulator::MoveLinear(geometry_msgs::Pose end_pose, bool check_collision)
-{
-    std::vector<geometry_msgs::Pose> direction;
-    direction.push_back(end_pose);
-    manipulator_->setPoseReferenceFrame(BASE_FRAME);
-    moveit_msgs::RobotTrajectory trajectory;
-    double res = manipulator_->computeCartesianPath(direction, 0.01, 10, trajectory, check_collision);
-    if (res >= 0)
-    {
-        manipulator_->execute(trajectory);
-    }
-    return res;
-}
+// double Manipulator::MoveLinear(geometry_msgs::Pose end_pose, bool check_collision)
+// {
+//     std::vector<geometry_msgs::Pose> direction;
+//     direction.push_back(end_pose);
+//     manipulator_->setPoseReferenceFrame(BASE_FRAME);
+//     moveit_msgs::RobotTrajectory trajectory;
+//     double res = manipulator_->computeCartesianPath(direction, 0.01, 10, trajectory, check_collision);
+//     if (res >= 0)
+//     {
+//         manipulator_->execute(trajectory);
+//     }
+//     return res;
+// }
 
 /**
  * @brief Moves the gripper linearly based on three coordinates
@@ -138,75 +138,75 @@ double Manipulator::MoveLinear(geometry_msgs::Pose end_pose, bool check_collisio
  * @param z The z coordinate
  * @return double Return a value that is between 0.0 and 1.0 indicating the fraction of the path achieved as described by the waypoints. Return -1.0 in case of error.
  */
-double Manipulator::MoveLinearVec(float x, float y, float z){
-    geometry_msgs::PoseStamped ee = manipulator_->getPoseTarget();
-    tf::TransformListener listener;
-    listener.waitForTransform(BASE_FRAME, ee.header.frame_id,ros::Time(0), ros::Duration(3));
-    geometry_msgs::PoseStamped ee_base_frame;
-    ee_base_frame.header.frame_id = BASE_FRAME;
-    listener.transformPose(BASE_FRAME, ee,ee_base_frame);
-    ee_base_frame.pose.position.x += x;
-    ee_base_frame.pose.position.y += y;
-    ee_base_frame.pose.position.z += z;
-    double res = MoveLinear(ee_base_frame.pose, false);
-    return res;
-}
+// double Manipulator::MoveLinearVec(float x, float y, float z){
+//     geometry_msgs::PoseStamped ee = manipulator_->getPoseTarget();
+//     tf::TransformListener listener;
+//     listener.waitForTransform(BASE_FRAME, ee.header.frame_id,ros::Time(0), ros::Duration(3));
+//     geometry_msgs::PoseStamped ee_base_frame;
+//     ee_base_frame.header.frame_id = BASE_FRAME;
+//     listener.transformPose(BASE_FRAME, ee,ee_base_frame);
+//     ee_base_frame.pose.position.x += x;
+//     ee_base_frame.pose.position.y += y;
+//     ee_base_frame.pose.position.z += z;
+//     double res = MoveLinear(ee_base_frame.pose, false);
+//     return res;
+// }
 
 /**
  * @brief Moves the UR5-Robot to its drop position
  * 
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::DropTomatoInBasket(void)
-{
-    manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_LARGE);
-    manipulator_->setPoseReferenceFrame(BASE_FRAME);
-    manipulator_->setPoseTarget(drop_pose_);
-    manipulator_->setPlanningTime(30);
-    return manipulator_->move();
-}
+// moveit::core::MoveItErrorCode Manipulator::DropTomatoInBasket(void)
+// {
+//     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_LARGE);
+//     manipulator_->setPoseReferenceFrame(BASE_FRAME);
+//     manipulator_->setPoseTarget(drop_pose_);
+//     manipulator_->setPlanningTime(30);
+//     return manipulator_->move();
+// }
 
 /**
  * @brief Moves the UR5-Robot to its initial position due to the basket.
  * 
  * @return moveit::core::MoveItErrorCode 
  */
-moveit::core::MoveItErrorCode Manipulator::MoveToInitialPosition(void) 
-{
-    manipulator_->setGoalJointTolerance(MANIPULATOR_JOINT_TOLERANCE);
-    manipulator_->setPoseReferenceFrame(BASE_FRAME);
-    manipulator_->setJointValueTarget(initial_position_);
-    manipulator_->setPlanningTime(30);
-    return manipulator_->move();
-}
+// moveit::core::MoveItErrorCode Manipulator::MoveToInitialPosition(void) 
+// {
+//     manipulator_->setGoalJointTolerance(MANIPULATOR_JOINT_TOLERANCE);
+//     manipulator_->setPoseReferenceFrame(BASE_FRAME);
+//     manipulator_->setJointValueTarget(initial_position_);
+//     manipulator_->setPlanningTime(30);
+//     return manipulator_->move();
+// }
 
 /**
  * @brief Moves the UR5-Robot to its driving position.
  * 
  * @return moveit::core::MoveItErrorCode 
  */
-moveit::core::MoveItErrorCode Manipulator::MoveToDrivingPosition(void) 
-{
-    manipulator_->setGoalJointTolerance(MANIPULATOR_JOINT_TOLERANCE);
-    manipulator_->setPoseReferenceFrame(BASE_FRAME);
-    manipulator_->setJointValueTarget(driving_position_);
-    manipulator_->setPlanningTime(30);
-    return manipulator_->move();
-}
+// moveit::core::MoveItErrorCode Manipulator::MoveToDrivingPosition(void) 
+// {
+//     manipulator_->setGoalJointTolerance(MANIPULATOR_JOINT_TOLERANCE);
+//     manipulator_->setPoseReferenceFrame(BASE_FRAME);
+//     manipulator_->setJointValueTarget(driving_position_);
+//     manipulator_->setPlanningTime(30);
+//     return manipulator_->move();
+// }
 
 /**
  * @brief Moves the UR5-Robot to its scanning position
  * 
  * @return moveit::core::MoveItErrorCode 
  */
-moveit::core::MoveItErrorCode Manipulator::MoveToScanningPosition(void)
-{
-    manipulator_->setGoalJointTolerance(MANIPULATOR_JOINT_TOLERANCE);
-    manipulator_->setPoseReferenceFrame(BASE_FRAME);
-    manipulator_->setJointValueTarget(scanning_position_);
-    manipulator_->setPlanningTime(30);
-    return manipulator_->move();
-}
+// moveit::core::MoveItErrorCode Manipulator::MoveToScanningPosition(void)
+// {
+//     manipulator_->setGoalJointTolerance(MANIPULATOR_JOINT_TOLERANCE);
+//     manipulator_->setPoseReferenceFrame(BASE_FRAME);
+//     manipulator_->setJointValueTarget(scanning_position_);
+//     manipulator_->setPlanningTime(30);
+//     return manipulator_->move();
+// }
 
 #pragma endregion
 
@@ -230,76 +230,76 @@ void Manipulator::InitializeSummitXlPoses()
  *        no workaround worked reliable for that case 
  * 
  */
-void Manipulator::InitializeInitialPose()
-{
-    std::string yaml_file;
-    ros::param::get("arm_positions", yaml_file);
-    YAML::Node arm_positions = YAML::LoadFile(yaml_file);
-    std::vector<float> joint_angles = arm_positions["initial_joint_angles"].as<std::vector<float>>();
+// void Manipulator::InitializeInitialPose()
+// {
+//     std::string yaml_file;
+//     ros::param::get("arm_positions", yaml_file);
+//     YAML::Node arm_positions = YAML::LoadFile(yaml_file);
+//     std::vector<float> joint_angles = arm_positions["initial_joint_angles"].as<std::vector<float>>();
 
-    initial_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
-    initial_position_["arm_shoulder_lift_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[1]);
-    initial_position_["arm_elbow_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[2]);
-    initial_position_["arm_wrist_1_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[3]);
-    initial_position_["arm_wrist_2_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[4]);
-    initial_position_["arm_wrist_3_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[5]);
-}
+//     initial_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
+//     initial_position_["arm_shoulder_lift_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[1]);
+//     initial_position_["arm_elbow_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[2]);
+//     initial_position_["arm_wrist_1_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[3]);
+//     initial_position_["arm_wrist_2_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[4]);
+//     initial_position_["arm_wrist_3_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[5]);
+// }
 
 /**
  * @brief Initializes the driving pose
  * 
  */
-void Manipulator::InitializeDrivingPose()
-{
-    std::string yaml_file;
-    ros::param::get("arm_positions", yaml_file);
-    YAML::Node arm_positions = YAML::LoadFile(yaml_file);
-    std::vector<float> joint_angles = arm_positions["driving_joint_angles"].as<std::vector<float>>();
+// void Manipulator::InitializeDrivingPose()
+// {
+//     std::string yaml_file;
+//     ros::param::get("arm_positions", yaml_file);
+//     YAML::Node arm_positions = YAML::LoadFile(yaml_file);
+//     std::vector<float> joint_angles = arm_positions["driving_joint_angles"].as<std::vector<float>>();
 
-    driving_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
-    driving_position_["arm_shoulder_lift_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[1]);
-    driving_position_["arm_elbow_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[2]);
-    driving_position_["arm_wrist_1_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[3]);
-    driving_position_["arm_wrist_2_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[4]);
-    driving_position_["arm_wrist_3_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[5]);
-}
+//     driving_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
+//     driving_position_["arm_shoulder_lift_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[1]);
+//     driving_position_["arm_elbow_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[2]);
+//     driving_position_["arm_wrist_1_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[3]);
+//     driving_position_["arm_wrist_2_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[4]);
+//     driving_position_["arm_wrist_3_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[5]);
+// }
 
 /**
  * @brief Initializes the scanning pose
  * 
  */
-void Manipulator::InitializeScanningPose()
-{
-    std::string yaml_file;
-    ros::param::get("arm_positions", yaml_file);
-    YAML::Node arm_positions = YAML::LoadFile(yaml_file);
-    std::vector<float> joint_angles = arm_positions["scan_position_joint_angles"].as<std::vector<float>>();
+// void Manipulator::InitializeScanningPose()
+// {
+//     std::string yaml_file;
+//     ros::param::get("arm_positions", yaml_file);
+//     YAML::Node arm_positions = YAML::LoadFile(yaml_file);
+//     std::vector<float> joint_angles = arm_positions["scan_position_joint_angles"].as<std::vector<float>>();
 
-    scanning_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
-    scanning_position_["arm_shoulder_lift_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[1]);
-    scanning_position_["arm_elbow_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[2]);
-    scanning_position_["arm_wrist_1_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[3]);
-    scanning_position_["arm_wrist_2_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[4]);
-    scanning_position_["arm_wrist_3_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[5]);
-}
+//     scanning_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
+//     scanning_position_["arm_shoulder_lift_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[1]);
+//     scanning_position_["arm_elbow_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[2]);
+//     scanning_position_["arm_wrist_1_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[3]);
+//     scanning_position_["arm_wrist_2_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[4]);
+//     scanning_position_["arm_wrist_3_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[5]);
+// }
 
 /**
  * @brief initialize drop zone: above basket facing downwards
  *
  */
-void Manipulator::InitializeDropPose()
-{
-    std::string yaml_file;
-    ros::param::get("arm_positions", yaml_file);
-    YAML::Node arm_positions = YAML::LoadFile(yaml_file);
-    std::vector<float> pose = arm_positions["dropping_position"].as<std::vector<float>>();
+// void Manipulator::InitializeDropPose()
+// {
+//     std::string yaml_file;
+//     ros::param::get("arm_positions", yaml_file);
+//     YAML::Node arm_positions = YAML::LoadFile(yaml_file);
+//     std::vector<float> pose = arm_positions["dropping_position"].as<std::vector<float>>();
 
-    drop_pose_.header.frame_id = BASE_FRAME;
-    drop_pose_.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(ba_helper::ConvertDegreesToRadians(pose[3]), ba_helper::ConvertDegreesToRadians(pose[4]), ba_helper::ConvertDegreesToRadians(pose[5]));
-    drop_pose_.pose.position.x = pose[0];
-    drop_pose_.pose.position.y = pose[1];
-    drop_pose_.pose.position.z = pose[2];
-}
+//     drop_pose_.header.frame_id = BASE_FRAME;
+//     drop_pose_.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(ba_helper::ConvertDegreesToRadians(pose[3]), ba_helper::ConvertDegreesToRadians(pose[4]), ba_helper::ConvertDegreesToRadians(pose[5]));
+//     drop_pose_.pose.position.x = pose[0];
+//     drop_pose_.pose.position.y = pose[1];
+//     drop_pose_.pose.position.z = pose[2];
+// }
 
 #pragma endregion
 

@@ -3,8 +3,8 @@
 
 #pragma region includes
 
-#include "behaviortree_cpp_v3/behavior_tree.h"
-#include "std_msgs/Float64.h"
+#include "behaviortree_cpp/behavior_tree.h"
+#include "std_msgs/msg/float64.hpp"
 #include "ros_logs.h"
 
 #pragma endregion
@@ -29,11 +29,11 @@ public:
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 private:
-    ros::Publisher grasp_publisher_;
-    ros::Subscriber grasp_subscriber_;
+    // ros::Publisher grasp_publisher_;
+    // ros::Subscriber grasp_subscriber_;
     bool object_attached_;
     bool object_attached_before_;
-    void ResultCallback(const std_msgs::Float64 &message);
+    void ResultCallback(const std_msgs::msg::Float64 &message);
 };
 
 #pragma endregion
