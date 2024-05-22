@@ -1,0 +1,24 @@
+# locations which are pushed to queue / stack as a path
+path_locations:
+  location1: [2, 0.1, 3.1415]
+  location2: [1, 0.1, 3.1415]
+  location3: [0, 0.1, 3.1415]
+  location4: [-1, 0.1, 3.1415]
+  location5: [-2, 0.1, 3.1415]
+  location6: [-3, 0.1, 3.1415]
+  location7: [-3, -1.5, 0]
+  #location7_1:  [-2.5, -1.5, 0]
+  location8: [-2, -1.5, 0]
+  #location8_1:  [-1.5, -1.5, 0]
+  location9: [-1, -1.5, 0]
+  #location9_1:  [-.5, -1.5, 0]
+  location10: [0, -1.5, 0]
+  #location10_1: [0.5, -1.5, 0]
+  location11: [1, -1.5, 0]
+  #location11_1: [1.5, -1.5, 0]
+  location12: [2, -1.5, 0]
+
+# locations as the place to emty the basket
+fixed_locations:
+  empty_basket_location: [3.0, 0, 1.5708]
+  recharge_location: [3.0, 0, 0]

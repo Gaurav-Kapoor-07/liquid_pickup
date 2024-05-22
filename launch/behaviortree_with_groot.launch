@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="id_robot" default="summit_xl" />
+    <group ns="$(arg id_robot)">
+        <node name="behaviortree" pkg="ba_behaviortree" type="bt_node"></node>
+        <node name="check_map" pkg="groot" type="Groot"></node>   
+    </group>
+</launch>

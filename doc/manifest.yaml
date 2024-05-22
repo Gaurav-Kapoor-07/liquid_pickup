@@ -1,0 +1,25 @@
+actions: []
+authors: Mirco Huber <hubermir@students.zhaw.ch>, Silas Hirschi <hirscsil@students.zhaw.ch>
+brief: ''
+bugtracker: ''
+depends:
+- actionlib
+- move_base_msgs
+- pcl_conversions
+- tb3_worlds
+- pcl_ros
+- gazebo_ros_link_attacher
+- sensor_msgs
+- roscpp
+- catkin
+- cv_bridge
+- image_transport
+- behaviortree_cpp_v3
+description: Behaviortree Control Architecture for robot behavior
+license: MIT
+maintainers: Mirco Huber <hubermir@students.zhaw.ch>, Silas Hirschi <hirscsil@students.zhaw.ch>
+msgs: []
+package_type: package
+repo_url: ''
+srvs: []
+url: ''
