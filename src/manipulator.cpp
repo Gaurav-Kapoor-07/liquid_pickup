@@ -8,13 +8,13 @@
  * @brief Construct a new Manipulator:: Manipulator object
  * 
  */
-// Manipulator::Manipulator()
-// {
-//     Manipulator::InitializeSummitXlPoses();
-//     moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
-//     manipulator_ = new moveit::planning_interface::MoveGroupInterface(manipulator_options_);
-//     manipulator_->allowReplanning(true);
-// }
+Manipulator::Manipulator()
+{
+    Manipulator::InitializeSummitXlPoses();
+    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
+    // manipulator_ = new moveit::planning_interface::MoveGroupInterface(manipulator_options_);
+    // manipulator_->allowReplanning(true);
+}
 
 /**
  * @brief Set the NodeHandle reference object
@@ -52,6 +52,7 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
     //     ROS_ERROR("[%s] Failed to reach Pose!", name);
     //     return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
     // }
+    return BT::NodeStatus::FAILURE; // delete later
 }
 
 /**
@@ -116,19 +117,20 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
  * @param check_collision Bool whether to check for collisions or not
  * @return double Return a value that is between 0.0 and 1.0 indicating the fraction of the path achieved as described by the waypoints. Return -1.0 in case of error.
  */
-// double Manipulator::MoveLinear(geometry_msgs::Pose end_pose, bool check_collision)
-// {
-//     std::vector<geometry_msgs::Pose> direction;
-//     direction.push_back(end_pose);
-//     manipulator_->setPoseReferenceFrame(BASE_FRAME);
-//     moveit_msgs::RobotTrajectory trajectory;
-//     double res = manipulator_->computeCartesianPath(direction, 0.01, 10, trajectory, check_collision);
-//     if (res >= 0)
-//     {
-//         manipulator_->execute(trajectory);
-//     }
-//     return res;
-// }
+double Manipulator::MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision)
+{
+    // std::vector<geometry_msgs::Pose> direction;
+    // direction.push_back(end_pose);
+    // manipulator_->setPoseReferenceFrame(BASE_FRAME);
+    // moveit_msgs::RobotTrajectory trajectory;
+    // double res = manipulator_->computeCartesianPath(direction, 0.01, 10, trajectory, check_collision);
+    // if (res >= 0)
+    // {
+    //     manipulator_->execute(trajectory);
+    // }
+    // return res;
+    return 0;
+}
 
 /**
  * @brief Moves the gripper linearly based on three coordinates
@@ -138,19 +140,20 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
  * @param z The z coordinate
  * @return double Return a value that is between 0.0 and 1.0 indicating the fraction of the path achieved as described by the waypoints. Return -1.0 in case of error.
  */
-// double Manipulator::MoveLinearVec(float x, float y, float z){
-//     geometry_msgs::PoseStamped ee = manipulator_->getPoseTarget();
-//     tf::TransformListener listener;
-//     listener.waitForTransform(BASE_FRAME, ee.header.frame_id,ros::Time(0), ros::Duration(3));
-//     geometry_msgs::PoseStamped ee_base_frame;
-//     ee_base_frame.header.frame_id = BASE_FRAME;
-//     listener.transformPose(BASE_FRAME, ee,ee_base_frame);
-//     ee_base_frame.pose.position.x += x;
-//     ee_base_frame.pose.position.y += y;
-//     ee_base_frame.pose.position.z += z;
-//     double res = MoveLinear(ee_base_frame.pose, false);
-//     return res;
-// }
+double Manipulator::MoveLinearVec(float x, float y, float z){
+    // geometry_msgs::PoseStamped ee = manipulator_->getPoseTarget();
+    // tf::TransformListener listener;
+    // listener.waitForTransform(BASE_FRAME, ee.header.frame_id,ros::Time(0), ros::Duration(3));
+    // geometry_msgs::PoseStamped ee_base_frame;
+    // ee_base_frame.header.frame_id = BASE_FRAME;
+    // listener.transformPose(BASE_FRAME, ee,ee_base_frame);
+    // ee_base_frame.pose.position.x += x;
+    // ee_base_frame.pose.position.y += y;
+    // ee_base_frame.pose.position.z += z;
+    // double res = MoveLinear(ee_base_frame.pose, false);
+    // return res;
+    return 0;
+}
 
 /**
  * @brief Moves the UR5-Robot to its drop position
@@ -230,9 +233,9 @@ void Manipulator::InitializeSummitXlPoses()
  *        no workaround worked reliable for that case 
  * 
  */
-// void Manipulator::InitializeInitialPose()
-// {
-//     std::string yaml_file;
+void Manipulator::InitializeInitialPose()
+{
+    std::string yaml_file;
 //     ros::param::get("arm_positions", yaml_file);
 //     YAML::Node arm_positions = YAML::LoadFile(yaml_file);
 //     std::vector<float> joint_angles = arm_positions["initial_joint_angles"].as<std::vector<float>>();
@@ -243,15 +246,15 @@ void Manipulator::InitializeSummitXlPoses()
 //     initial_position_["arm_wrist_1_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[3]);
 //     initial_position_["arm_wrist_2_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[4]);
 //     initial_position_["arm_wrist_3_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[5]);
-// }
+}
 
 /**
  * @brief Initializes the driving pose
  * 
  */
-// void Manipulator::InitializeDrivingPose()
-// {
-//     std::string yaml_file;
+void Manipulator::InitializeDrivingPose()
+{
+    std::string yaml_file;
 //     ros::param::get("arm_positions", yaml_file);
 //     YAML::Node arm_positions = YAML::LoadFile(yaml_file);
 //     std::vector<float> joint_angles = arm_positions["driving_joint_angles"].as<std::vector<float>>();
@@ -262,15 +265,15 @@ void Manipulator::InitializeSummitXlPoses()
 //     driving_position_["arm_wrist_1_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[3]);
 //     driving_position_["arm_wrist_2_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[4]);
 //     driving_position_["arm_wrist_3_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[5]);
-// }
+}
 
 /**
  * @brief Initializes the scanning pose
  * 
  */
-// void Manipulator::InitializeScanningPose()
-// {
-//     std::string yaml_file;
+void Manipulator::InitializeScanningPose()
+{
+    std::string yaml_file;
 //     ros::param::get("arm_positions", yaml_file);
 //     YAML::Node arm_positions = YAML::LoadFile(yaml_file);
 //     std::vector<float> joint_angles = arm_positions["scan_position_joint_angles"].as<std::vector<float>>();
@@ -281,15 +284,15 @@ void Manipulator::InitializeSummitXlPoses()
 //     scanning_position_["arm_wrist_1_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[3]);
 //     scanning_position_["arm_wrist_2_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[4]);
 //     scanning_position_["arm_wrist_3_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[5]);
-// }
+}
 
 /**
  * @brief initialize drop zone: above basket facing downwards
  *
  */
-// void Manipulator::InitializeDropPose()
-// {
-//     std::string yaml_file;
+void Manipulator::InitializeDropPose()
+{
+    std::string yaml_file;
 //     ros::param::get("arm_positions", yaml_file);
 //     YAML::Node arm_positions = YAML::LoadFile(yaml_file);
 //     std::vector<float> pose = arm_positions["dropping_position"].as<std::vector<float>>();
@@ -299,7 +302,7 @@ void Manipulator::InitializeSummitXlPoses()
 //     drop_pose_.pose.position.x = pose[0];
 //     drop_pose_.pose.position.y = pose[1];
 //     drop_pose_.pose.position.z = pose[2];
-// }
+}
 
 #pragma endregion
 

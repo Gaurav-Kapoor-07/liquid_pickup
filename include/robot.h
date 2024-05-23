@@ -13,7 +13,7 @@
 #include "behaviortree_cpp/behavior_tree.h"
 #include "manipulator.h"
 
-#include "behaviortree_cpp/behavior_tree.h"
+// #include "behaviortree_cpp/behavior_tree.h"
 // #include <actionlib/client/simple_action_client.h>
 // #include <gazebo_msgs/SpawnModel.h>
 
@@ -33,15 +33,15 @@ class RobotInitializer : public BT::SyncActionNode, public IBAInitManipulatorNod
 public:
     RobotInitializer(const std::string &name, const BT::NodeConfiguration &config);
     // void init(ros::NodeHandle node_handle) override;
-    void init(Manipulator manipulator) override;
+    // void init(Manipulator manipulator) override;
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 
 private:
-    Manipulator manipulator_;
+    // Manipulator manipulator_;
     // ros::NodeHandle node_handle_;
     // moveit::core::MoveItErrorCode SetInitialPosition();
-    void LaunchBasket();
+    // void LaunchBasket();
 };
 
 #pragma endregion

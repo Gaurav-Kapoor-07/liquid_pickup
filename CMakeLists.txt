@@ -45,7 +45,7 @@ find_package(std_msgs REQUIRED)
 include_directories(include ${CMAKE_SOURCE_DIR}/../BehaviorTree.CPP/src) 
 
 set(BT_SOURCES
-    src/navigation_behaviors.cpp 
+    # src/navigation_behaviors.cpp 
     # src/vision_behaviors.cpp
     src/manipulator.cpp
     src/manipulator_behaviors.cpp

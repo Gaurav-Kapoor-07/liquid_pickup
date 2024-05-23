@@ -9,7 +9,7 @@
 // #include <actionlib/client/simple_action_client.h>
 #include "manipulator.h"
 #include "ros_logs.h"
-#include "tomato_queue.h"
+// #include "tomato_queue.h"
 #include <math.h>
 #include "ba_interfaces.h"
 #include "std_msgs/msg/float64.hpp"
@@ -30,49 +30,49 @@
 
 // typedef actionlib::SimpleActionClient<moveit_msgs::MoveGroupAction> MoveGroupClient;
 
-#pragma region DequeueTomato
+// #pragma region DequeueTomato
 
 /**
  * @brief Gets location from a queue of locations read from a list
  * 
  */
-class DequeueTomato : public BT::SyncActionNode, public IBAInitTomatoQueue
-{
-public:
-    DequeueTomato(const std::string &name, const BT::NodeConfiguration &config);
-    void init(TomatoQueue &tqueue) override;
-    BT::NodeStatus tick() override;
-    static BT::PortsList providedPorts();
+// class DequeueTomato : public BT::SyncActionNode, public IBAInitTomatoQueue
+// {
+// public:
+//     DequeueTomato(const std::string &name, const BT::NodeConfiguration &config);
+//     void init(TomatoQueue &tqueue) override;
+//     BT::NodeStatus tick() override;
+//     static BT::PortsList providedPorts();
 
-private:
-    TomatoQueue *tomato_queue_;
-    std::list<TomatoCoordinates> reachable_tomatoes_;
-    geometry_msgs::msg::PoseStamped TransformTomatoToPose(TomatoCoordinates tomato, std::string frame);
-};
+// private:
+//     TomatoQueue *tomato_queue_;
+//     std::list<TomatoCoordinates> reachable_tomatoes_;
+//     geometry_msgs::msg::PoseStamped TransformTomatoToPose(TomatoCoordinates tomato, std::string frame);
+// };
 
-#pragma endregion
+// #pragma endregion
 
-#pragma region FilterTomatoQueue
+// #pragma region FilterTomatoQueue
 
 /**
  * @brief Filters the tomato queue to only keep the reachable ones
  * 
  */
-class FilterTomatoQueue : public BT::SyncActionNode, public IBAInitTomatoQueue
-{
-public:
-    FilterTomatoQueue(const std::string &name, const BT::NodeConfiguration &config);
-    void init(TomatoQueue &tomato_queue) override;
-    BT::NodeStatus tick() override;
-    static BT::PortsList providedPorts();
+// class FilterTomatoQueue : public BT::SyncActionNode, public IBAInitTomatoQueue
+// {
+// public:
+//     FilterTomatoQueue(const std::string &name, const BT::NodeConfiguration &config);
+//     void init(TomatoQueue &tomato_queue) override;
+//     BT::NodeStatus tick() override;
+//     static BT::PortsList providedPorts();
 
-private:
-    TomatoQueue *tomato_queue_;
-};
+// private:
+//     TomatoQueue *tomato_queue_;
+// };
 
-#pragma endregion
+// #pragma endregion
 
-#pragma region ManipulatorGraspTomato
+// #pragma region ManipulatorGraspTomato
 
 /**
  * @brief Class/Behavior which grasps a tomato
@@ -150,14 +150,14 @@ class ManipulatorDropTomato : public BT::StatefulActionNode, public IBAInitManip
 public:
     ManipulatorDropTomato(const std::string &name);
     void init(Manipulator manipulator) override;
-    void init(TomatoQueue &tomato_queue) override;
+    // void init(TomatoQueue &tomato_queue) override;
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
 
 private:
     Manipulator manipulator_;
-    TomatoQueue *tomato_queue_;
+    // TomatoQueue *tomato_queue_;
 };
 
 #pragma endregion
