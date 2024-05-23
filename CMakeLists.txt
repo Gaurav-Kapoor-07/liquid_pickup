@@ -19,6 +19,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(std_msgs REQUIRED)
 
 # find_package(rclcpp_action REQUIRED)
 
@@ -48,10 +49,11 @@ set(BT_SOURCES
     # src/vision_behaviors.cpp
     src/manipulator.cpp
     src/manipulator_behaviors.cpp
-    # src/gripper_behavior.cpp
+    src/gripper_behavior.cpp
     src/robot.cpp
-    src/path_queue.cpp
+    # src/path_queue.cpp
     src/helper.cpp
+    src/time_logger.cpp
 )
 
 # add_library(pathqueue src/path_queue.cpp)
@@ -59,7 +61,7 @@ set(BT_SOURCES
 # target_link_libraries(pathqueue ${rclcpp_LIBRARIES} rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs)
 
 add_executable(liquid_pickup_node src/bt_node.cpp ${BT_SOURCES})
-ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp)
+ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp std_msgs)
 
 install(TARGETS
     liquid_pickup_node

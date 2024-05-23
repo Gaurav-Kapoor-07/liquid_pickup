@@ -22,9 +22,9 @@
 
 #include "manipulator.h"
 #include "helper.h"
-#include "basket.h"
-#include "tomato_queue.h"
-#include "path_queue.h"
+// #include "basket.h"
+// #include "tomato_queue.h"
+// #include "path_queue.h"
 #include "robot.h"
 #include "ba_types.h"
 
@@ -47,8 +47,8 @@ int main(int argc, char **argv)
     // async_spinner.start();
     Manipulator manipulator;
 
-    TomatoQueue tomato_queue_;
-    PathQueue p_queue;
+    // TomatoQueue tomato_queue_;
+    // PathQueue p_queue;
 
     // Build a behavior tree from XML and set it up for logging
     std::string behavior_tree_type;
@@ -63,18 +63,18 @@ int main(int argc, char **argv)
     // factory.registerNodeType<LookForObject>("LookForObject");
     // factory.registerNodeType<ValidateTomato>("ValidateTomato");
     factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
-    factory.registerNodeType<DequeueTomato>("DequeueTomato");
+    // factory.registerNodeType<DequeueTomato>("DequeueTomato");
     factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
     factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
-    factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
+    // factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
     factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
     factory.registerNodeType<ManipulatorScanPose>("ScanPose");
-    factory.registerNodeType<BasketCheck>("BasketFull");
-    factory.registerNodeType<BasketChange>("ChangeBasket");
+    // factory.registerNodeType<BasketCheck>("BasketFull");
+    // factory.registerNodeType<BasketChange>("ChangeBasket");
     factory.registerNodeType<GripperActuator>("ChangeGripper");
     factory.registerNodeType<SaveCurrentLocation>("SaveCurrentLocation");
     factory.registerNodeType<WriteChargingLocationToQueue>("WriteChargingLocationToQueue");
-    factory.registerNodeType<WriteBasketChangeLocationToQueue>("WriteBasketChangeLocationToQueue");
+    // factory.registerNodeType<WriteBasketChangeLocationToQueue>("WriteBasketChangeLocationToQueue");
     factory.registerNodeType<BatteryCharge>("BatteryCharge");
     factory.registerNodeType<BatteryCheck>("BatteryCheck");
     try
@@ -89,25 +89,25 @@ int main(int argc, char **argv)
         std::cerr << e.what() << '\n';
     }
 
-    // for (auto &node : tree.nodes)
-    // {
-    //     if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node.get()))
-    //     {
-    //         // vis_node->init(nh);
-    //     }
-    //     if (auto vis_node = dynamic_cast<IBAInitManipulatorNode *>(node.get()))
-    //     {
-    //         vis_node->init(manipulator);
-    //     }
-    //     if (auto vis_node = dynamic_cast<IBAInitTomatoQueue *>(node.get()))
-    //     {
-    //         vis_node->init(tomato_queue_);
-    //     }
-    //     if (auto vis_node = dynamic_cast<IBAInitPathQueue *>(node.get()))
-    //     {
-    //         vis_node->init(p_queue);
-    //     }
-    // }
+    for (auto &node : tree.nodes)
+    {
+        if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node.get()))
+        {
+            // vis_node->init(nh);
+        }
+        if (auto vis_node = dynamic_cast<IBAInitManipulatorNode *>(node.get()))
+        {
+            vis_node->init(manipulator);
+        }
+        // if (auto vis_node = dynamic_cast<IBAInitTomatoQueue *>(node.get()))
+        // {
+        //     vis_node->init(tomato_queue_);
+        // }
+        if (auto vis_node = dynamic_cast<IBAInitPathQueue *>(node.get()))
+        {
+            vis_node->init(p_queue);
+        }
+    }
 
     unsigned max_msg_per_second = 25;
     unsigned publisher_port = 1666;

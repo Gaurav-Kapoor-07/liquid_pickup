@@ -11,7 +11,7 @@
 #define FILE_MOVEBASE   "move_base.csv"
 #define FILE_MOVEARM    "move_group.csv"
 #define FILE_PLANARM    "plan_move_group.csv"
-#define FILE_VISION     "image_processing.csv"
+// #define FILE_VISION     "image_processing.csv"
 #define FILE_SCAN       "loc_scan.csv"
 #define FILE_VALIDATE   "loc_validate.csv"
 
@@ -31,7 +31,7 @@ class BATimeLogger
     static void LogMoveBase(std::string source, LogType type);
     static void LogMoveGroup(std::string source, LogType type);
     static void LogPlanArm(std::string source, LogType type);
-    static void LogImageProcessing(std::string source, LogType type);
+    // static void LogImageProcessing(std::string source, LogType type);
     static void InitFiles(void);
     static void CloseFiles(void);
     static std::ofstream file_movebase;

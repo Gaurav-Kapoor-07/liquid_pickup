@@ -2,7 +2,7 @@
 
 std::ofstream BATimeLogger::file_movebase;
 std::ofstream BATimeLogger::file_movegroup;
-std::ofstream BATimeLogger::file_imageprocessing;
+// std::ofstream BATimeLogger::file_imageprocessing;
 std::ofstream BATimeLogger::file_scan;
 std::ofstream BATimeLogger::file_validate;
 
@@ -14,12 +14,12 @@ std::ofstream BATimeLogger::file_validate;
 void BATimeLogger::InitFiles(void){
     file_movebase.open(FILE_MOVEBASE,std::ios_base::app);
     file_movegroup.open(FILE_MOVEARM,std::ios_base::app);
-    file_imageprocessing.open(FILE_VISION,std::ios_base::app);
+    // file_imageprocessing.open(FILE_VISION,std::ios_base::app);
     file_scan.open(FILE_SCAN,std::ios_base::app);
     file_validate.open(FILE_VALIDATE, std::ios_base::app);
     file_movebase << "\n\n NEW RUN\n";
     file_movegroup << "\n\n NEW RUN\n";
-    file_imageprocessing << "\n\n NEW RUN\n";
+    // file_imageprocessing << "\n\n NEW RUN\n";
 }
 
 /**
@@ -29,7 +29,7 @@ void BATimeLogger::InitFiles(void){
 void BATimeLogger::CloseFiles(void){
     file_movebase.close();
     file_movegroup.close();
-    file_imageprocessing.close();
+    // file_imageprocessing.close();
     file_scan.close();
     file_validate.close();
 }
@@ -40,7 +40,7 @@ void BATimeLogger::CloseFiles(void){
  * @param pose PoseStamped pose of the tomato in map_frame
  * @param radius radius of the tomato in m
  */
-void BATimeLogger::LogValidate(geometry_msgs::PoseStamped pose, float radius){
+void BATimeLogger::LogValidate(geometry_msgs::msg::PoseStamped pose, float radius){
     file_validate<<pose.pose.position.x<<";"<<pose.pose.position.y<<";"<<pose.pose.position.z<<";"<<radius<<"\n";
 }
 
@@ -50,7 +50,7 @@ void BATimeLogger::LogValidate(geometry_msgs::PoseStamped pose, float radius){
  * @param pose PoseStamped pose of the tomato in map_frame
  * @param radius radius of the tomato in m
  */
-void BATimeLogger::LogScan(geometry_msgs::PoseStamped pose, float radius){
+void BATimeLogger::LogScan(geometry_msgs::msg::PoseStamped pose, float radius){
     file_scan<<pose.pose.position.x<<";"<<pose.pose.position.y<<";"<<pose.pose.position.z<<";"<<radius<<"\n";
 }
 
@@ -96,6 +96,6 @@ void BATimeLogger::LogMoveGroup(std::string source, LogType type){
  * @param source name of the behavior; is logged in first column
  * @param type logtype start or stop
  */
-void BATimeLogger::LogImageProcessing(std::string source, LogType type){
-    LogFile(source, type, file_imageprocessing);
-}
+// void BATimeLogger::LogImageProcessing(std::string source, LogType type){
+//     LogFile(source, type, file_imageprocessing);
+// }
