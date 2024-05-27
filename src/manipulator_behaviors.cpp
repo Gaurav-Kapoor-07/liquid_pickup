@@ -191,15 +191,15 @@ void ManipulatorGraspTomato::init(Manipulator manipulator)
  */
 BT::NodeStatus ManipulatorGraspTomato::onStart()
 {
-    // LOG_MANI_START(this->name());
-    // BT::Expected<float> tomato_map_x = getInput<float>("target_x");
-    // BT::Expected<float> tomato_map_y = getInput<float>("target_y");
-    // BT::Expected<float> tomato_map_z = getInput<float>("target_z");
-    // if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
-    // {
-    //     // ROS_ERROR("GOT NO POSE!");
-    //     return BT::NodeStatus::FAILURE;
-    // }
+    LOG_MANI_START(this->name());
+    BT::Expected<float> tomato_map_x = getInput<float>("target_x");
+    BT::Expected<float> tomato_map_y = getInput<float>("target_y");
+    BT::Expected<float> tomato_map_z = getInput<float>("target_z");
+    if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
+    {
+        // ROS_ERROR("GOT NO POSE!");
+        return BT::NodeStatus::FAILURE;
+    }
     // geometry_msgs::msg::Point armlink_loc = ba_helper::GetCurrentArmbaseLocation();
     // float phi = atan2(tomato_map_y.value() - armlink_loc.y, tomato_map_x.value() - armlink_loc.x);
     // geometry_msgs::msg::PoseStamped tomato;
@@ -220,13 +220,13 @@ BT::NodeStatus ManipulatorGraspTomato::onStart()
  */
 BT::NodeStatus ManipulatorGraspTomato::onRunning()
 {
-    // BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
-    // if (state != BT::NodeStatus::RUNNING)
-    // {   
-    //     LOG_MANI_STOP(this->name());
-    // }
-    // return state;
-    return BT::NodeStatus::RUNNING; // remove later
+    BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
+    if (state != BT::NodeStatus::RUNNING)
+    {   
+        LOG_MANI_STOP(this->name());
+    }
+    return state;
+
 }
 
 /**
@@ -259,7 +259,7 @@ BT::PortsList ManipulatorGraspTomato::providedPorts()
 ManipulatorPregrasp::ManipulatorPregrasp(const std::string &name, const BT::NodeConfiguration &config)
     : BT::StatefulActionNode(name, config)
 {
-    // ROS_LOG_INIT(this->name().c_str());
+    ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -287,7 +287,7 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
     BT::Expected<float> pregresp_offset = getInput<float>("pregrasp_offset");
     if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
     {
-        // ROS_ERROR("GOT NO POSE!");
+        RCLCPP_ERROR(rclcpp::get_logger("ManipulatorPregrasp"), "GOT NO POSE!");
         return BT::NodeStatus::FAILURE;
     }
     geometry_msgs::msg::PoseStamped tomato;
@@ -297,9 +297,13 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
     tomato.pose.position.x = tomato_map_x.value() - sin(phi) * 0;
     tomato.pose.position.y = tomato_map_y.value() - cos(phi) * 0;
     tomato.pose.position.z = tomato_map_z.value();
-    // tomato.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
 
-    // manipulator_.MoveGripperToPregraspPose(tomato, pregresp_offset.value());
+    tf2::Quaternion tf2_quat;
+    tf2_quat.setRPY(0, 0, 0);
+    geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
+    tomato.pose.orientation = msg_quat;
+
+    manipulator_.MoveGripperToPregraspPose(tomato, pregresp_offset.value());
     return BT::NodeStatus::RUNNING;
 }
 
@@ -351,7 +355,7 @@ BT::PortsList ManipulatorPregrasp::providedPorts()
 ManipulatorPostgraspRetreat::ManipulatorPostgraspRetreat(const std::string &name, const BT::NodeConfiguration &config)
     : BT::StatefulActionNode(name, config)
 {
-    // ROS_LOG_INIT(this->name().c_str());
+    ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -423,7 +427,7 @@ BT::PortsList ManipulatorPostgraspRetreat::providedPorts()
 ManipulatorDropTomato::ManipulatorDropTomato(const std::string &name)
     : BT::StatefulActionNode(name, {})
 {
-    // ROS_LOG_INIT(this->name().c_str());
+    ROS_LOG_INIT(this->name().c_str());
 }
 
 /**

@@ -22,6 +22,7 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
 // #include <move_base_msgs/MoveBaseAction.h>
+#include <string>
 
 #include "ba_frames_summit_xl.h"
 
@@ -54,10 +55,11 @@ class Manipulator
 {
 public:
     Manipulator();
-    // void init(ros::NodeHandle& node_handle);
+    void init(rclcpp::Node::SharedPtr node_handle);
+
     BT::NodeStatus GetNodeStatus(const char* name);
-    // moveit::core::MoveItErrorCode MoveGripperToPregraspPose(geometry_msgs::PoseStamped& tomato_pose, float offset);
-    // moveit::core::MoveItErrorCode MoveGripperToTomato(geometry_msgs::PoseStamped& tomato_pose);
+    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped& tomato_pose, float offset);
+    moveit::core::MoveItErrorCode MoveGripperToTomato(geometry_msgs::msg::PoseStamped& tomato_pose);
     double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
     double MoveLinearVec(float x, float y, float z);
     // moveit::core::MoveItErrorCode DropTomatoInBasket(void);
@@ -65,10 +67,10 @@ public:
     // moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
     // moveit::core::MoveItErrorCode MoveToScanningPosition(void);
 private:
-    // moveit::planning_interface::MoveGroupInterface *manipulator_;
+    moveit::planning_interface::MoveGroupInterface *manipulator_;
     geometry_msgs::msg::PoseStamped drop_pose_;
     std::map<std::string, double> initial_position_, driving_position_, scanning_position_;
-    // ros::NodeHandle node_handle_;
+    rclcpp::Node::SharedPtr node_handle_;
     void InitializeSummitXlPoses(void);
     void InitializeInitialPose(void);
     void InitializeDrivingPose(void);

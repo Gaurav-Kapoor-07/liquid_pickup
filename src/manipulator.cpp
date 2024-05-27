@@ -21,10 +21,10 @@ Manipulator::Manipulator()
  * 
  * @param node_handle Reference to the NodeHandle 
  */
-// void Manipulator::init(ros::NodeHandle &node_handle)
-// {
-//     node_handle_ = node_handle;
-// }
+void Manipulator::init(rclcpp::Node::SharedPtr node_handle)
+{
+    node_handle_ = node_handle;
+}
 
 /**
  * @brief Gets the current status of the node
@@ -62,29 +62,59 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
  * @param offset The offset to the end pose
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-// moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_msgs::PoseStamped &tomato_pose, float offset)
-// {
+moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped &tomato_pose, float offset)
+{
+    manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
+    // tf::TransformListener listener;
+    // tf2_ros::TransformListener listener;
 
-//     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
-//     tf::TransformListener listener;
+    std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
+    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
-//     listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
+    tf_listener_ =
+        std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
-//     moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
-//     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
-//     geometry_msgs::PoseStamped tomato_base_footprint;
-//     listener.transformPose(BASE_FRAME, tomato_pose, tomato_base_footprint);
-//     tomato_base_footprint.pose.position.z += TCP_OFFSET_Z;
-//     float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
-//     tomato_base_footprint.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI / 6, angle);
+    geometry_msgs::msg::TransformStamped t;
 
-//     tomato_base_footprint.pose.position.x -= cos(angle) * (offset+TCP_OFFSET_XY);
-//     tomato_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
-//     manipulator_->setPoseReferenceFrame(tomato_base_footprint.header.frame_id);
-//     manipulator_->setPoseTarget(tomato_base_footprint);
-//     manipulator_->setPlanningTime(5);
-//     return manipulator_->asyncMove();
-// }
+    // Look up for the transformation between target_frame and turtle2 frames
+    // and send velocity commands for turtle2 to reach target_frame
+    try {
+        t = tf_buffer_->lookupTransform(
+            BASE_FRAME, tomato_pose.header.frame_id,
+            tf2::TimePointZero);
+    }   catch (const tf2::TransformException & ex) {
+        RCLCPP_INFO(rclcpp::get_logger("MoveGripperToPregraspPose"),
+            "Could not transform %s to %s: %s",
+            BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
+    }
+
+    // listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
+
+    auto node = std::make_shared<rclcpp::Node>("MoveGripperToPregraspPose");
+    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
+    moveit::planning_interface::MoveGroupInterface move_group(node, manipulator_options_);
+
+    float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
+    geometry_msgs::msg::PoseStamped tomato_base_footprint;
+    // listener.transformPose(BASE_FRAME, tomato_pose, tomato_base_footprint);
+    tf2::doTransform(tomato_pose, tomato_base_footprint, tf_buffer_->lookupTransform(
+            BASE_FRAME, tomato_pose.header.frame_id,
+            tf2::TimePointZero));
+    
+    tomato_base_footprint.pose.position.z += TCP_OFFSET_Z;
+    float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
+    // tomato_base_footprint.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI / 6, angle);
+    tf2::Quaternion tf2_quat;
+    tf2_quat.setRPY(0, M_PI / 6, angle);
+    geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
+    tomato_base_footprint.pose.orientation = msg_quat;
+    tomato_base_footprint.pose.position.x -= cos(angle) * (offset+TCP_OFFSET_XY);
+    tomato_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
+    manipulator_->setPoseReferenceFrame(tomato_base_footprint.header.frame_id);
+    manipulator_->setPoseTarget(tomato_base_footprint);
+    manipulator_->setPlanningTime(5);
+    return manipulator_->asyncMove();
+}
 
 /**
  * @brief Moves the gripper to the tomato
