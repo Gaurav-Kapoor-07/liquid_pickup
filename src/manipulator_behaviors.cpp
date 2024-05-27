@@ -165,13 +165,13 @@
  * @param name The name of the behavior
  * @param config The node configuration
  */
-// ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config)
-//     : BT::StatefulActionNode(name, config),
-//       client_("/summit_xl/move_group", true)
-// {
-//     client_.waitForServer();
-//     ROS_LOG_INIT(this->name().c_str());
-// }
+ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config)
+    : BT::StatefulActionNode(name, config),
+      client_(rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(rclcpp::Node::make_shared(""), "/summit_xl/move_group", nullptr, rcl_action_client_get_default_options()))
+{
+    client_->wait_for_action_server();
+    ROS_LOG_INIT(this->name().c_str());
+}
 
 /**
  * @brief Set the Manipulator object
@@ -226,6 +226,7 @@ BT::NodeStatus ManipulatorGraspTomato::onRunning()
     //     LOG_MANI_STOP(this->name());
     // }
     // return state;
+    return BT::NodeStatus::RUNNING; // remove later
 }
 
 /**

@@ -32,14 +32,14 @@ class RobotInitializer : public BT::SyncActionNode, public IBAInitManipulatorNod
 {
 public:
     RobotInitializer(const std::string &name, const BT::NodeConfiguration &config);
-    // void init(ros::NodeHandle node_handle) override;
-    // void init(Manipulator manipulator) override;
+    void init(std::shared_ptr<rclcpp::Node> node_handle) override;
+    void init(Manipulator manipulator) override;
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 
 private:
-    // Manipulator manipulator_;
-    // ros::NodeHandle node_handle_;
+    Manipulator manipulator_;
+    std::shared_ptr<rclcpp::Node> node_handle_;
     // moveit::core::MoveItErrorCode SetInitialPosition();
     // void LaunchBasket();
 };
@@ -56,12 +56,12 @@ class BatteryCheck : public BT::ConditionNode, public IBAInitNodeHandle
 {
 public:
     BatteryCheck(const std::string &name, const BT::NodeConfiguration &config);
-    // void init(ros::NodeHandle node_handle) override;
+    void init(std::shared_ptr<rclcpp::Node> node_handle) override;
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 
 private:
-    // ros::NodeHandle node_handle_;
+    std::shared_ptr<rclcpp::Node> node_handle_;
     // ros::Timer timer_;
     bool battery_empty_;
     float timer_duration_;

@@ -42,13 +42,8 @@ class LiquidPickup : public rclcpp::Node
     LiquidPickup()
     : Node("bt_node")
     {
-    // factory.registerNodeType<RobotInitializer>("RobotInitializer");
-        // factory.registerNodeType<GoToPose>("GoToPose");
-        // factory.registerNodeType<SetLocations>("SetLocations");
-        // factory.registerNodeType<GetLocationFromQueue>("GetLocationFromQueue");
-        // // factory.registerNodeType<LookForObject>("LookForObject");
-        // // factory.registerNodeType<ValidateTomato>("ValidateTomato");
-        // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
+      factory.registerNodeType<RobotInitializer>("RobotInitializer");
+      factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
         // // factory.registerNodeType<DequeueTomato>("DequeueTomato");
         // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
         // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");

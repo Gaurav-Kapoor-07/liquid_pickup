@@ -20,6 +20,10 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(moveit_ros_planning_interface REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(moveit_msgs REQUIRED)
 
 # find_package(rclcpp_action REQUIRED)
 
@@ -61,7 +65,7 @@ set(BT_SOURCES
 # target_link_libraries(pathqueue ${rclcpp_LIBRARIES} rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs)
 
 add_executable(liquid_pickup_node src/bt_node.cpp ${BT_SOURCES})
-ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp std_msgs)
+ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp std_msgs moveit_ros_planning_interface rclcpp_action rclcpp_components moveit_msgs)
 
 install(TARGETS
     liquid_pickup_node

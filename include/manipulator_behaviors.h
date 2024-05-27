@@ -15,6 +15,12 @@
 #include "std_msgs/msg/float64.hpp"
 #include "helper.h"
 
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
+#include "rclcpp_components/register_node_macro.hpp"
+
+#include <moveit_msgs/action/move_group.hpp>
+
 #include "time_logger.h"
 #ifdef TIME_LOGGER_ON
 #define LOG_MANI_START(val) BATimeLogger::LogMoveGroup(val, log_start)
@@ -81,7 +87,7 @@
 class ManipulatorGraspTomato : public BT::StatefulActionNode, public IBAInitManipulatorNode
 {
 public:
-    // actionlib::SimpleActionClient<moveit_msgs::MoveGroupAction> client_;
+    rclcpp_action::Client<moveit_msgs::action::MoveGroup>::SharedPtr client_;
     ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config);
     void init(Manipulator manipulator) override;
     BT::NodeStatus onStart() override;

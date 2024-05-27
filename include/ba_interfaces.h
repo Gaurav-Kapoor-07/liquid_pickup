@@ -32,7 +32,7 @@ class IBAInitNodeHandle
 public:
     IBAInitNodeHandle(){};
     virtual ~IBAInitNodeHandle(){};
-    // virtual void init(ros::NodeHandle node_handle) = 0;
+    virtual void init(std::shared_ptr<rclcpp::Node> node_handle) = 0;
 };
 #pragma endregion
 

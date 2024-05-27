@@ -20,20 +20,20 @@ RobotInitializer::RobotInitializer(const std::string &name, const BT::NodeConfig
  * 
  * @param manipulator The manipulator 
  */
-// void RobotInitializer::init(Manipulator manipulator)
-// {
-//     manipulator_ = manipulator;
-// }
+void RobotInitializer::init(Manipulator manipulator)
+{
+    manipulator_ = manipulator;
+}
 
 /**
  * @brief Set the NodeHandle reference object
  * 
  * @param node_handle Reference to the NodeHandle 
  */
-// void RobotInitializer::init(ros::NodeHandle node_handle)
-// {
-//     node_handle_ = node_handle;
-// }
+void RobotInitializer::init(std::shared_ptr<rclcpp::Node> node_handle)
+{
+    node_handle_ = node_handle;
+}
 
 /**
  * @brief Handles the tick from the behavior tree
@@ -157,10 +157,10 @@ BatteryCheck::BatteryCheck(const std::string &name, const BT::NodeConfiguration 
  *
  * @param node_handle The NodeHandle reference
  */
-// void BatteryCheck::init(ros::NodeHandle node_handle)
-// {
-//     node_handle_ = node_handle;
-// }
+void BatteryCheck::init(std::shared_ptr<rclcpp::Node> node_handle)
+{
+    node_handle_ = node_handle;
+}
 
 /**
  * @brief Handles the tick from the behavior tree
