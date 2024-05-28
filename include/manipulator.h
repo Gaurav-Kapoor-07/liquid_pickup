@@ -26,6 +26,8 @@
 
 #include "ba_frames_summit_xl.h"
 
+#include "actionlib_msgs/msg/goal_status.hpp"
+
 #pragma endregion
 
 #pragma region defines
@@ -62,10 +64,10 @@ public:
     moveit::core::MoveItErrorCode MoveGripperToTomato(geometry_msgs::msg::PoseStamped& tomato_pose);
     double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
     double MoveLinearVec(float x, float y, float z);
-    // moveit::core::MoveItErrorCode DropTomatoInBasket(void);
-    // moveit::core::MoveItErrorCode MoveToInitialPosition(void);
-    // moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
-    // moveit::core::MoveItErrorCode MoveToScanningPosition(void);
+    moveit::core::MoveItErrorCode DropTomatoInBasket(void);
+    moveit::core::MoveItErrorCode MoveToInitialPosition(void);
+    moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
+    moveit::core::MoveItErrorCode MoveToScanningPosition(void);
 private:
     moveit::planning_interface::MoveGroupInterface *manipulator_;
     geometry_msgs::msg::PoseStamped drop_pose_;
@@ -76,6 +78,7 @@ private:
     void InitializeDrivingPose(void);
     void InitializeScanningPose(void);
     void InitializeDropPose(void);
+    rclcpp::Node::SharedPtr node_;
 };
 
 #pragma endregion

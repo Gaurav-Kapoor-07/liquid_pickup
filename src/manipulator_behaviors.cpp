@@ -503,7 +503,7 @@ void ManipulatorDropTomato::onHalted() {}
 ManipulatorScanPose::ManipulatorScanPose(const std::string &name)
     : BT::StatefulActionNode(name, {})
 {
-    // ROS_LOG_INIT(this->name().c_str());
+    ROS_LOG_INIT(this->name().c_str());
 }
 
 /**
@@ -525,7 +525,7 @@ void ManipulatorScanPose::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorScanPose::onStart()
 {
     LOG_MANI_START(this->name());
-    // manipulator_.MoveToScanningPosition();
+    manipulator_.MoveToScanningPosition();
     // ROS_INFO("moving EE to scan position");
     return BT::NodeStatus::RUNNING;
 }
