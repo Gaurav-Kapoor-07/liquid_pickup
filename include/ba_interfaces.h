@@ -36,36 +36,36 @@ public:
 };
 #pragma endregion
 
-#pragma region IBAInitTomatoQueue
+// #pragma region IBAInitTomatoQueue
 
-/**
- * @brief Interface for all classes which depend on the TomatoQueue
- *
- */
-class IBAInitTomatoQueue
-{
-public:
-    IBAInitTomatoQueue(){};
-    virtual ~IBAInitTomatoQueue(){};
-    virtual void init(TomatoQueue &tomato_queue) = 0;
-};
+// /**
+//  * @brief Interface for all classes which depend on the TomatoQueue
+//  *
+//  */
+// class IBAInitTomatoQueue
+// {
+// public:
+//     IBAInitTomatoQueue(){};
+//     virtual ~IBAInitTomatoQueue(){};
+//     virtual void init(TomatoQueue &tomato_queue) = 0;
+// };
 
-#pragma endregion
+// #pragma endregion
 
-#pragma region IBAInitPathQueue
+// #pragma region IBAInitPathQueue
 
-/**
- * @brief Interface for all classes which depend on the PathQueue
- *
- */
-class IBAInitPathQueue
-{
-public:
-    IBAInitPathQueue(){};
-    virtual ~IBAInitPathQueue(){};
-    virtual void init(PathQueue &path_queue) = 0;
-};
+// /**
+//  * @brief Interface for all classes which depend on the PathQueue
+//  *
+//  */
+// class IBAInitPathQueue
+// {
+// public:
+//     IBAInitPathQueue(){};
+//     virtual ~IBAInitPathQueue(){};
+//     virtual void init(PathQueue &path_queue) = 0;
+// };
 
-#pragma endregion
+// #pragma endregion
 
 #endif

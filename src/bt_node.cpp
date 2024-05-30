@@ -44,20 +44,20 @@ class LiquidPickup : public rclcpp::Node
     {
       factory.registerNodeType<RobotInitializer>("RobotInitializer");
       factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
-        // // factory.registerNodeType<DequeueTomato>("DequeueTomato");
-        // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
-        // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
-        // // factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
-        // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
-        // factory.registerNodeType<ManipulatorScanPose>("ScanPose");
-        // // factory.registerNodeType<BasketCheck>("BasketFull");
-        // // factory.registerNodeType<BasketChange>("ChangeBasket");
-        // factory.registerNodeType<GripperActuator>("ChangeGripper");
-        // factory.registerNodeType<SaveCurrentLocation>("SaveCurrentLocation");
-        // factory.registerNodeType<WriteChargingLocationToQueue>("WriteChargingLocationToQueue");
-        // // factory.registerNodeType<WriteBasketChangeLocationToQueue>("WriteBasketChangeLocationToQueue");
-        // factory.registerNodeType<BatteryCharge>("BatteryCharge");
-        // factory.registerNodeType<BatteryCheck>("BatteryCheck");  
+      // factory.registerNodeType<DequeueTomato>("DequeueTomato");
+      factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
+      factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
+      // factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
+      factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
+      factory.registerNodeType<ManipulatorScanPose>("ScanPose");
+      // factory.registerNodeType<BasketCheck>("BasketFull");
+      // factory.registerNodeType<BasketChange>("ChangeBasket");
+      factory.registerNodeType<GripperActuator>("ChangeGripper");
+      // factory.registerNodeType<SaveCurrentLocation>("SaveCurrentLocation");
+      // factory.registerNodeType<WriteChargingLocationToQueue>("WriteChargingLocationToQueue");
+      // factory.registerNodeType<WriteBasketChangeLocationToQueue>("WriteBasketChangeLocationToQueue");
+      factory.registerNodeType<BatteryCharge>("BatteryCharge");
+      factory.registerNodeType<BatteryCheck>("BatteryCheck");  
       // subscription_ = this->create_subscription<std_msgs::msg::String>(
       // "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
     }
@@ -97,28 +97,6 @@ int main(int argc, char *argv[])
     // // ros::param::get("behavior_tree_type", behavior_tree_type);
     // BT::Tree tree;
 
-    // BT::BehaviorTreeFactory factory;
-    // factory.registerNodeType<RobotInitializer>("RobotInitializer");
-    // factory.registerNodeType<GoToPose>("GoToPose");
-    // factory.registerNodeType<SetLocations>("SetLocations");
-    // factory.registerNodeType<GetLocationFromQueue>("GetLocationFromQueue");
-    // // factory.registerNodeType<LookForObject>("LookForObject");
-    // // factory.registerNodeType<ValidateTomato>("ValidateTomato");
-    // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
-    // // factory.registerNodeType<DequeueTomato>("DequeueTomato");
-    // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
-    // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
-    // // factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
-    // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
-    // factory.registerNodeType<ManipulatorScanPose>("ScanPose");
-    // // factory.registerNodeType<BasketCheck>("BasketFull");
-    // // factory.registerNodeType<BasketChange>("ChangeBasket");
-    // factory.registerNodeType<GripperActuator>("ChangeGripper");
-    // factory.registerNodeType<SaveCurrentLocation>("SaveCurrentLocation");
-    // factory.registerNodeType<WriteChargingLocationToQueue>("WriteChargingLocationToQueue");
-    // // factory.registerNodeType<WriteBasketChangeLocationToQueue>("WriteBasketChangeLocationToQueue");
-    // factory.registerNodeType<BatteryCharge>("BatteryCharge");
-    // factory.registerNodeType<BatteryCheck>("BatteryCheck");
     // try
     // {
     //     std::string bt_xml;

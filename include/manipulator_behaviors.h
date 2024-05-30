@@ -151,7 +151,8 @@ private:
  * @brief Class/Behavior to drop the tomato into the attached basket after grasping
  * 
  */
-class ManipulatorDropTomato : public BT::StatefulActionNode, public IBAInitManipulatorNode, public IBAInitTomatoQueue
+// class ManipulatorDropTomato : public BT::StatefulActionNode, public IBAInitManipulatorNode, public IBAInitTomatoQueue
+class ManipulatorDropTomato : public BT::StatefulActionNode, public IBAInitManipulatorNode
 {
 public:
     ManipulatorDropTomato(const std::string &name);
