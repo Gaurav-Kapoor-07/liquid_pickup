@@ -198,18 +198,25 @@ BT::NodeStatus ManipulatorGraspTomato::onStart()
     if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
     {
         // ROS_ERROR("GOT NO POSE!");
+        RCLCPP_ERROR(rclcpp::get_logger("ManipulatorGraspTomato"), "GOT NO POSE!");
+
         return BT::NodeStatus::FAILURE;
     }
-    // geometry_msgs::msg::Point armlink_loc = ba_helper::GetCurrentArmbaseLocation();
-    // float phi = atan2(tomato_map_y.value() - armlink_loc.y, tomato_map_x.value() - armlink_loc.x);
-    // geometry_msgs::msg::PoseStamped tomato;
-    // tomato.header.frame_id = MAP_FRAME;
-    // tomato.pose.position.x = tomato_map_x.value() - sin(phi) * 0;
-    // tomato.pose.position.y = tomato_map_y.value() - cos(phi) * 0;
-    // tomato.pose.position.z = tomato_map_z.value();
+    geometry_msgs::msg::Point armlink_loc = ba_helper::GetCurrentArmbaseLocation();
+    float phi = atan2(tomato_map_y.value() - armlink_loc.y, tomato_map_x.value() - armlink_loc.x);
+    geometry_msgs::msg::PoseStamped tomato;
+    tomato.header.frame_id = MAP_FRAME;
+    tomato.pose.position.x = tomato_map_x.value() - sin(phi) * 0;
+    tomato.pose.position.y = tomato_map_y.value() - cos(phi) * 0;
+    tomato.pose.position.z = tomato_map_z.value();
     // // tomato.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
 
-    // // manipulator_.MoveGripperToTomato(tomato);
+    tf2::Quaternion tf2_quat;
+    tf2_quat.setRPY(0, 0, 0);
+    geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
+    tomato.pose.orientation = msg_quat;
+
+    manipulator_.MoveGripperToTomato(tomato);
     return BT::NodeStatus::RUNNING;
 }
 
@@ -459,8 +466,8 @@ void ManipulatorDropTomato::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorDropTomato::onStart()
 {
     LOG_MANI_START(this->name());
-    // manipulator_.DropTomatoInBasket();
-    // ROS_INFO("going to drop tomato in basket");
+    manipulator_.DropTomatoInBasket();
+    RCLCPP_INFO(rclcpp::get_logger("ManipulatorDropTomato"), "going to drop tomato in basket");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -527,6 +534,7 @@ BT::NodeStatus ManipulatorScanPose::onStart()
     LOG_MANI_START(this->name());
     manipulator_.MoveToScanningPosition();
     // ROS_INFO("moving EE to scan position");
+    RCLCPP_INFO(rclcpp::get_logger("ManipulatorScanPose"), "moving EE to scan position");
     return BT::NodeStatus::RUNNING;
 }
 

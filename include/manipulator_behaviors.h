@@ -184,6 +184,7 @@ public:
     void onHalted() override;
 private:
     Manipulator manipulator_;
+    // rclcpp::Node::SharedPtr node_;
 };
 
 #pragma endregion
