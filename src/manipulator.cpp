@@ -206,6 +206,7 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::ms
     tf2::Quaternion tf2_quat;
     tf2_quat.setRPY(0, M_PI / 6, angle);
     geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
+    tomato_base_footprint.pose.orientation = msg_quat;
 
     MoveLinear(tomato_base_footprint.pose, false);
     return moveit::core::MoveItErrorCode::SUCCESS;
