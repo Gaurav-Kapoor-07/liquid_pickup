@@ -62,12 +62,12 @@ void BATimeLogger::LogScan(geometry_msgs::msg::PoseStamped pose, float radius){
  * @param file destination file to log into
  */
 void BATimeLogger::LogFile(std::string source, LogType type, std::ofstream &file){
-    // auto current_time = ros::Time::now().toSec();
-    // if(type == log_start){
-    //     file<<source<<";"<<current_time<<";";
-    // }else{
-    //     file<<current_time<<";\n";
-    // }
+    auto current_time = rclcpp::Clock{RCL_ROS_TIME}.now().seconds();
+    if(type == log_start){
+        file<<source<<";"<<current_time<<";";
+    }else{
+        file<<current_time<<";\n";
+    }
 }
 
 /**
