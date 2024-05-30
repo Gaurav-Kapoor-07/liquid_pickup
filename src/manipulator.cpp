@@ -66,10 +66,11 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
     auto state = result_.code;
 
     // if (state == action_msgs::msg::GoalStatus::STATUS_SUCCEEDED)
-    // {
-    //     RCLCPP_DEBUG(node_->get_logger(), "[%s] reached Pose", name);
-    //     return BT::NodeStatus::SUCCESS;
-    // }
+    if (state == rclcpp_action::ResultCode::SUCCEEDED)
+    {
+        RCLCPP_DEBUG(node_->get_logger(), "[%s] reached Pose", name);
+        return BT::NodeStatus::SUCCESS;
+    }
     // else if (state == action_msgs::msg::GoalStatus::STATUS_ACCEPTED ||
     //          state == action_msgs::msg::GoalStatus::STATUS_EXECUTING)
     // {
@@ -81,6 +82,12 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
     //     RCLCPP_ERROR(node_->get_logger(), "[%s] Failed to reach Pose!", name);
     //     return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
     // }
+
+    else
+    {
+        RCLCPP_ERROR(node_->get_logger(), "[%s] Failed to reach Pose!", name);
+        return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
+    }
 }
 
 /**
