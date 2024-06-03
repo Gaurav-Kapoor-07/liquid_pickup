@@ -23,9 +23,9 @@
 
 #include "manipulator.h"
 #include "helper.h"
-// #include "basket.h"
-// #include "tomato_queue.h"
-// #include "path_queue.h"
+// // #include "basket.h"
+// // #include "tomato_queue.h"
+// // #include "path_queue.h"
 #include "robot.h"
 #include "ba_types.h"
 
@@ -45,30 +45,34 @@ class LiquidPickup : public rclcpp::Node
     {
       auto self = std::shared_ptr<LiquidPickup>(this, [](LiquidPickup*){});
       // ros::param::get("behavior_tree_type", behavior_tree_type);
+      
+      this->declare_parameter("behavior_tree_type", "behavior_tree_type");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
 
-      factory.registerNodeType<RobotInitializer>("RobotInitializer");
+      // factory.registerNodeType<RobotInitializer>("RobotInitializer");
       factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
       // factory.registerNodeType<DequeueTomato>("DequeueTomato");
-      factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
-      factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
+      // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
+      // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
       // factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
-      factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
-      factory.registerNodeType<ManipulatorScanPose>("ScanPose");
+      // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
+      // factory.registerNodeType<ManipulatorScanPose>("ScanPose");
       // factory.registerNodeType<BasketCheck>("BasketFull");
       // factory.registerNodeType<BasketChange>("ChangeBasket");
-      factory.registerNodeType<GripperActuator>("ChangeGripper");
+      // factory.registerNodeType<GripperActuator>("ChangeGripper");
       // factory.registerNodeType<SaveCurrentLocation>("SaveCurrentLocation");
       // factory.registerNodeType<WriteChargingLocationToQueue>("WriteChargingLocationToQueue");
       // factory.registerNodeType<WriteBasketChangeLocationToQueue>("WriteBasketChangeLocationToQueue");
-      factory.registerNodeType<BatteryCharge>("BatteryCharge");
-      factory.registerNodeType<BatteryCheck>("BatteryCheck");  
+      // factory.registerNodeType<BatteryCharge>("BatteryCharge");
+      // factory.registerNodeType<BatteryCheck>("BatteryCheck");  
 
       try
       {
+        this->declare_parameter("bt_xml", "/home/ros/rap/gaurav_ws/src/liquid_pickup/config/test.xml");
         bt_xml = this->get_parameter("bt_xml").as_string(); 
         // ros::param::get("bt_xml", bt_xml);
-        tree = factory.createTreeFromFile(bt_xml);
+        factory.createTreeFromFile("/home/ros/rap/gaurav_ws/src/liquid_pickup/config/test.xml");
+        // tree = factory.createTreeFromFile(bt_xml);
       }
       catch (const std::exception &e)
       {
@@ -76,16 +80,16 @@ class LiquidPickup : public rclcpp::Node
         std::cerr << e.what() << '\n';
       }
 
-      auto node = tree.rootNode();
+      // auto node = tree.rootNode();
 
-      if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node))
-      {
-        vis_node->init(self);
-      }
-      if (auto vis_node = dynamic_cast<IBAInitManipulatorNode *>(node))
-      {
-        vis_node->init(manipulator);
-      }
+      // if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node))
+      // {
+      //   vis_node->init(self);
+      // }
+      // if (auto vis_node = dynamic_cast<IBAInitManipulatorNode *>(node))
+      // {
+      //   vis_node->init(manipulator);
+      // }
       // if (auto vis_node = dynamic_cast<IBAInitTomatoQueue *>(node.get()))
       // {
       //     vis_node->init(tomato_queue_);
@@ -95,51 +99,51 @@ class LiquidPickup : public rclcpp::Node
       //     // vis_node->init(p_queue);
       // }
 
-      BT::PublisherZMQ publisher_zmq(tree, max_msg_per_second, publisher_port, server_port);
+      // BT::PublisherZMQ publisher_zmq(tree, max_msg_per_second, publisher_port, server_port);
 
-      // Tick the tree until it reaches a terminal state
-      BT::NodeStatus status = BT::NodeStatus::RUNNING;
-      auto start = this->now().seconds();
+      // // Tick the tree until it reaches a terminal state
+      // BT::NodeStatus status = BT::NodeStatus::RUNNING;
+      // auto start = this->now().seconds();
       
-      #ifdef LOG_TIME
-      BATimeLogger::InitFiles();
-      #endif
-      while (status == BT::NodeStatus::RUNNING)
-      {
-        status = tree.tickRoot();
-        // ros::Duration(0.1).sleep();
-        rclcpp::sleep_for(std::chrono::nanoseconds(100000000));
-      }
+      // #ifdef LOG_TIME
+      // BATimeLogger::InitFiles();
+      // #endif
+      // while (status == BT::NodeStatus::RUNNING)
+      // {
+      //   status = tree.tickRoot();
+      //   // ros::Duration(0.1).sleep();
+      //   rclcpp::sleep_for(std::chrono::nanoseconds(100000000));
+      // }
 
-      // Output final results
-      std::string status_str;
-      if (status == BT::NodeStatus::SUCCESS)
-      {
-          status_str = "SUCCESS";
-      }
-      else
-      {
-          status_str = "FAILURE";
-      }
-      auto stop = this->now().seconds();;
-      auto seconds = stop-start;
-      // ROS_INFO("Done with status %s!", status_str.c_str());
-      // ROS_INFO("Used time: %.2lf", seconds);
-      RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
-      RCLCPP_INFO(this->get_logger(), "Used time: %.2lf", seconds);
+      // // Output final results
+      // std::string status_str;
+      // if (status == BT::NodeStatus::SUCCESS)
+      // {
+      //     status_str = "SUCCESS";
+      // }
+      // else
+      // {
+      //     status_str = "FAILURE";
+      // }
+      // auto stop = this->now().seconds();;
+      // auto seconds = stop-start;
+      // // ROS_INFO("Done with status %s!", status_str.c_str());
+      // // ROS_INFO("Used time: %.2lf", seconds);
+      // RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
+      // RCLCPP_INFO(this->get_logger(), "Used time: %.2lf", seconds);
       
-      #ifdef LOG_TIME
-      BATimeLogger::CloseFiles();
-      #endif
-      std::cout << '\n'
-                << "Press a key to continue...";
-      do
-      {
-      } while (std::cin.get() != '\n');
+      // #ifdef LOG_TIME
+      // BATimeLogger::CloseFiles();
+      // #endif
+      // std::cout << '\n'
+      //           << "Press a key to continue...";
+      // do
+      // {
+      // } while (std::cin.get() != '\n');
     }
 
   private:
-    Manipulator manipulator;
+    // Manipulator manipulator;
     std::string behavior_tree_type;
     BT::Tree tree;
     BT::BehaviorTreeFactory factory;

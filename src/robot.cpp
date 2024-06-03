@@ -66,11 +66,11 @@ BT::PortsList RobotInitializer::providedPorts()
  *
  * @return moveit::core::MoveItErrorCode The error code
  */
-// moveit::core::MoveItErrorCode RobotInitializer::SetInitialPosition()
-// {
-//     moveit::core::MoveItErrorCode code = manipulator_.MoveToInitialPosition();
-//     return code;
-// }
+moveit::core::MoveItErrorCode RobotInitializer::SetInitialPosition()
+{
+    moveit::core::MoveItErrorCode code = manipulator_.MoveToInitialPosition();
+    return code;
+}
 
 /**
  * @brief Launches the basket into gazebo and attaches it to the summit_xl robot
@@ -147,8 +147,14 @@ BatteryCheck::BatteryCheck(const std::string &name, const BT::NodeConfiguration 
 {
     ROS_LOG_INIT(this->name().c_str());
     battery_empty_ = false;
+    this->node_handle_->declare_parameter<float>("battery_timer", timer_duration_);
     // ros::param::get("battery_timer", timer_duration_);
     // timer_ = node_handle_.createTimer(ros::Duration(timer_duration_), &BatteryCheck::TimerCallback, this);
+
+    int64_t nanoseconds = static_cast<int64_t>(timer_duration_ * 1e9);
+
+    timer_ = this->node_handle_->create_wall_timer(std::chrono::nanoseconds(nanoseconds), std::bind(&BatteryCheck::TimerCallback, this));
+    start_ = rclcpp::Clock{RCL_ROS_TIME}.now().seconds();
     // start_ = ros::Time::now().toSec();
 }
 
@@ -170,27 +176,31 @@ void BatteryCheck::init(std::shared_ptr<rclcpp::Node> node_handle)
 BT::NodeStatus BatteryCheck::tick()
 {
     // double now = ros::Time::now().toSec();
+    double now = rclcpp::Clock{RCL_ROS_TIME}.now().seconds();
 
-    // double current_battery_level = (90 - (now - start_) / timer_duration_ * 90) + 10;
+    double current_battery_level = (90 - (now - start_) / timer_duration_ * 90) + 10;
 
-    // if (battery_empty_)
-    // {
-    //     battery_empty_ = false;
-    //     start_ = ros::Time::now().toSec();
-    //     if (current_battery_level < 3)
-    //     {
-    //         ROS_WARN("[MOCKED BEHAVIOR] Battery capacity too low: <3 %%!");
-    //         return BT::NodeStatus::FAILURE;
-    //     }
-    //     ROS_WARN("[MOCKED BEHAVIOR] Battery capacity too low: %.2lf %%!", current_battery_level);
-    //     return BT::NodeStatus::FAILURE;
-    // }
-    // else
-    // {
-    //     ROS_INFO("[MOCKED BEHAVIOR] Battery capacity ok: %.2lf %%!", current_battery_level);
-    //     return BT::NodeStatus::SUCCESS;
-    // }
-    return BT::NodeStatus::SUCCESS; // remove later
+    if (battery_empty_)
+    {
+        battery_empty_ = false;
+        // start_ = ros::Time::now().toSec();
+        start_ = rclcpp::Clock{RCL_ROS_TIME}.now().seconds();
+        if (current_battery_level < 3)
+        {
+            // ROS_WARN("[MOCKED BEHAVIOR] Battery capacity too low: <3 %%!");
+            RCLCPP_WARN(this->node_handle_->get_logger(), "[MOCKED BEHAVIOR] Battery capacity too low: <3 %%!");
+            return BT::NodeStatus::FAILURE;
+        }
+        // ROS_WARN("[MOCKED BEHAVIOR] Battery capacity too low: %.2lf %%!", current_battery_level);
+        RCLCPP_WARN(this->node_handle_->get_logger(), "[MOCKED BEHAVIOR] Battery capacity too low: %.2lf %%!", current_battery_level);
+        return BT::NodeStatus::FAILURE;
+    }
+    else
+    {
+        // ROS_INFO("[MOCKED BEHAVIOR] Battery capacity ok: %.2lf %%!", current_battery_level);
+        RCLCPP_INFO(this->node_handle_->get_logger(), "[MOCKED BEHAVIOR] Battery capacity ok: %.2lf %%!", current_battery_level);
+        return BT::NodeStatus::SUCCESS;
+    }
 }
 
 /**
@@ -208,6 +218,13 @@ BT::PortsList BatteryCheck::providedPorts()
 //     battery_empty_ = true;
 //     ROS_WARN("Battery capacity from now on too low!");
 // }
+
+void BatteryCheck::TimerCallback()
+{
+    battery_empty_ = true;
+    RCLCPP_WARN(this->node_handle_->get_logger(), "Battery capacity from now on too low!");
+    // ROS_WARN("Battery capacity from now on too low!");
+}
 
 #pragma endregion
 
@@ -232,12 +249,22 @@ BatteryCharge::BatteryCharge(const std::string &name, const BT::NodeConfiguratio
 BT::NodeStatus BatteryCharge::tick()
 {
     // ROS_WARN("Mocking behavior of charging:");
+    RCLCPP_WARN(this->node_handle_2->get_logger(), "Mocking behavior of charging:");
 
     // for (int i = 0; i <= 10; i++)
     // {
     //     ros::Duration(0.5).sleep();
     //     ROS_INFO("Battery capacity: %d %%", i * 10);
     // }
+
+    for (int i = 0; i <= 10; i++)
+    {
+        // ros::Duration(0.5).sleep();
+        rclcpp::sleep_for(std::chrono::nanoseconds(500000000));
+        RCLCPP_INFO(this->node_handle_2->get_logger(), "Battery capacity: %d %%", i * 10);;
+        // ROS_INFO("Battery capacity: %d %%", i * 10);
+    }
+
     return BT::NodeStatus::SUCCESS;
 }
 

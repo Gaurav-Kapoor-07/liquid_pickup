@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 project(liquid_pickup)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
@@ -62,10 +64,6 @@ set(BT_SOURCES
     src/helper.cpp
     src/time_logger.cpp
 )
-
-# add_library(pathqueue src/path_queue.cpp)
-
-# target_link_libraries(pathqueue ${rclcpp_LIBRARIES} rclcpp behaviortree_cpp_v3 geometry_msgs tf2 tf2_ros tf2_geometry_msgs)
 
 add_executable(liquid_pickup_node src/bt_node.cpp ${BT_SOURCES})
 ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp_v3 geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp std_msgs moveit_ros_planning_interface rclcpp_action rclcpp_components moveit_msgs)

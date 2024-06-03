@@ -40,7 +40,7 @@ public:
 private:
     Manipulator manipulator_;
     std::shared_ptr<rclcpp::Node> node_handle_;
-    // moveit::core::MoveItErrorCode SetInitialPosition();
+    moveit::core::MoveItErrorCode SetInitialPosition();
     // void LaunchBasket();
 };
 
@@ -62,12 +62,14 @@ public:
 
 private:
     std::shared_ptr<rclcpp::Node> node_handle_;
+    rclcpp::TimerBase::SharedPtr timer_;
     // ros::Timer timer_;
     bool battery_empty_;
     float timer_duration_;
+    // int timer_duration_;
     double start_;
 
-    // void TimerCallback(const ros::TimerEvent &timer_event);
+    void TimerCallback();
 };
 
 #pragma endregion
@@ -84,6 +86,9 @@ public:
     BatteryCharge(const std::string &name, const BT::NodeConfiguration &config);
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
+
+private:
+    std::shared_ptr<rclcpp::Node> node_handle_2;
 };
 
 #pragma endregion

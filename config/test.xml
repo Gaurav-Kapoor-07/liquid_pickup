@@ -1,0 +1,10 @@
+ <root main_tree_to_execute="MainTree">
+     <BehaviorTree ID="MainTree">
+        <Sequence name="main_loop">
+            <!-- <RobotInitializer   name="RobotInitializer" message="Hello"/> -->
+            <GraspTomato    name="GraspTomato"/>
+            <!-- <pregraspTomato name="pregraspTomato"/> -->
+            <!-- <dropTomato   name="dropTomato"/> -->
+        </Sequence>
+     </BehaviorTree>
+ </root>
