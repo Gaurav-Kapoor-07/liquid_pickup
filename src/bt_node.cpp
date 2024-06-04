@@ -9,6 +9,7 @@
 #include "behaviortree_cpp_v3/bt_factory.h"
 #include "behaviortree_cpp_v3/loggers/bt_zmq_publisher.h"
 #include <string>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 #define LOG_TIME
 
@@ -49,8 +50,8 @@ class LiquidPickup : public rclcpp::Node
       this->declare_parameter("behavior_tree_type", "behavior_tree_type");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
 
-      // factory.registerNodeType<RobotInitializer>("RobotInitializer");
-      factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
+      factory.registerNodeType<RobotInitializer>("RobotInitializer");
+      // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
       // factory.registerNodeType<DequeueTomato>("DequeueTomato");
       // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
       // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
@@ -68,11 +69,21 @@ class LiquidPickup : public rclcpp::Node
 
       try
       {
-        this->declare_parameter("bt_xml", "/home/ros/rap/gaurav_ws/src/liquid_pickup/config/test.xml");
+        this->declare_parameter("bt_xml", "test.xml");
         bt_xml = this->get_parameter("bt_xml").as_string(); 
         // ros::param::get("bt_xml", bt_xml);
-        factory.createTreeFromFile("/home/ros/rap/gaurav_ws/src/liquid_pickup/config/test.xml");
-        // tree = factory.createTreeFromFile(bt_xml);
+        // factory.createTreeFromFile("/home/ros/rap/gaurav_ws/src/liquid_pickup/config/test.xml");
+
+        std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
+
+        // strcat(package_share_directory)
+        // std::cerr << package_share_directory;
+
+        std::string path_to_xml = package_share_directory + "/config/";
+
+        // factory.createTreeFromFile("src/liquid_pickup/config/test.xml");
+
+        tree = factory.createTreeFromFile(path_to_xml + bt_xml);
       }
       catch (const std::exception &e)
       {

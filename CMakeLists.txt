@@ -51,7 +51,7 @@ find_package(moveit_msgs REQUIRED)
 #   RUNTIME DESTINATION bin)
 
 # include_directories(include ${CMAKE_SOURCE_DIR}/../BehaviorTree.CPP/src) 
-include_directories(include) 
+include_directories(include config) 
 
 set(BT_SOURCES
     # src/navigation_behaviors.cpp 
@@ -76,6 +76,7 @@ install(TARGETS
 
 install(DIRECTORY
   launch 
+  config
   DESTINATION share/${PROJECT_NAME}/
 )
 
