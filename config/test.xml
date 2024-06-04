@@ -1,10 +1,11 @@
- <root main_tree_to_execute="MainTree">
+ <root main_tree_to_execute = "MainTree" >
      <BehaviorTree ID="MainTree">
-        <Sequence name="main_loop">
-            <RobotInitializer   name="RobotInitializer" message="Hello"/>
-            <!-- <GraspTomato    name="GraspTomato"/> -->
-            <!-- <pregraspTomato name="pregraspTomato"/> -->
-            <!-- <dropTomato   name="dropTomato"/> -->
+        <Sequence name="root_sequence">
+            <!-- <CheckBattery   name="check_battery"/> -->
+            <!-- <OpenGripper    name="open_gripper"/> -->
+            <ApproachObject name="approach_object"/>
+            <SaySomething name="SaySomething"/>
+            <!-- <CloseGripper   name="close_gripper"/> -->
         </Sequence>
      </BehaviorTree>
  </root>

@@ -37,6 +37,7 @@
 #include "ba_interfaces.h"
 
 using namespace BT;
+using namespace DummyNodes;
 
 class LiquidPickup : public rclcpp::Node
 {
@@ -50,7 +51,10 @@ class LiquidPickup : public rclcpp::Node
       this->declare_parameter("behavior_tree_type", "behavior_tree_type");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
 
-      factory.registerNodeType<RobotInitializer>("RobotInitializer");
+      factory.registerNodeType<ApproachObject>("ApproachObject");
+      factory.registerNodeType<SaySomething>("SaySomething");
+
+      // factory.registerNodeType<RobotInitializer>("RobotInitializer");
       // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
       // factory.registerNodeType<DequeueTomato>("DequeueTomato");
       // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
@@ -110,7 +114,7 @@ class LiquidPickup : public rclcpp::Node
       //     // vis_node->init(p_queue);
       // }
 
-      // BT::PublisherZMQ publisher_zmq(tree, max_msg_per_second, publisher_port, server_port);
+      BT::PublisherZMQ publisher_zmq(tree, max_msg_per_second, publisher_port, server_port);
 
       // // Tick the tree until it reaches a terminal state
       // BT::NodeStatus status = BT::NodeStatus::RUNNING;
@@ -158,6 +162,7 @@ class LiquidPickup : public rclcpp::Node
     std::string behavior_tree_type;
     BT::Tree tree;
     BT::BehaviorTreeFactory factory;
+    // BehaviorTreeFactory factory;
     std::string bt_xml;
     unsigned max_msg_per_second = 25;
     unsigned publisher_port = 1666;

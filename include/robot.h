@@ -1,94 +1,234 @@
-#pragma region includes
+// #pragma region includes
 
-#include "rclcpp/rclcpp.hpp"
-// #include "ros/message.h"
-#include "ros_logs.h"
-// #include <ros/package.h>
-#include <stdio.h>
-#include <math.h>
-#include <iostream>
-#include "ba_interfaces.h"
+// #include "rclcpp/rclcpp.hpp"
+// // #include "ros/message.h"
+// #include "ros_logs.h"
+// // #include <ros/package.h>
+// #include <stdio.h>
+// #include <math.h>
+// #include <iostream>
+// #include "ba_interfaces.h"
 
-
-#include "behaviortree_cpp_v3/behavior_tree.h"
-#include "manipulator.h"
 
 // #include "behaviortree_cpp_v3/behavior_tree.h"
-// #include <actionlib/client/simple_action_client.h>
-// #include <gazebo_msgs/SpawnModel.h>
+// #include "manipulator.h"
 
-#pragma endregion
+// // #include "behaviortree_cpp_v3/behavior_tree.h"
+// // #include <actionlib/client/simple_action_client.h>
+// // #include <gazebo_msgs/SpawnModel.h>
 
-#define CRITICAL_BATTERY_LEVEL 40
-// typedef actionlib::SimpleActionClient<moveit_msgs::MoveGroupAction> MoveGroupClient;
+// #pragma endregion
 
-#pragma region RobotInitializer
+// #define CRITICAL_BATTERY_LEVEL 40
+// // typedef actionlib::SimpleActionClient<moveit_msgs::MoveGroupAction> MoveGroupClient;
 
-/**
- * @brief Class/Behavior to initialize the robot in the beginning
- *
- */
-class RobotInitializer : public BT::SyncActionNode, public IBAInitManipulatorNode, public IBAInitNodeHandle
+// #pragma region RobotInitializer
+
+// /**
+//  * @brief Class/Behavior to initialize the robot in the beginning
+//  *
+//  */
+// class RobotInitializer : public BT::SyncActionNode, public IBAInitManipulatorNode, public IBAInitNodeHandle
+// {
+// public:
+//     RobotInitializer(const std::string &name, const BT::NodeConfiguration &config);
+//     void init(std::shared_ptr<rclcpp::Node> node_handle) override;
+//     void init(Manipulator manipulator) override;
+//     BT::NodeStatus tick() override;
+//     static BT::PortsList providedPorts();
+
+// private:
+//     Manipulator manipulator_;
+//     std::shared_ptr<rclcpp::Node> node_handle_;
+//     moveit::core::MoveItErrorCode SetInitialPosition();
+//     // void LaunchBasket();
+// };
+
+// #pragma endregion
+
+// #pragma region BatteryCheck
+
+// /**
+//  * @brief Behavior to check the battery of the robot
+//  *
+//  */
+// class BatteryCheck : public BT::ConditionNode, public IBAInitNodeHandle
+// {
+// public:
+//     BatteryCheck(const std::string &name, const BT::NodeConfiguration &config);
+//     void init(std::shared_ptr<rclcpp::Node> node_handle) override;
+//     BT::NodeStatus tick() override;
+//     static BT::PortsList providedPorts();
+
+// private:
+//     std::shared_ptr<rclcpp::Node> node_handle_;
+//     rclcpp::TimerBase::SharedPtr timer_;
+//     // ros::Timer timer_;
+//     bool battery_empty_;
+//     float timer_duration_;
+//     // int timer_duration_;
+//     double start_;
+
+//     void TimerCallback();
+// };
+
+// #pragma endregion
+
+// #pragma region BatteryCharge
+
+// /**
+//  * @brief Behavior to charge the battery of the robot
+//  *
+//  */
+// class BatteryCharge : public BT::ConditionNode
+// {
+// public:
+//     BatteryCharge(const std::string &name, const BT::NodeConfiguration &config);
+//     BT::NodeStatus tick() override;
+//     static BT::PortsList providedPorts();
+
+// private:
+//     std::shared_ptr<rclcpp::Node> node_handle_2;
+// };
+
+// #pragma endregion
+
+#ifndef SIMPLE_BT_NODES_H
+#define SIMPLE_BT_NODES_H
+
+#include "behaviortree_cpp_v3/behavior_tree.h"
+#include "behaviortree_cpp_v3/bt_factory.h"
+
+namespace DummyNodes
 {
-public:
-    RobotInitializer(const std::string &name, const BT::NodeConfiguration &config);
-    void init(std::shared_ptr<rclcpp::Node> node_handle) override;
-    void init(Manipulator manipulator) override;
-    BT::NodeStatus tick() override;
-    static BT::PortsList providedPorts();
 
-private:
-    Manipulator manipulator_;
-    std::shared_ptr<rclcpp::Node> node_handle_;
-    moveit::core::MoveItErrorCode SetInitialPosition();
-    // void LaunchBasket();
+using BT::NodeStatus;
+
+// NodeStatus CheckBattery();
+
+// NodeStatus CheckTemperature();
+// NodeStatus SayHello();
+
+// class GripperInterface
+// {
+//   public:
+//     GripperInterface() : _opened(true)
+//     {
+//     }
+
+//     NodeStatus open();
+
+//     NodeStatus close();
+
+//   private:
+//     bool _opened;
+// };
+
+//--------------------------------------
+
+// Example of custom SyncActionNode (synchronous action)
+// without ports.
+class ApproachObject : public BT::SyncActionNode
+{
+  public:
+    ApproachObject(const std::string& name) :
+        BT::SyncActionNode(name, {})
+    {
+    }
+
+    // You must override the virtual function tick()
+    NodeStatus tick() override;
 };
 
-#pragma endregion
-
-#pragma region BatteryCheck
-
-/**
- * @brief Behavior to check the battery of the robot
- *
- */
-class BatteryCheck : public BT::ConditionNode, public IBAInitNodeHandle
+// Example of custom SyncActionNode (synchronous action)
+// with an input port.
+class SaySomething : public BT::SyncActionNode
 {
-public:
-    BatteryCheck(const std::string &name, const BT::NodeConfiguration &config);
-    void init(std::shared_ptr<rclcpp::Node> node_handle) override;
-    BT::NodeStatus tick() override;
-    static BT::PortsList providedPorts();
+  public:
+    SaySomething(const std::string& name, const BT::NodeConfiguration& config)
+      : BT::SyncActionNode(name, config)
+    {
+    }
 
-private:
-    std::shared_ptr<rclcpp::Node> node_handle_;
-    rclcpp::TimerBase::SharedPtr timer_;
-    // ros::Timer timer_;
-    bool battery_empty_;
-    float timer_duration_;
-    // int timer_duration_;
-    double start_;
+    // You must override the virtual function tick()
+    NodeStatus tick() override;
 
-    void TimerCallback();
+    // It is mandatory to define this static method.
+    static BT::PortsList providedPorts()
+    {
+        return{ BT::InputPort<std::string>("message") };
+    }
 };
 
-#pragma endregion
+// //Same as class SaySomething, but to be registered with SimpleActionNode
+// NodeStatus SaySomethingSimple(BT::TreeNode& self);
 
-#pragma region BatteryCharge
+// // Example os Asynchronous node that use StatefulActionNode as base class
+// class SleepNode : public BT::StatefulActionNode
+// {
+//   public:
+//     SleepNode(const std::string& name, const BT::NodeConfiguration& config)
+//       : BT::StatefulActionNode(name, config)
+//     {}
 
-/**
- * @brief Behavior to charge the battery of the robot
- *
- */
-class BatteryCharge : public BT::ConditionNode
-{
-public:
-    BatteryCharge(const std::string &name, const BT::NodeConfiguration &config);
-    BT::NodeStatus tick() override;
-    static BT::PortsList providedPorts();
+    // static BT::PortsList providedPorts()
+    // {
+    //     // amount of milliseconds that we want to sleep
+    //     return{ BT::InputPort<int>("msec") };
+    // }
 
-private:
-    std::shared_ptr<rclcpp::Node> node_handle_2;
-};
+    // NodeStatus onStart() override
+    // {
+    //     int msec = 0;
+    //     getInput("msec", msec);
+    //     if( msec <= 0 )
+    //     {
+    //         // no need to go into the RUNNING state
+    //         return NodeStatus::SUCCESS;
+    //     }
+    //     else {
+    //         using namespace std::chrono;
+    //         // once the deadline is reached, we will return SUCCESS.
+    //         deadline_ = system_clock::now() + milliseconds(msec);
+//             return NodeStatus::RUNNING;
+//         }
+//     }
 
-#pragma endregion
+//     /// method invoked by an action in the RUNNING state.
+//     NodeStatus onRunning() override
+//     {
+//         if ( std::chrono::system_clock::now() >= deadline_ )
+//         {
+//             return NodeStatus::SUCCESS;
+//         }
+//         else {
+//             return NodeStatus::RUNNING;
+//         }
+//     }
+
+//     void onHalted() override
+//     {
+//         // nothing to do here...
+//         std::cout << "SleepNode interrupted" << std::endl;
+//     }
+
+//   private:
+//     std::chrono::system_clock::time_point deadline_;
+// };
+
+// inline void RegisterNodes(BT::BehaviorTreeFactory& factory)
+// {
+//     static GripperInterface grip_singleton;
+
+//     factory.registerSimpleCondition("CheckBattery", std::bind(CheckBattery));
+//     factory.registerSimpleCondition("CheckTemperature", std::bind(CheckTemperature));
+//     factory.registerSimpleAction("SayHello", std::bind(SayHello));
+//     factory.registerSimpleAction("OpenGripper", std::bind(&GripperInterface::open, &grip_singleton));
+//     factory.registerSimpleAction("CloseGripper", std::bind(&GripperInterface::close, &grip_singleton));
+//     factory.registerNodeType<ApproachObject>("ApproachObject");
+//     factory.registerNodeType<SaySomething>("SaySomething");
+// }
+
+} // end namespace
+
+#endif   // SIMPLE_BT_NODES_H
