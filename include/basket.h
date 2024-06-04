@@ -5,7 +5,7 @@
 
 // #include "ros/message.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
-#include "behaviortree_cpp_v3/behavior_tree.h"
+#include "behaviortree_cpp/behavior_tree.h"
 #include "ros_logs.h"
 #include "ba_interfaces.h"
 #include "ba_types.h"

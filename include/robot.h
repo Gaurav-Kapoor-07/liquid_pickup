@@ -10,10 +10,10 @@
 // #include "ba_interfaces.h"
 
 
-// #include "behaviortree_cpp_v3/behavior_tree.h"
+// #include "behaviortree_cpp/behavior_tree.h"
 // #include "manipulator.h"
 
-// // #include "behaviortree_cpp_v3/behavior_tree.h"
+// // #include "behaviortree_cpp/behavior_tree.h"
 // // #include <actionlib/client/simple_action_client.h>
 // // #include <gazebo_msgs/SpawnModel.h>
 
@@ -96,8 +96,8 @@
 #ifndef SIMPLE_BT_NODES_H
 #define SIMPLE_BT_NODES_H
 
-#include "behaviortree_cpp_v3/behavior_tree.h"
-#include "behaviortree_cpp_v3/bt_factory.h"
+#include "behaviortree_cpp/behavior_tree.h"
+#include "behaviortree_cpp/bt_factory.h"
 
 namespace DummyNodes
 {

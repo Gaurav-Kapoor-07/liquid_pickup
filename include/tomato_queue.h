@@ -5,7 +5,7 @@
 #include "ros_logs.h"
 #include <rclcpp/rclcpp.hpp>
 #include "geometry_msgs/msg/pose_stamped.hpp"
-#include "behaviortree_cpp_v3/behavior_tree.h"
+#include "behaviortree_cpp/behavior_tree.h"
 
 #include "ba_types.h"
 

@@ -2,12 +2,13 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "yaml-cpp/yaml.h"
-#include "behaviortree_cpp_v3/behavior_tree.h"
-#include "behaviortree_cpp_v3/loggers/bt_cout_logger.h"
-#include "behaviortree_cpp_v3/loggers/bt_minitrace_logger.h"
-#include "behaviortree_cpp_v3/loggers/bt_file_logger.h"
-#include "behaviortree_cpp_v3/bt_factory.h"
-#include "behaviortree_cpp_v3/loggers/bt_zmq_publisher.h"
+#include "behaviortree_cpp/behavior_tree.h"
+#include "behaviortree_cpp/loggers/bt_cout_logger.h"
+#include "behaviortree_cpp/loggers/bt_minitrace_logger.h"
+#include "behaviortree_cpp/loggers/bt_file_logger.h"
+#include "behaviortree_cpp/bt_factory.h"
+// #include "behaviortree_cpp/loggers/bt_zmq_publisher.h"
+#include "behaviortree_cpp/loggers/groot2_publisher.h"
 #include <string>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
@@ -95,6 +96,8 @@ class LiquidPickup : public rclcpp::Node
         std::cerr << e.what() << '\n';
       }
 
+      // BT::Groot2Publisher publisher(tree, server_port);
+
       // auto node = tree.rootNode();
 
       // if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node))
@@ -114,7 +117,7 @@ class LiquidPickup : public rclcpp::Node
       //     // vis_node->init(p_queue);
       // }
 
-      BT::PublisherZMQ publisher_zmq(tree, max_msg_per_second, publisher_port, server_port);
+      // BT::PublisherZMQ publisher_zmq(tree, max_msg_per_second, publisher_port, server_port);
 
       // // Tick the tree until it reaches a terminal state
       // BT::NodeStatus status = BT::NodeStatus::RUNNING;
