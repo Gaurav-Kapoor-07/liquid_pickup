@@ -25,6 +25,7 @@
 #include <string>
 
 #include "ba_frames_summit_xl.h"
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 // #include "actionlib_msgs/msg/goal_status.hpp"
 
@@ -32,8 +33,8 @@
 
 #pragma region defines
 
-#define ROBOT_DESCRIPTION               "/summit_xl/robot_description"
-#define GROUP_NAME                      "manipulator"
+#define ROBOT_DESCRIPTION               "robot_description"
+#define GROUP_NAME                      "arm"
 
 #define MY_PI                           3.14159
 #define PREGRASP_DISTANCE               0.35    // distance offset of ee from tomato for validation scan
@@ -79,6 +80,8 @@ private:
     void InitializeScanningPose(void);
     void InitializeDropPose(void);
     rclcpp::Node::SharedPtr node_;
+    std::string yaml_file;
+    YAML::Node arm_positions;
 };
 
 #pragma endregion

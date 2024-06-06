@@ -10,16 +10,30 @@
  */
 Manipulator::Manipulator()
 {
-    Manipulator::InitializeSummitXlPoses();
+    // Manipulator::InitializeSummitXlPoses();
 
     // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
     // manipulator_ = new moveit::planning_interface::MoveGroupInterface(manipulator_options_);
 
-    // node_ = rclcpp::Node::make_shared("InitializeSummitXlPoses");
-    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
-    // moveit::planning_interface::MoveGroupInterface move_group(node_, manipulator_options_);
+    node_ = rclcpp::Node::make_shared("manipulator");
+    
+    node_->declare_parameter("yaml_file", "arm_positions.yaml");
+    yaml_file = node_->get_parameter("yaml_file").as_string();
 
-    // manipulator_->allowReplanning(true);
+    std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
+
+    std::string path_to_yaml = package_share_directory + "/config/";
+
+    // std::cerr << path_to_yaml + yaml_file;
+
+    arm_positions = YAML::LoadFile(path_to_yaml + yaml_file);
+
+    Manipulator::InitializeSummitXlPoses();
+
+    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
+    manipulator_ = new moveit::planning_interface::MoveGroupInterface(node_, manipulator_options_);
+
+    manipulator_->allowReplanning(true);
 }
 
 /**
@@ -126,8 +140,8 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
     // listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
 
     // auto node = std::make_shared<rclcpp::Node>("MoveGripperToPregraspPose");
-    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
-    moveit::planning_interface::MoveGroupInterface move_group(node_, manipulator_options_);
+    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
+    // moveit::planning_interface::MoveGroupInterface move_group(node_, manipulator_options_);
 
     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
     geometry_msgs::msg::PoseStamped tomato_base_footprint;
@@ -186,8 +200,8 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::ms
     // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
 
     // auto node = std::make_shared<rclcpp::Node>("MoveGripperToTomato");
-    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
-    moveit::planning_interface::MoveGroupInterface move_group(node_, manipulator_options_);
+    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
+    // moveit::planning_interface::MoveGroupInterface move_group(node_, manipulator_options_);
 
     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
     geometry_msgs::msg::PoseStamped tomato_base_footprint;
@@ -362,14 +376,20 @@ void Manipulator::InitializeSummitXlPoses()
  */
 void Manipulator::InitializeInitialPose()
 {
-    std::string yaml_file;
+    // std::cerr << arm_positions;
+    // std::string yaml_file;
     // ros::param::get("arm_positions", yaml_file);
 
-    node_->get_parameter("arm_positions", yaml_file);
+    // node_->declare_parameter("yaml_file", "yaml_file");
+    // yaml_file = node_->get_parameter("yaml_file").as_string();
+
+    // node_->get_parameter("arm_positions", yaml_file);
 
     // rclcpp::Node::get_parameter("arm_positions", yaml_file);
-    YAML::Node arm_positions = YAML::LoadFile(yaml_file);
+    // YAML::Node arm_positions = YAML::LoadFile(yaml_file);
     std::vector<float> joint_angles = arm_positions["initial_joint_angles"].as<std::vector<float>>();
+
+    //  std::cerr << arm_positions;
 
     initial_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
     initial_position_["arm_shoulder_lift_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[1]);
@@ -385,13 +405,13 @@ void Manipulator::InitializeInitialPose()
  */
 void Manipulator::InitializeDrivingPose()
 {
-    std::string yaml_file;
-    //     ros::param::get("arm_positions", yaml_file);
+    // std::string yaml_file;
+    // ros::param::get("arm_positions", yaml_file);
 
     // auto node = std::make_shared<rclcpp::Node>("InitializeDrivingPose");
-    node_->get_parameter("arm_positions", yaml_file);
+    // node_->get_parameter("arm_positions", yaml_file);
 
-    YAML::Node arm_positions = YAML::LoadFile(yaml_file);
+    // YAML::Node arm_positions = YAML::LoadFile(yaml_file);
     std::vector<float> joint_angles = arm_positions["driving_joint_angles"].as<std::vector<float>>();
 
     driving_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
@@ -408,13 +428,13 @@ void Manipulator::InitializeDrivingPose()
  */
 void Manipulator::InitializeScanningPose()
 {
-    std::string yaml_file;
-//     ros::param::get("arm_positions", yaml_file);
+    // std::string yaml_file;
+    // ros::param::get("arm_positions", yaml_file);
 
     // auto node = std::make_shared<rclcpp::Node>("InitializeScanningPose");
-    node_->get_parameter("arm_positions", yaml_file);
+    // node_->get_parameter("arm_positions", yaml_file);
 
-    YAML::Node arm_positions = YAML::LoadFile(yaml_file);
+    // YAML::Node arm_positions = YAML::LoadFile(yaml_file);
     std::vector<float> joint_angles = arm_positions["scan_position_joint_angles"].as<std::vector<float>>();
 
     scanning_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
@@ -431,12 +451,12 @@ void Manipulator::InitializeScanningPose()
  */
 void Manipulator::InitializeDropPose()
 {
-    std::string yaml_file;
-//     ros::param::get("arm_positions", yaml_file);
+    // std::string yaml_file;
+    // ros::param::get("arm_positions", yaml_file);
     // auto node = std::make_shared<rclcpp::Node>("InitializeDropPose");
-    node_->get_parameter("arm_positions", yaml_file);
+    // node_->get_parameter("arm_positions", yaml_file);
 
-    YAML::Node arm_positions = YAML::LoadFile(yaml_file);
+    // YAML::Node arm_positions = YAML::LoadFile(yaml_file);
     std::vector<float> pose = arm_positions["dropping_position"].as<std::vector<float>>();
 
     drop_pose_.header.frame_id = BASE_FRAME;
