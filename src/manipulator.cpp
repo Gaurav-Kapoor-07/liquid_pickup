@@ -15,11 +15,11 @@ Manipulator::Manipulator()
     // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
     // manipulator_ = new moveit::planning_interface::MoveGroupInterface(manipulator_options_);
 
-    node_ = rclcpp::Node::make_shared("InitializeSummitXlPoses");
-    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
-    moveit::planning_interface::MoveGroupInterface move_group(node_, manipulator_options_);
+    // node_ = rclcpp::Node::make_shared("InitializeSummitXlPoses");
+    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
+    // moveit::planning_interface::MoveGroupInterface move_group(node_, manipulator_options_);
 
-    manipulator_->allowReplanning(true);
+    // manipulator_->allowReplanning(true);
 }
 
 /**

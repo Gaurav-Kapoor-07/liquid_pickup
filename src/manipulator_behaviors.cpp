@@ -192,13 +192,13 @@ void ManipulatorGraspTomato::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorGraspTomato::onStart()
 {
     LOG_MANI_START(this->name());
-    // BT::Optional<float> tomato_map_x = getInput<float>("target_x");
-    // BT::Optional<float> tomato_map_y = getInput<float>("target_y");
-    // BT::Optional<float> tomato_map_z = getInput<float>("target_z");
+    BT::Optional<float> tomato_map_x = getInput<float>("target_x");
+    BT::Optional<float> tomato_map_y = getInput<float>("target_y");
+    BT::Optional<float> tomato_map_z = getInput<float>("target_z");
 
-    BT::Expected<float> tomato_map_x = getInput<float>("target_x");
-    BT::Expected<float> tomato_map_y = getInput<float>("target_y");
-    BT::Expected<float> tomato_map_z = getInput<float>("target_z");
+    // BT::Expected<float> tomato_map_x = getInput<float>("target_x");
+    // BT::Expected<float> tomato_map_y = getInput<float>("target_y");
+    // BT::Expected<float> tomato_map_z = getInput<float>("target_z");
 
     if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
     {
@@ -293,17 +293,17 @@ void ManipulatorPregrasp::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorPregrasp::onStart()
 {
     LOG_MANI_START(this->name());
-    // BT::Optional<float> tomato_map_x = getInput<float>("target_x");
-    // BT::Optional<float> tomato_map_y = getInput<float>("target_y");
-    // BT::Optional<float> tomato_map_z = getInput<float>("target_z");
+    BT::Optional<float> tomato_map_x = getInput<float>("target_x");
+    BT::Optional<float> tomato_map_y = getInput<float>("target_y");
+    BT::Optional<float> tomato_map_z = getInput<float>("target_z");
 
-    BT::Expected<float> tomato_map_x = getInput<float>("target_x");
-    BT::Expected<float> tomato_map_y = getInput<float>("target_y");
-    BT::Expected<float> tomato_map_z = getInput<float>("target_z");
+    // BT::Expected<float> tomato_map_x = getInput<float>("target_x");
+    // BT::Expected<float> tomato_map_y = getInput<float>("target_y");
+    // BT::Expected<float> tomato_map_z = getInput<float>("target_z");
 
-    // BT::Optional<float> pregresp_offset = getInput<float>("pregrasp_offset");
+    BT::Optional<float> pregresp_offset = getInput<float>("pregrasp_offset");
 
-    BT::Expected<float> pregresp_offset = getInput<float>("pregrasp_offset");
+    // BT::Expected<float> pregresp_offset = getInput<float>("pregrasp_offset");
 
     if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
     {

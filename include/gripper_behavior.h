@@ -8,6 +8,7 @@
 #include "ros_logs.h"
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
+#include "ba_interfaces.h"
 
 using std::placeholders::_1;
 using namespace std::chrono_literals;

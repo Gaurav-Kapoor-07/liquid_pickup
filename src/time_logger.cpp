@@ -1,6 +1,6 @@
 #include "time_logger.h"
 
-std::ofstream BATimeLogger::file_movebase;
+// std::ofstream BATimeLogger::file_movebase;
 std::ofstream BATimeLogger::file_movegroup;
 // std::ofstream BATimeLogger::file_imageprocessing;
 std::ofstream BATimeLogger::file_scan;
@@ -12,12 +12,12 @@ std::ofstream BATimeLogger::file_validate;
  * 
  */
 void BATimeLogger::InitFiles(void){
-    file_movebase.open(FILE_MOVEBASE,std::ios_base::app);
+    // file_movebase.open(FILE_MOVEBASE,std::ios_base::app);
     file_movegroup.open(FILE_MOVEARM,std::ios_base::app);
     // file_imageprocessing.open(FILE_VISION,std::ios_base::app);
     file_scan.open(FILE_SCAN,std::ios_base::app);
     file_validate.open(FILE_VALIDATE, std::ios_base::app);
-    file_movebase << "\n\n NEW RUN\n";
+    // file_movebase << "\n\n NEW RUN\n";
     file_movegroup << "\n\n NEW RUN\n";
     // file_imageprocessing << "\n\n NEW RUN\n";
 }
@@ -27,7 +27,7 @@ void BATimeLogger::InitFiles(void){
  * 
  */
 void BATimeLogger::CloseFiles(void){
-    file_movebase.close();
+    // file_movebase.close();
     file_movegroup.close();
     // file_imageprocessing.close();
     file_scan.close();
@@ -76,9 +76,9 @@ void BATimeLogger::LogFile(std::string source, LogType type, std::ofstream &file
  * @param source name of the behavior; is logged in first column
  * @param type logtype start or stop
  */
-void BATimeLogger::LogMoveBase(std::string source, LogType type){
-    LogFile(source, type, file_movebase);
-}
+// void BATimeLogger::LogMoveBase(std::string source, LogType type){
+//     LogFile(source, type, file_movebase);
+// }
 
 /**
  * @brief log time of movegroup task

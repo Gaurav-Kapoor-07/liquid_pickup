@@ -5,6 +5,14 @@
 #include "tomato_queue.h"
 #include "path_queue.h"
 
+namespace BT 
+{
+  using NodeConfiguration = NodeConfig;
+  using AsyncActionNode = ThreadedAction;
+  template <typename T>
+  using Optional = Expected<T>;
+}
+
 #pragma region IBAInitManipulatorNode
 
 /**

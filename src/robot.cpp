@@ -326,7 +326,7 @@ namespace DummyNodes
 
 BT::NodeStatus ApproachObject::tick()
 {
-    std::cout << "ApproachObject: " << this->name() << std::endl;
+    std::cerr << "ApproachObject: " << this->name() << std::endl;
     return BT::NodeStatus::SUCCESS;
 }
 
@@ -338,7 +338,7 @@ BT::NodeStatus SaySomething::tick()
         throw BT::RuntimeError( "missing required input [message]: ", msg.error() );
     }
 
-    std::cout << "Robot says: " << msg.value() << std::endl;
+    std::cerr << "Robot says: " << msg.value() << std::endl;
     return BT::NodeStatus::SUCCESS;
 }
 

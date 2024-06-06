@@ -7,6 +7,7 @@
 #include "behaviortree_cpp/loggers/bt_minitrace_logger.h"
 #include "behaviortree_cpp/loggers/bt_file_logger.h"
 #include "behaviortree_cpp/bt_factory.h"
+#include "behaviortree_cpp/xml_parsing.h"
 // #include "behaviortree_cpp/loggers/bt_zmq_publisher.h"
 #include "behaviortree_cpp/loggers/groot2_publisher.h"
 #include <string>
@@ -72,6 +73,9 @@ class LiquidPickup : public rclcpp::Node
       // factory.registerNodeType<BatteryCharge>("BatteryCharge");
       // factory.registerNodeType<BatteryCheck>("BatteryCheck");  
 
+      std::string xml_models = BT::writeTreeNodesModelXML(factory);
+      std::cerr << xml_models;
+
       try
       {
         this->declare_parameter("bt_xml", "test.xml");
@@ -96,7 +100,7 @@ class LiquidPickup : public rclcpp::Node
         std::cerr << e.what() << '\n';
       }
 
-      // BT::Groot2Publisher publisher(tree, server_port);
+      BT::Groot2Publisher publisher(tree, server_port);
 
       // auto node = tree.rootNode();
 
@@ -120,12 +124,12 @@ class LiquidPickup : public rclcpp::Node
       // BT::PublisherZMQ publisher_zmq(tree, max_msg_per_second, publisher_port, server_port);
 
       // // Tick the tree until it reaches a terminal state
-      // BT::NodeStatus status = BT::NodeStatus::RUNNING;
-      // auto start = this->now().seconds();
+      BT::NodeStatus status = BT::NodeStatus::RUNNING;
+      auto start = this->now().seconds();
       
-      // #ifdef LOG_TIME
-      // BATimeLogger::InitFiles();
-      // #endif
+      #ifdef LOG_TIME
+      BATimeLogger::InitFiles();
+      #endif
       // while (status == BT::NodeStatus::RUNNING)
       // {
       //   status = tree.tickRoot();
@@ -133,35 +137,49 @@ class LiquidPickup : public rclcpp::Node
       //   rclcpp::sleep_for(std::chrono::nanoseconds(100000000));
       // }
 
-      // // Output final results
-      // std::string status_str;
-      // if (status == BT::NodeStatus::SUCCESS)
+      // Use Tree::sleep and wait for either SUCCESS or FAILURE
+      // while(!BT::isStatusCompleted(status)) 
       // {
-      //     status_str = "SUCCESS";
+      //   status = tree.tickOnce();
+      //   tree.sleep(sleep_ms);
       // }
-      // else
-      // {
-      //     status_str = "FAILURE";
-      // }
-      // auto stop = this->now().seconds();;
-      // auto seconds = stop-start;
-      // // ROS_INFO("Done with status %s!", status_str.c_str());
-      // // ROS_INFO("Used time: %.2lf", seconds);
-      // RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
-      // RCLCPP_INFO(this->get_logger(), "Used time: %.2lf", seconds);
+      //---- or, even better ------
+      status = tree.tickWhileRunning(std::chrono::milliseconds(100)); 
+
+      // Output final results
+      std::string status_str;
+      if (status == BT::NodeStatus::SUCCESS)
+      {
+          status_str = "SUCCESS";
+      }
+      else
+      {
+          status_str = "FAILURE";
+      }
+      auto stop = this->now().seconds();;
+      auto seconds = stop-start;
+      // ROS_INFO("Done with status %s!", status_str.c_str());
+      // ROS_INFO("Used time: %.2lf", seconds);
+      RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
+      RCLCPP_INFO(this->get_logger(), "Used time: %.2lf", seconds);
       
       // #ifdef LOG_TIME
       // BATimeLogger::CloseFiles();
       // #endif
-      // std::cout << '\n'
+      // std::cerr << '\n'
       //           << "Press a key to continue...";
       // do
       // {
       // } while (std::cin.get() != '\n');
+
+      int x{0};
+      std::cerr << "Enter a no.";
+      std::cin >> x;
+      Manipulator t;
     }
 
   private:
-    // Manipulator manipulator;
+    // Manipulator t;
     std::string behavior_tree_type;
     BT::Tree tree;
     BT::BehaviorTreeFactory factory;
