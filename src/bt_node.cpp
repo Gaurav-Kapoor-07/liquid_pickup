@@ -102,28 +102,28 @@ class LiquidPickup : public rclcpp::Node
 
       BT::Groot2Publisher publisher(tree, server_port);
 
-      // auto node = tree.rootNode();
+      auto node = tree.rootNode();
 
-      // if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node))
-      // {
-      //   vis_node->init(self);
-      // }
-      // if (auto vis_node = dynamic_cast<IBAInitManipulatorNode *>(node))
-      // {
-      //   vis_node->init(manipulator);
-      // }
+      if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node))
+      {
+        vis_node->init(self);
+      }
+      if (auto vis_node = dynamic_cast<IBAInitManipulatorNode *>(node))
+      {
+        vis_node->init(manipulator);
+      }
       // if (auto vis_node = dynamic_cast<IBAInitTomatoQueue *>(node.get()))
       // {
-      //     vis_node->init(tomato_queue_);
+      //   vis_node->init(tomato_queue_);
       // }
       // if (auto vis_node = dynamic_cast<IBAInitPathQueue *>(node))
       // {
-      //     // vis_node->init(p_queue);
+      //   vis_node->init(p_queue);
       // }
 
       // BT::PublisherZMQ publisher_zmq(tree, max_msg_per_second, publisher_port, server_port);
 
-      // // Tick the tree until it reaches a terminal state
+      // Tick the tree until it reaches a terminal state
       BT::NodeStatus status = BT::NodeStatus::RUNNING;
       auto start = this->now().seconds();
       
@@ -163,28 +163,27 @@ class LiquidPickup : public rclcpp::Node
       RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
       RCLCPP_INFO(this->get_logger(), "Used time: %.2lf", seconds);
       
-      // #ifdef LOG_TIME
-      // BATimeLogger::CloseFiles();
-      // #endif
-      // std::cerr << '\n'
-      //           << "Press a key to continue...";
-      // do
-      // {
-      // } while (std::cin.get() != '\n');
+      #ifdef LOG_TIME
+      BATimeLogger::CloseFiles();
+      #endif
+      std::cerr << '\n'
+                << "Press a key to continue...";
+      do
+      {
+      } while (std::cin.get() != '\n');
 
       // int x{0};
       // std::cerr << "Enter a no.";
       // std::cin >> x;
       // RCLCPP_INFO(this->get_logger(), "Used time: %.2lf", seconds);
-      Manipulator t;
+      // Manipulator t;
     }
 
   private:
-    // Manipulator t;
+    Manipulator manipulator;
     std::string behavior_tree_type;
     BT::Tree tree;
     BT::BehaviorTreeFactory factory;
-    // BehaviorTreeFactory factory;
     std::string bt_xml;
     unsigned max_msg_per_second = 25;
     unsigned publisher_port = 1666;

@@ -214,14 +214,14 @@ BT::NodeStatus ManipulatorGraspTomato::onStart()
     tomato.pose.position.x = tomato_map_x.value() - sin(phi) * 0;
     tomato.pose.position.y = tomato_map_y.value() - cos(phi) * 0;
     tomato.pose.position.z = tomato_map_z.value();
-    // // tomato.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+    // tomato.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
 
     tf2::Quaternion tf2_quat;
     tf2_quat.setRPY(0, 0, 0);
     geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
     tomato.pose.orientation = msg_quat;
 
-    // manipulator_.MoveGripperToTomato(tomato);
+    manipulator_.MoveGripperToTomato(tomato);
     return BT::NodeStatus::RUNNING;
 }
 
