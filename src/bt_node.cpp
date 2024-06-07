@@ -39,7 +39,7 @@
 #include "ba_interfaces.h"
 
 using namespace BT;
-using namespace DummyNodes;
+// using namespace DummyNodes;
 
 class LiquidPickup : public rclcpp::Node
 {
@@ -53,10 +53,14 @@ class LiquidPickup : public rclcpp::Node
       this->declare_parameter("behavior_tree_type", "behavior_tree_type");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
 
-      factory.registerNodeType<ApproachObject>("ApproachObject");
-      factory.registerNodeType<SaySomething>("SaySomething");
+      // factory.registerNodeType<ApproachObject>("ApproachObject");
+      // factory.registerNodeType<SaySomething>("SaySomething");
 
-      // factory.registerNodeType<RobotInitializer>("RobotInitializer");
+      // int x{0};
+      // std::cerr << "Enter a no.";
+      // std::cin >> x;
+      
+      factory.registerNodeType<RobotInitializer>("RobotInitializer");
       // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
       // factory.registerNodeType<DequeueTomato>("DequeueTomato");
       // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
@@ -79,6 +83,7 @@ class LiquidPickup : public rclcpp::Node
       try
       {
         this->declare_parameter("bt_xml", "test.xml");
+        // this->declare_parameter("bt_xml", "test_2.xml");
         bt_xml = this->get_parameter("bt_xml").as_string(); 
         // ros::param::get("bt_xml", bt_xml);
         // factory.createTreeFromFile("/home/ros/rap/gaurav_ws/src/liquid_pickup/config/test.xml");
