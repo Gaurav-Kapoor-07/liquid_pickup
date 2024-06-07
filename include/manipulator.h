@@ -64,14 +64,14 @@ public:
     void init(rclcpp::Node::SharedPtr node_handle);
 
     BT::NodeStatus GetNodeStatus(const char* name);
-    // moveit::core::MoveItErrorCode MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped& tomato_pose, float offset);
-    // moveit::core::MoveItErrorCode MoveGripperToTomato(geometry_msgs::msg::PoseStamped& tomato_pose);
-    // double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
-    // double MoveLinearVec(float x, float y, float z);
-    // moveit::core::MoveItErrorCode DropTomatoInBasket(void);
-    // moveit::core::MoveItErrorCode MoveToInitialPosition(void);
-    // moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
-    // moveit::core::MoveItErrorCode MoveToScanningPosition(void);
+    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped& tomato_pose, float offset);
+    moveit::core::MoveItErrorCode MoveGripperToTomato(geometry_msgs::msg::PoseStamped& tomato_pose);
+    double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
+    double MoveLinearVec(float x, float y, float z);
+    moveit::core::MoveItErrorCode DropTomatoInBasket(void);
+    moveit::core::MoveItErrorCode MoveToInitialPosition(void);
+    moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
+    moveit::core::MoveItErrorCode MoveToScanningPosition(void);
 private:
     moveit::planning_interface::MoveGroupInterface *manipulator_;
     geometry_msgs::msg::PoseStamped drop_pose_;
