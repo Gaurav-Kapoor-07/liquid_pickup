@@ -221,7 +221,7 @@ BT::NodeStatus ManipulatorGraspTomato::onStart()
     geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
     tomato.pose.orientation = msg_quat;
 
-    manipulator_.MoveGripperToTomato(tomato);
+    // manipulator_.MoveGripperToTomato(tomato);
     return BT::NodeStatus::RUNNING;
 }
 

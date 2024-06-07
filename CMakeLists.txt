@@ -57,7 +57,7 @@ set(BT_SOURCES
     # src/navigation_behaviors.cpp 
     # src/vision_behaviors.cpp
     src/manipulator.cpp
-    src/manipulator_behaviors.cpp
+    # src/manipulator_behaviors.cpp
     src/gripper_behavior.cpp
     src/robot.cpp
     # src/path_queue.cpp

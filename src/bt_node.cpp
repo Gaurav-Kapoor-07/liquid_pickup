@@ -163,14 +163,14 @@ class LiquidPickup : public rclcpp::Node
       RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
       RCLCPP_INFO(this->get_logger(), "Used time: %.2lf", seconds);
       
-      #ifdef LOG_TIME
-      BATimeLogger::CloseFiles();
-      #endif
-      std::cerr << '\n'
-                << "Press a key to continue...";
-      do
-      {
-      } while (std::cin.get() != '\n');
+      // #ifdef LOG_TIME
+      // BATimeLogger::CloseFiles();
+      // #endif
+      // std::cerr << '\n'
+      //           << "Press a key to continue...";
+      // do
+      // {
+      // } while (std::cin.get() != '\n');
 
       // int x{0};
       // std::cerr << "Enter a no.";
@@ -199,6 +199,7 @@ int main(int argc, char *argv[])
     rclcpp::executors::MultiThreadedExecutor executor;
     executor.add_node(mnode);
     executor.spin();
+    // rclcpp::spin(std::make_shared<LiquidPickup>());
     // ros::NodeHandle nh;
     // ros::AsyncSpinner async_spinner(1);
     // async_spinner.start();

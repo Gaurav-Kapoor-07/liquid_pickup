@@ -7,6 +7,7 @@ def generate_launch_description():
             package='liquid_pickup',
             executable='liquid_pickup_node',
             name='bt_node',
+            namespace='summit',
             # prefix=['gdbserver localhost:3000'],
             # prefix='gdb -ex "run" --args',
             output='screen'

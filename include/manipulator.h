@@ -18,7 +18,7 @@
 #include <math.h>
 
 #include "behaviortree_cpp/behavior_tree.h"
-#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/logger.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
 // #include <move_base_msgs/MoveBaseAction.h>
@@ -54,6 +54,9 @@
  * @brief Class which actually controls the manipulator
  * 
  */
+
+// using moveit::planning_interface::MoveGroupInterface;
+
 class Manipulator 
 {
 public:
@@ -61,19 +64,19 @@ public:
     void init(rclcpp::Node::SharedPtr node_handle);
 
     BT::NodeStatus GetNodeStatus(const char* name);
-    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped& tomato_pose, float offset);
-    moveit::core::MoveItErrorCode MoveGripperToTomato(geometry_msgs::msg::PoseStamped& tomato_pose);
-    double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
-    double MoveLinearVec(float x, float y, float z);
-    moveit::core::MoveItErrorCode DropTomatoInBasket(void);
-    moveit::core::MoveItErrorCode MoveToInitialPosition(void);
-    moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
-    moveit::core::MoveItErrorCode MoveToScanningPosition(void);
+    // moveit::core::MoveItErrorCode MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped& tomato_pose, float offset);
+    // moveit::core::MoveItErrorCode MoveGripperToTomato(geometry_msgs::msg::PoseStamped& tomato_pose);
+    // double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
+    // double MoveLinearVec(float x, float y, float z);
+    // moveit::core::MoveItErrorCode DropTomatoInBasket(void);
+    // moveit::core::MoveItErrorCode MoveToInitialPosition(void);
+    // moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
+    // moveit::core::MoveItErrorCode MoveToScanningPosition(void);
 private:
     moveit::planning_interface::MoveGroupInterface *manipulator_;
     geometry_msgs::msg::PoseStamped drop_pose_;
     std::map<std::string, double> initial_position_, driving_position_, scanning_position_;
-    rclcpp::Node::SharedPtr node_handle_;
+    // rclcpp::Node::SharedPtr node_handle_;
     void InitializeSummitXlPoses(void);
     void InitializeInitialPose(void);
     void InitializeDrivingPose(void);
