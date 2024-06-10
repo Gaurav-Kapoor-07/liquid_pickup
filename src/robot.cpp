@@ -261,7 +261,7 @@ BT::NodeStatus BatteryCharge::tick()
     {
         // ros::Duration(0.5).sleep();
         rclcpp::sleep_for(std::chrono::nanoseconds(500000000));
-        RCLCPP_INFO(this->node_handle_2->get_logger(), "Battery capacity: %d %%", i * 10);;
+        RCLCPP_INFO(this->node_handle_2->get_logger(), "Battery capacity: %d %%", i * 10);
         // ROS_INFO("Battery capacity: %d %%", i * 10);
     }
 
