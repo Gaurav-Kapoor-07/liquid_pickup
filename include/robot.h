@@ -64,10 +64,10 @@ private:
     std::shared_ptr<rclcpp::Node> node_handle_;
     rclcpp::TimerBase::SharedPtr timer_;
     // ros::Timer timer_;
-    bool battery_empty_;
-    float timer_duration_;
+    bool battery_empty_{false};
+    float timer_duration_{1.0};
     // int timer_duration_;
-    double start_;
+    double start_{0.0};
 
     void TimerCallback();
 };

@@ -2,14 +2,16 @@
     <BehaviorTree ID="MainTree">
         <Sequence name="root_sequence">
             <!-- <RobotInitializer   name="RobotInitializer" message="RobotInitializer"/> -->
-            <GraspTomato name="grasp_tomato" target_x="{target_x}" target_y="{target_y}" target_z="{target_z}" />
+            <!-- <GraspTomato name="grasp_tomato" target_x="{target_x}" target_y="{target_y}" target_z="{target_z}" /> -->
+            <!-- <GraspTomato name="grasp_tomato" target_x="0.0" target_y="0.0" target_z="0.0" /> -->
             <!-- <pregraspTomato name="pregrasp_tomato" target_x="{target_x}" target_y="{target_y}" target_z="{target_z}" pregrasp_offset="0.1" /> -->
+            <pregraspTomato name="pregrasp_tomato" target_x="0.0" target_y="0.0" target_z="0.0" pregrasp_offset="0.1" />
             <!-- <dropTomato name="drop_tomato" /> -->
             <!-- <RetreatZ name="post_grasp_retreat" target_x="{target_x}" target_y="{target_y}" target_z="{target_z}" /> -->
             <!-- <ScanPose name="init_scanpose" /> -->
             <!-- <ChangeGripper name="close_gripper" gripper_param="0.0" /> -->
-            <!-- <BatteryCheck /> -->
-            <!-- <BatteryCharge /> -->
+            <BatteryCheck />
+            <BatteryCharge />
         </Sequence>
     </BehaviorTree>
         <TreeNodesModel>
@@ -28,9 +30,9 @@
             <!-- <input_port name="target_y" type="float"/> -->
             <!-- <input_port name="target_x" type="float"/> -->
         <!-- </Action> -->
-        <Action ID="RobotInitializer">
-            <input_port name="message" type="std::string"/>
-        </Action>
+        <!-- <Action ID="RobotInitializer"> -->
+            <!-- <input_port name="message" type="std::string"/> -->
+        <!-- </Action> -->
         <!-- <Action ID="ScanPose"/> -->
         <!-- <Action ID="dropTomato"/> -->
         <!-- <Action ID="pregraspTomato"> -->

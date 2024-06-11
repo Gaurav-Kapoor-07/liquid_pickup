@@ -61,9 +61,9 @@ class LiquidPickup : public rclcpp::Node
       std::cin >> x;
       
       // factory.registerNodeType<RobotInitializer>("RobotInitializer");
-      factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
+      // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
       // factory.registerNodeType<DequeueTomato>("DequeueTomato");
-      // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
+      factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
       // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
       // factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
       // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
@@ -74,8 +74,8 @@ class LiquidPickup : public rclcpp::Node
       // factory.registerNodeType<SaveCurrentLocation>("SaveCurrentLocation");
       // factory.registerNodeType<WriteChargingLocationToQueue>("WriteChargingLocationToQueue");
       // factory.registerNodeType<WriteBasketChangeLocationToQueue>("WriteBasketChangeLocationToQueue");
-      // factory.registerNodeType<BatteryCharge>("BatteryCharge");
-      // factory.registerNodeType<BatteryCheck>("BatteryCheck");  
+      factory.registerNodeType<BatteryCharge>("BatteryCharge");
+      factory.registerNodeType<BatteryCheck>("BatteryCheck");  
 
       std::string xml_models = BT::writeTreeNodesModelXML(factory);
       std::cerr << xml_models;
@@ -172,12 +172,12 @@ class LiquidPickup : public rclcpp::Node
       {
           status_str = "FAILURE";
       }
-      auto stop = this->now().seconds();;
+      auto stop = this->now().seconds();
       auto seconds = stop-start;
       // ROS_INFO("Done with status %s!", status_str.c_str());
       // ROS_INFO("Used time: %.2lf", seconds);
       RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
-      RCLCPP_INFO(this->get_logger(), "Used time: %.2lf", seconds);
+      RCLCPP_INFO(this->get_logger(), "Used time: %.2lf seconds", seconds);
       
       #ifdef LOG_TIME
       BATimeLogger::CloseFiles();
