@@ -12,6 +12,7 @@ GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfigur
     object_attached_ = false;
     object_attached_before_ = false;
     ROS_LOG_INIT(this->name().c_str());
+    node_ = rclcpp::Node::make_shared("GripperActuator");
 }
 
 /**

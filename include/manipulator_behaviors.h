@@ -87,7 +87,6 @@
 class ManipulatorGraspTomato : public BT::StatefulActionNode, public IBAInitManipulatorNode
 {
 public:
-    rclcpp_action::Client<moveit_msgs::action::MoveGroup>::SharedPtr client_;
     ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config);
     void init(Manipulator manipulator) override;
     BT::NodeStatus onStart() override;
@@ -96,6 +95,8 @@ public:
     static BT::PortsList providedPorts();
 
 private:
+    rclcpp::Node::SharedPtr node_;
+    rclcpp_action::Client<moveit_msgs::action::MoveGroup>::SharedPtr client_;
     Manipulator manipulator_;
 };
 

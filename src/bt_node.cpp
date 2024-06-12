@@ -64,13 +64,13 @@ class LiquidPickup : public rclcpp::Node
       // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
       // factory.registerNodeType<DequeueTomato>("DequeueTomato");
       // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
-      // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
+      factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
       // factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
       // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
       // factory.registerNodeType<ManipulatorScanPose>("ScanPose");
       // factory.registerNodeType<BasketCheck>("BasketFull");
       // factory.registerNodeType<BasketChange>("ChangeBasket");
-      // factory.registerNodeType<GripperActuator>("ChangeGripper");
+      factory.registerNodeType<GripperActuator>("ChangeGripper");
       // factory.registerNodeType<SaveCurrentLocation>("SaveCurrentLocation");
       // factory.registerNodeType<WriteChargingLocationToQueue>("WriteChargingLocationToQueue");
       // factory.registerNodeType<WriteBasketChangeLocationToQueue>("WriteBasketChangeLocationToQueue");
