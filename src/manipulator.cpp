@@ -93,20 +93,24 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
     
     // std::shared_ptr<moveit::planning_interface::MoveGroupInterface> manipulator_ptr(manipulator_);
 
-    auto& action_client = manipulator_->getMoveGroupClient();
+    // auto& action_client = manipulator_->getMoveGroupClient();
 
     // action_client.async_get_result();
 
-    // Define a callback function for the action client result
-    auto result_callback = [](const rclcpp_action::ClientGoalHandle<moveit_msgs::action::MoveGroup>::WrappedResult&) {};
+    // // Define a callback function for the action client result
+    // auto result_callback = [](const rclcpp_action::ClientGoalHandle<moveit_msgs::action::MoveGroup>::WrappedResult&) {};
 
     // Create a goal handle, assuming it's nullptr for now
-    auto goal_handle = std::shared_ptr<rclcpp_action::ClientGoalHandle<moveit_msgs::action::MoveGroup>>(nullptr);
+    // auto goal_handle = std::shared_ptr<rclcpp_action::ClientGoalHandle<moveit_msgs::action::MoveGroup>>(nullptr);
 
+    using MoveGoalHandle = rclcpp_action::ClientGoalHandle<moveit_msgs::action::MoveGroup>;
+
+    MoveGoalHandle::WrappedResult result_;
     // Call async_get_result() with appropriate arguments
-    auto result_future = action_client.async_get_result(goal_handle, result_callback);
+    // auto result_future = action_client.async_get_result(goal_handle, result_callback);
+    // auto result_future = action_client.async_get_result(goal_handle);
 
-    auto result_ = result_future.get();
+    // auto result_ = result_future.get();
     auto state = result_.code;
 
     // if (state == action_msgs::msg::GoalStatus::STATUS_SUCCEEDED)
