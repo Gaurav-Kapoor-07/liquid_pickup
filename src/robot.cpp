@@ -243,7 +243,8 @@ void BatteryCheck::TimerCallback()
 BatteryCharge::BatteryCharge(const std::string &name, const BT::NodeConfiguration &config) : BT::ConditionNode(name, config)
 {
     ROS_LOG_INIT(this->name().c_str());
-    node_handle_2 = rclcpp::Node::make_shared("battery_charge");}
+    node_handle_2 = rclcpp::Node::make_shared("battery_charge");
+}
 
 /**
  * @brief Handles the tick from the behavior tree

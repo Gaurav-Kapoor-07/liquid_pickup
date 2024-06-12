@@ -17,7 +17,7 @@ using namespace std::chrono_literals;
 
 #pragma region defines
 
-#define DEFAULT_CONTACT_TOPIC   "gazebo/default/summit/contacts"
+#define DEFAULT_CONTACT_TOPIC   "gazebo/default/summit_xl/contacts"
 #define GRIPPER_TOPIC           "gripper_left_controller/command"
 
 #pragma endregion
