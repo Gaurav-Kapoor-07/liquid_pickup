@@ -15,7 +15,9 @@ Manipulator::Manipulator()
     // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
     // manipulator_ = new moveit::planning_interface::MoveGroupInterface(manipulator_options_);
 
-    node_ = rclcpp::Node::make_shared("manipulator");
+    // node_ = rclcpp::Node::make_shared("manipulator");
+
+    node_ = rclcpp::Node::make_shared("manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
 
     // auto const node = std::make_shared<rclcpp::Node>(
     // "trial",

@@ -60,14 +60,14 @@ class LiquidPickup : public rclcpp::Node
       std::cerr << "Enter a no.";
       std::cin >> x;
       
-      // factory.registerNodeType<RobotInitializer>("RobotInitializer");
+      factory.registerNodeType<RobotInitializer>("RobotInitializer");
       // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
       // factory.registerNodeType<DequeueTomato>("DequeueTomato");
-      // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
+      factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
       factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
       // factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
-      // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
-      // factory.registerNodeType<ManipulatorScanPose>("ScanPose");
+      factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
+      factory.registerNodeType<ManipulatorScanPose>("ScanPose");
       // factory.registerNodeType<BasketCheck>("BasketFull");
       // factory.registerNodeType<BasketChange>("ChangeBasket");
       factory.registerNodeType<GripperActuator>("ChangeGripper");
@@ -146,6 +146,11 @@ class LiquidPickup : public rclcpp::Node
       #ifdef LOG_TIME
       BATimeLogger::InitFiles();
       #endif
+
+      // int x{0};
+      // std::cerr << "Enter a no.";
+      // std::cin >> x;
+
       // while (status == BT::NodeStatus::RUNNING)
       // {
       //   status = tree.tickRoot();
