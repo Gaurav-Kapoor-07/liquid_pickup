@@ -23,9 +23,9 @@ Manipulator::Manipulator()
     // {
         // node_ = rclcpp::Node::make_shared("manipulator");
 
-        // node_ = rclcpp::Node::make_shared("manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
+        node_ = rclcpp::Node::make_shared("Manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
 
-        auto node_ = rclcpp::Node::make_shared("manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
+        // auto node_ = rclcpp::Node::make_shared("manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
 
         // auto const node = std::make_shared<rclcpp::Node>(
         // "trial",

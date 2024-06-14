@@ -65,7 +65,7 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     // ros::Timer timer_;
     bool battery_empty_{false};
-    float timer_duration_{1.0};
+    double timer_duration_{1.0};
     // int timer_duration_;
     double start_{0.0};
 

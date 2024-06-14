@@ -54,29 +54,19 @@ class LiquidPickup : public rclcpp::Node
       this->declare_parameter("behavior_tree_type", "behavior_tree_type");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
 
-      // factory.registerNodeType<ApproachObject>("ApproachObject");
-      // factory.registerNodeType<SaySomething>("SaySomething");
-
       int x{0};
       std::cerr << "Enter a no.";
       std::cin >> x;
       
       factory.registerNodeType<RobotInitializer>("RobotInitializer");
-      // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
-      // factory.registerNodeType<DequeueTomato>("DequeueTomato");
-      // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
-      // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
-      // factory.registerNodeType<FilterTomatoQueue>("FilterTomatoQueue");
-      // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
-      // factory.registerNodeType<ManipulatorScanPose>("ScanPose");
-      // factory.registerNodeType<BasketCheck>("BasketFull");
-      // factory.registerNodeType<BasketChange>("ChangeBasket");
-      // factory.registerNodeType<GripperActuator>("ChangeGripper");
-      // factory.registerNodeType<SaveCurrentLocation>("SaveCurrentLocation");
-      // factory.registerNodeType<WriteChargingLocationToQueue>("WriteChargingLocationToQueue");
-      // factory.registerNodeType<WriteBasketChangeLocationToQueue>("WriteBasketChangeLocationToQueue");
-      // factory.registerNodeType<BatteryCharge>("BatteryCharge");
-      // factory.registerNodeType<BatteryCheck>("BatteryCheck");  
+      factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
+      factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
+      factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
+      factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
+      factory.registerNodeType<ManipulatorScanPose>("ScanPose");
+      factory.registerNodeType<GripperActuator>("ChangeGripper");
+      factory.registerNodeType<BatteryCharge>("BatteryCharge");
+      factory.registerNodeType<BatteryCheck>("BatteryCheck");  
 
       std::string xml_models = BT::writeTreeNodesModelXML(factory);
       std::cerr << xml_models;

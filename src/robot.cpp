@@ -149,7 +149,7 @@ BatteryCheck::BatteryCheck(const std::string &name, const BT::NodeConfiguration 
     // ROS_LOG_INIT(this->name().c_str());
     battery_empty_ = false;
     node_handle_ = rclcpp::Node::make_shared("BatteryCheck");
-    node_handle_->declare_parameter<float>("battery_timer", timer_duration_);
+    node_handle_->declare_parameter<double>("battery_timer", timer_duration_);
     // this->node_handle_->declare_parameter<float>("battery_timer", timer_duration_);
     // ros::param::get("battery_timer", timer_duration_);
     // timer_ = node_handle_.createTimer(ros::Duration(timer_duration_), &BatteryCheck::TimerCallback, this);
