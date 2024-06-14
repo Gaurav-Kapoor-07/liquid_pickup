@@ -8,6 +8,10 @@
  * @brief Construct a new Manipulator:: Manipulator object
  * 
  */
+
+// bool Manipulator::a = false;
+// rclcpp::Node::SharedPtr Manipulator::node_ = nullptr;
+
 Manipulator::Manipulator()
 {
     // Manipulator::InitializeSummitXlPoses();
@@ -15,37 +19,56 @@ Manipulator::Manipulator()
     // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
     // manipulator_ = new moveit::planning_interface::MoveGroupInterface(manipulator_options_);
 
-    // node_ = rclcpp::Node::make_shared("manipulator");
+    // if(!a)
+    // {
+        // node_ = rclcpp::Node::make_shared("manipulator");
 
-    node_ = rclcpp::Node::make_shared("manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
+        // node_ = rclcpp::Node::make_shared("manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
 
-    // auto const node = std::make_shared<rclcpp::Node>(
-    // "trial",
-    // rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true)
-    // );
+        auto node_ = rclcpp::Node::make_shared("manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
 
-    // auto options = rclcpp::NodeOptions().arguments(
-    // {"--ros-args", "-r", "__ns:=/summit", "-r", "__node:=manipulator"});
+        // auto const node = std::make_shared<rclcpp::Node>(
+        // "trial",
+        // rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true)
+        // );
 
-    // node_ = std::make_shared<rclcpp::Node>("_", options);
+        // auto options = rclcpp::NodeOptions().arguments(
+        // {"--ros-args", "-r", "__ns:=/summit", "-r", "__node:=manipulator"});
 
-    // node_ = std::make_shared<rclcpp::Node>("_", "summit", options);
+        // node_ = std::make_shared<rclcpp::Node>("_", options);
 
-    // auto options = rclcpp::NodeOptions().arguments(
-    // {"--ros-args", "-r", "__node:=manipulator"});
+        // node_ = std::make_shared<rclcpp::Node>("_", "summit", options);
 
-    // node_ = std::make_shared<rclcpp::Node>("_", options);
+        // auto options = rclcpp::NodeOptions().arguments(
+        // {"--ros-args", "-r", "__node:=manipulator"});
 
-    node_->declare_parameter("yaml_file", "arm_positions.yaml");
-    yaml_file = node_->get_parameter("yaml_file").as_string();
+        // node_ = std::make_shared<rclcpp::Node>("_", options);
 
-    std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
+        node_->declare_parameter("yaml_file", "arm_positions.yaml");
+        yaml_file = node_->get_parameter("yaml_file").as_string();
 
-    std::string path_to_yaml = package_share_directory + "/config/";
+        std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
 
-    // std::cerr << path_to_yaml + yaml_file;
+        std::string path_to_yaml = package_share_directory + "/config/";
 
-    arm_positions = YAML::LoadFile(path_to_yaml + yaml_file);
+        // std::cerr << path_to_yaml + yaml_file;
+
+        arm_positions = YAML::LoadFile(path_to_yaml + yaml_file);
+
+        // a = true;
+    // }
+
+    // yaml_file = node_->get_parameter("yaml_file").as_string();
+
+    // // yaml_file = node_->get_parameter("yaml_file").as_string();
+
+    // std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
+
+    // std::string path_to_yaml = package_share_directory + "/config/";
+
+    // // std::cerr << path_to_yaml + yaml_file;
+
+    // arm_positions = YAML::LoadFile(path_to_yaml + yaml_file);
 
     Manipulator::InitializeSummitXlPoses();
 
@@ -119,6 +142,7 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
     if (state == rclcpp_action::ResultCode::SUCCEEDED)
     {
         RCLCPP_DEBUG(node_->get_logger(), "[%s] reached Pose", name);
+        // RCLCPP_DEBUG(rclcpp::get_logger("Manipulator"), "[%s] reached Pose", name);
         return BT::NodeStatus::SUCCESS;
     }
     // else if (state == action_msgs::msg::GoalStatus::STATUS_ACCEPTED ||
@@ -136,6 +160,7 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
     else
     {
         RCLCPP_ERROR(node_->get_logger(), "[%s] Failed to reach Pose!", name);
+        // RCLCPP_ERROR(rclcpp::get_logger("Manipulator"), "[%s] Failed to reach Pose!", name);
         return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
     }
 }
@@ -171,6 +196,9 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
         RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
             BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
+        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        //     "Could not transform %s to %s: %s",  
+        //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
     }
 
     // listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
@@ -231,6 +259,9 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::ms
         RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
             BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
+        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        //     "Could not transform %s to %s: %s",
+        //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
     }
 
     // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
@@ -314,6 +345,9 @@ double Manipulator::MoveLinearVec(float x, float y, float z){
         RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
             BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
+        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        //     "Could not transform %s to %s: %s",
+        //     BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
     }
 
     geometry_msgs::msg::PoseStamped ee_base_frame;

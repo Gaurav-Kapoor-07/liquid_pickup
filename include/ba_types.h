@@ -34,23 +34,23 @@ struct TomatoCoordinates{
     };
 } ;
 
-/**
- * @brief Struct to specify single locations of the path where the robot has to drive.
- * 
- */
-struct PathLocation {
-    float x;
-    float y;
-    float orientation;
-};
+// /**
+//  * @brief Struct to specify single locations of the path where the robot has to drive.
+//  * 
+//  */
+// struct PathLocation {
+//     float x;
+//     float y;
+//     float orientation;
+// };
 
-/**
- * @brief Enum to specify whether to push/pop in front or back of queue.
- * 
- */
-enum QueueSide {
-    front,
-    back
-};
+// /**
+//  * @brief Enum to specify whether to push/pop in front or back of queue.
+//  * 
+//  */
+// enum QueueSide {
+//     front,
+//     back
+// };
 
 #endif

@@ -85,6 +85,8 @@ private:
     rclcpp::Node::SharedPtr node_;
     std::string yaml_file;
     YAML::Node arm_positions;
+    // static bool a;
+    // static rclcpp::Node::SharedPtr node_;
 };
 
 #pragma endregion

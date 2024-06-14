@@ -8,7 +8,7 @@
 #include "behaviortree_cpp/bt_factory.h"
 
 #include "manipulator.h"
-#include "ros_logs.h"
+// #include "ros_logs.h"
 // #include "tomato_queue.h"
 #include <math.h>
 #include "ba_interfaces.h"

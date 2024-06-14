@@ -2,7 +2,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 // #include "ros/message.h"
-#include "ros_logs.h"
+// #include "ros_logs.h"
 // #include <ros/package.h>
 #include <stdio.h>
 #include <math.h>
@@ -88,7 +88,7 @@ public:
     static BT::PortsList providedPorts();
 
 private:
-    std::shared_ptr<rclcpp::Node> node_handle_2;
+    // std::shared_ptr<rclcpp::Node> node_handle_2;
 };
 
 #pragma endregion

@@ -12,7 +12,8 @@
  */
 RobotInitializer::RobotInitializer(const std::string &name, const BT::NodeConfiguration &config) : BT::SyncActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
+    RCLCPP_INFO(rclcpp::get_logger("RobotInitializer"), "[%s] Initialized!", this->name().c_str());
 }
 
 /**
@@ -145,13 +146,14 @@ moveit::core::MoveItErrorCode RobotInitializer::SetInitialPosition()
  */
 BatteryCheck::BatteryCheck(const std::string &name, const BT::NodeConfiguration &config) : BT::ConditionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
     battery_empty_ = false;
-    node_handle_ = rclcpp::Node::make_shared("battery_check");
+    node_handle_ = rclcpp::Node::make_shared("BatteryCheck");
     node_handle_->declare_parameter<float>("battery_timer", timer_duration_);
     // this->node_handle_->declare_parameter<float>("battery_timer", timer_duration_);
     // ros::param::get("battery_timer", timer_duration_);
     // timer_ = node_handle_.createTimer(ros::Duration(timer_duration_), &BatteryCheck::TimerCallback, this);
+    RCLCPP_INFO(node_handle_->get_logger(), "[%s] Initialized!", this->name().c_str());
 
     int64_t nanoseconds = static_cast<int64_t>(timer_duration_ * 1e9);
 
@@ -242,8 +244,10 @@ void BatteryCheck::TimerCallback()
  */
 BatteryCharge::BatteryCharge(const std::string &name, const BT::NodeConfiguration &config) : BT::ConditionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
-    node_handle_2 = rclcpp::Node::make_shared("battery_charge");
+    // ROS_LOG_INIT(this->name().c_str());
+    // node_handle_2 = rclcpp::Node::make_shared("battery_charge");
+    // RCLCPP_INFO(node_handle_2->get_logger(), "[%s] Initialized!", name)
+    RCLCPP_INFO(rclcpp::get_logger("BatteryCharge"), "[%s] Initialized!", this->name().c_str());
 }
 
 /**
@@ -254,8 +258,8 @@ BatteryCharge::BatteryCharge(const std::string &name, const BT::NodeConfiguratio
 BT::NodeStatus BatteryCharge::tick()
 {
     // ROS_WARN("Mocking behavior of charging:");
-    RCLCPP_WARN(node_handle_2->get_logger(), "Mocking behavior of charging:");
-
+    // RCLCPP_WARN(node_handle_2->get_logger(), "Mocking behavior of charging:");
+    RCLCPP_WARN(rclcpp::get_logger("BatteryCharge"), "Mocking behavior of charging:");
     // for (int i = 0; i <= 10; i++)
     // {
     //     ros::Duration(0.5).sleep();
@@ -266,7 +270,8 @@ BT::NodeStatus BatteryCharge::tick()
     {
         // ros::Duration(0.5).sleep();
         rclcpp::sleep_for(std::chrono::nanoseconds(500000000));
-        RCLCPP_INFO(node_handle_2->get_logger(), "Battery capacity: %d %%", i * 10);
+        // RCLCPP_INFO(node_handle_2->get_logger(), "Battery capacity: %d %%", i * 10);
+        RCLCPP_WARN(rclcpp::get_logger("BatteryCharge"), "Battery capacity: %d %%", i * 10);
         // ROS_INFO("Battery capacity: %d %%", i * 10);
     }
 

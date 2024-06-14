@@ -179,7 +179,8 @@ ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT
     node_ = rclcpp::Node::make_shared("ManipulatorGraspTomato");
     this->client_ = rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(node_, "/summit/move_group");
     this->client_->wait_for_action_server();
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
 
 /**
@@ -212,7 +213,8 @@ BT::NodeStatus ManipulatorGraspTomato::onStart()
     if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
     {
         // ROS_ERROR("GOT NO POSE!");
-        RCLCPP_ERROR(rclcpp::get_logger("ManipulatorGraspTomato"), "GOT NO POSE!");
+        // RCLCPP_ERROR(rclcpp::get_logger("ManipulatorGraspTomato"), "GOT NO POSE!");
+        RCLCPP_ERROR(node_->get_logger(), "GOT NO POSE!");
 
         return BT::NodeStatus::FAILURE;
     }
@@ -280,7 +282,8 @@ BT::PortsList ManipulatorGraspTomato::providedPorts()
 ManipulatorPregrasp::ManipulatorPregrasp(const std::string &name, const BT::NodeConfiguration &config)
     : BT::StatefulActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
+    RCLCPP_INFO(rclcpp::get_logger("ManipulatorPregrasp"), "[%s] Initialized!", this->name().c_str());
 }
 
 /**
@@ -384,7 +387,8 @@ BT::PortsList ManipulatorPregrasp::providedPorts()
 ManipulatorPostgraspRetreat::ManipulatorPostgraspRetreat(const std::string &name, const BT::NodeConfiguration &config)
     : BT::StatefulActionNode(name, config)
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
+    RCLCPP_INFO(rclcpp::get_logger("ManipulatorPostgraspRetreat"), "[%s] Initialized!", this->name().c_str());
 }
 
 /**
@@ -456,7 +460,8 @@ BT::PortsList ManipulatorPostgraspRetreat::providedPorts()
 ManipulatorDropTomato::ManipulatorDropTomato(const std::string &name)
     : BT::StatefulActionNode(name, {})
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
+    RCLCPP_INFO(rclcpp::get_logger("ManipulatorDropTomato"), "[%s] Initialized!", this->name().c_str());
 }
 
 /**
@@ -532,7 +537,8 @@ void ManipulatorDropTomato::onHalted() {}
 ManipulatorScanPose::ManipulatorScanPose(const std::string &name)
     : BT::StatefulActionNode(name, {})
 {
-    ROS_LOG_INIT(this->name().c_str());
+    // ROS_LOG_INIT(this->name().c_str());
+    RCLCPP_INFO(rclcpp::get_logger("ManipulatorScanPose"), "[%s] Initialized!", this->name().c_str());
 }
 
 /**
