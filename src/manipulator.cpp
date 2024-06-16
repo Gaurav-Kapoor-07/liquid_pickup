@@ -11,12 +11,19 @@
 
 rclcpp::Node::SharedPtr Manipulator::node_ = nullptr;
 
+std::shared_ptr<tf2_ros::TransformListener> Manipulator::tf_listener_ = nullptr;
+        
+std::unique_ptr<tf2_ros::Buffer> Manipulator::tf_buffer_ = nullptr;
+
 Manipulator::Manipulator()
 {
     if (node_ == nullptr)
     {
         node_ = rclcpp::Node::make_shared("Manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
         node_->declare_parameter("yaml_file", "arm_positions.yaml");
+
+        tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
+        tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
     }
 
     yaml_file = node_->get_parameter("yaml_file").as_string();
@@ -87,14 +94,6 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
 moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped &tomato_pose, float offset)
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
-    // tf::TransformListener listener;
-    // tf2_ros::TransformListener listener;
-
-    std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
-    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
-
-    tf_listener_ =
-        std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
     geometry_msgs::msg::TransformStamped t;
 
@@ -129,6 +128,7 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
     tomato_base_footprint.pose.orientation = msg_quat;
     tomato_base_footprint.pose.position.x -= cos(angle) * (offset+TCP_OFFSET_XY);
     tomato_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
+
     manipulator_->setPoseReferenceFrame(tomato_base_footprint.header.frame_id);
     manipulator_->setPoseTarget(tomato_base_footprint);
     manipulator_->setPlanningTime(5);
@@ -143,12 +143,6 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
  */
 moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::msg::PoseStamped &tomato_pose)
 {
-    std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
-    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
-
-    tf_listener_ =
-        std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
-
     geometry_msgs::msg::TransformStamped t;
 
     // Look up for the transformation between target_frame and turtle2 frames
@@ -220,12 +214,6 @@ double Manipulator::MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_col
  */
 double Manipulator::MoveLinearVec(float x, float y, float z){
     geometry_msgs::msg::PoseStamped ee = manipulator_->getPoseTarget();
-
-    std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
-    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
-
-    tf_listener_ =
-        std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
     geometry_msgs::msg::TransformStamped t;
 

@@ -175,8 +175,8 @@ ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT
     {
         node_ = rclcpp::Node::make_shared("ManipulatorGraspTomato");
     }
-    this->client_ = rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(node_, "/summit/move_group");
-    this->client_->wait_for_action_server();
+    client_ = rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(node_, "/summit/move_group");
+    client_->wait_for_action_server();
     // ROS_LOG_INIT(this->name().c_str());
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
@@ -303,6 +303,7 @@ void ManipulatorPregrasp::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorPregrasp::onStart()
 {
     LOG_MANI_START(this->name());
+
     BT::Optional<float> tomato_map_x = getInput<float>("target_x");
     BT::Optional<float> tomato_map_y = getInput<float>("target_y");
     BT::Optional<float> tomato_map_z = getInput<float>("target_z");
@@ -333,7 +334,10 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
     geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
     tomato.pose.orientation = msg_quat;
 
+    RCLCPP_ERROR(rclcpp::get_logger("ManipulatorPregrasp"), "above MoveGripperToPregraspPose");   
     manipulator_.MoveGripperToPregraspPose(tomato, pregresp_offset.value());
+    RCLCPP_ERROR(rclcpp::get_logger("ManipulatorPregrasp"), "below MoveGripperToPregraspPose");
+
     return BT::NodeStatus::RUNNING;
 }
 

@@ -15,7 +15,7 @@
 #define FILE_SCAN       "loc_scan.csv"
 #define FILE_VALIDATE   "loc_validate.csv"
 
-//#define TIME_LOGGER_ON
+#define TIME_LOGGER_ON
 
 enum LogType{log_start, log_stop};
 /**

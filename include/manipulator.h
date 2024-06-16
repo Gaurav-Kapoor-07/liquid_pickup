@@ -88,6 +88,9 @@ private:
     static rclcpp::Node::SharedPtr node_;
     std::string yaml_file;
     YAML::Node arm_positions;
+    
+    static std::shared_ptr<tf2_ros::TransformListener> tf_listener_;    
+    static std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 };
 
 #pragma endregion

@@ -50,7 +50,7 @@ class LiquidPickup : public rclcpp::Node
       
       factory.registerNodeType<RobotInitializer>("RobotInitializer");
       // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
-      // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
+      factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
       // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
       // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
       // factory.registerNodeType<ManipulatorScanPose>("ScanPose");

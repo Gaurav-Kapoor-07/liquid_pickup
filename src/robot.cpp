@@ -154,9 +154,10 @@ BatteryCheck::BatteryCheck(const std::string &name, const BT::NodeConfiguration 
     if (node_handle_ == nullptr)
     {
         node_handle_ = rclcpp::Node::make_shared("BatteryCheck");
+        node_handle_->declare_parameter<double>("battery_timer", 1.0);
     }
 
-    node_handle_->declare_parameter<double>("battery_timer", timer_duration_);
+    node_handle_->get_parameter("battery_timer", timer_duration_);
 
     RCLCPP_INFO(node_handle_->get_logger(), "[%s] Initialized!", this->name().c_str());
 
