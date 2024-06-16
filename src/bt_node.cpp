@@ -59,10 +59,10 @@ class LiquidPickup : public rclcpp::Node
       std::cin >> x;
       
       factory.registerNodeType<RobotInitializer>("RobotInitializer");
-      factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
-      factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
-      factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
-      factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
+      // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
+      // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
+      // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
+      // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
       factory.registerNodeType<ManipulatorScanPose>("ScanPose");
       factory.registerNodeType<GripperActuator>("ChangeGripper");
       factory.registerNodeType<BatteryCharge>("BatteryCharge");

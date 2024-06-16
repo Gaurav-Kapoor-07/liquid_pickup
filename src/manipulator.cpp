@@ -9,83 +9,28 @@
  * 
  */
 
-// bool Manipulator::a = false;
-// rclcpp::Node::SharedPtr Manipulator::node_ = nullptr;
+rclcpp::Node::SharedPtr Manipulator::node_ = nullptr;
 
 Manipulator::Manipulator()
 {
-    // Manipulator::InitializeSummitXlPoses();
-
-    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
-    // manipulator_ = new moveit::planning_interface::MoveGroupInterface(manipulator_options_);
-
-    // if(!a)
-    // {
-        // node_ = rclcpp::Node::make_shared("manipulator");
-
+    if (node_ == nullptr)
+    {
         node_ = rclcpp::Node::make_shared("Manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
-
-        // auto node_ = rclcpp::Node::make_shared("manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
-
-        // auto const node = std::make_shared<rclcpp::Node>(
-        // "trial",
-        // rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true)
-        // );
-
-        // auto options = rclcpp::NodeOptions().arguments(
-        // {"--ros-args", "-r", "__ns:=/summit", "-r", "__node:=manipulator"});
-
-        // node_ = std::make_shared<rclcpp::Node>("_", options);
-
-        // node_ = std::make_shared<rclcpp::Node>("_", "summit", options);
-
-        // auto options = rclcpp::NodeOptions().arguments(
-        // {"--ros-args", "-r", "__node:=manipulator"});
-
-        // node_ = std::make_shared<rclcpp::Node>("_", options);
-
         node_->declare_parameter("yaml_file", "arm_positions.yaml");
-        yaml_file = node_->get_parameter("yaml_file").as_string();
+    }
 
-        std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
+    yaml_file = node_->get_parameter("yaml_file").as_string();
 
-        std::string path_to_yaml = package_share_directory + "/config/";
+    std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
 
-        // std::cerr << path_to_yaml + yaml_file;
+    std::string path_to_yaml = package_share_directory + "/config/";
 
-        arm_positions = YAML::LoadFile(path_to_yaml + yaml_file);
-
-        // a = true;
-    // }
-
-    // yaml_file = node_->get_parameter("yaml_file").as_string();
-
-    // // yaml_file = node_->get_parameter("yaml_file").as_string();
-
-    // std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
-
-    // std::string path_to_yaml = package_share_directory + "/config/";
-
-    // // std::cerr << path_to_yaml + yaml_file;
-
-    // arm_positions = YAML::LoadFile(path_to_yaml + yaml_file);
+    arm_positions = YAML::LoadFile(path_to_yaml + yaml_file);
 
     Manipulator::InitializeSummitXlPoses();
 
-    // std::cerr << "i am up";
-
-    // auto move_group_interface = MoveGroupInterface(node, GROUP_NAME);
-
-    // std::cerr << "i am down";
-
     moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, "summit");
     manipulator_ = new moveit::planning_interface::MoveGroupInterface(node_, manipulator_options_);
-
-    // Specify a finite wait duration for connecting to action servers
-    // rclcpp::Duration wait_for_servers = rclcpp::Duration::from_seconds(5.0); // 5 seconds timeout
-
-    // Initialize the MoveGroupInterface with the node, options, TF buffer, and timeout
-    // manipulator_ = new moveit::planning_interface::MoveGroupInterface(node_, manipulator_options_, std::shared_ptr<tf2_ros::Buffer>(), wait_for_servers);
 
     manipulator_->allowReplanning(true);
 }
@@ -95,11 +40,12 @@ Manipulator::Manipulator()
  * 
  * @param node_handle Reference to the NodeHandle 
  */
-void Manipulator::init(rclcpp::Node::SharedPtr node_handle)
-{
-    node_ = node_handle;
-    // node_handle_ = node_handle;
-}
+// // void Manipulator::init(rclcpp::Node::UniquePtr node_handle)
+// void Manipulator::init(rclcpp::Node::SharedPtr node_handle)
+// {
+//     node_ = node_handle;
+//     // node_handle_ = node_handle;
+// }
 
 /**
  * @brief Gets the current status of the node
@@ -109,58 +55,24 @@ void Manipulator::init(rclcpp::Node::SharedPtr node_handle)
  */
 BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
 {
-    // actionlib::SimpleClientGoalState state = manipulator_->getMoveGroupClient().getState();
-
-    // rclcpp_action::Client state = manipulator_->getMoveGroupClient().getState();
-    // auto future = manipulator_->getMoveGroupClient();
-    // auto result = future.get();
-    // moveit::planning_interface::MoveGroupInterface *manipulator_;
-    
-    // std::shared_ptr<moveit::planning_interface::MoveGroupInterface> manipulator_ptr(manipulator_);
-
-    // auto& action_client = manipulator_->getMoveGroupClient();
-
-    // action_client.async_get_result();
-
-    // // Define a callback function for the action client result
-    // auto result_callback = [](const rclcpp_action::ClientGoalHandle<moveit_msgs::action::MoveGroup>::WrappedResult&) {};
-
-    // Create a goal handle, assuming it's nullptr for now
-    // auto goal_handle = std::shared_ptr<rclcpp_action::ClientGoalHandle<moveit_msgs::action::MoveGroup>>(nullptr);
-
     using MoveGoalHandle = rclcpp_action::ClientGoalHandle<moveit_msgs::action::MoveGroup>;
 
     MoveGoalHandle::WrappedResult result_;
-    // Call async_get_result() with appropriate arguments
-    // auto result_future = action_client.async_get_result(goal_handle, result_callback);
-    // auto result_future = action_client.async_get_result(goal_handle);
 
-    // auto result_ = result_future.get();
     auto state = result_.code;
 
     // if (state == action_msgs::msg::GoalStatus::STATUS_SUCCEEDED)
     if (state == rclcpp_action::ResultCode::SUCCEEDED)
     {
-        RCLCPP_DEBUG(node_->get_logger(), "[%s] reached Pose", name);
-        // RCLCPP_DEBUG(rclcpp::get_logger("Manipulator"), "[%s] reached Pose", name);
+        // RCLCPP_DEBUG(node_->get_logger(), "[%s] reached Pose", name);
+        RCLCPP_DEBUG(rclcpp::get_logger("Manipulator"), "[%s] reached Pose", name);
         return BT::NodeStatus::SUCCESS;
     }
-    // else if (state == action_msgs::msg::GoalStatus::STATUS_ACCEPTED ||
-    //          state == action_msgs::msg::GoalStatus::STATUS_EXECUTING)
-    // {
-    //     RCLCPP_DEBUG(node_->get_logger(), "[%s] moving to Pose", name);
-    //     return BT::NodeStatus::RUNNING;
-    // }
-    // else
-    // {
-    //     RCLCPP_ERROR(node_->get_logger(), "[%s] Failed to reach Pose!", name);
-    //     return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
-    // }
 
     else
     {
-        RCLCPP_ERROR(node_->get_logger(), "[%s] Failed to reach Pose!", name);
-        // RCLCPP_ERROR(rclcpp::get_logger("Manipulator"), "[%s] Failed to reach Pose!", name);
+        // RCLCPP_ERROR(node_->get_logger(), "[%s] Failed to reach Pose!", name);
+        RCLCPP_ERROR(rclcpp::get_logger("Manipulator"), "[%s] Failed to reach Pose!", name);
         return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
     }
 }
@@ -193,19 +105,13 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
             BASE_FRAME, tomato_pose.header.frame_id,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
-        RCLCPP_INFO(node_->get_logger(),
-            "Could not transform %s to %s: %s",
-            BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
-        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
-        //     "Could not transform %s to %s: %s",  
+        // RCLCPP_INFO(node_->get_logger(),
+        //     "Could not transform %s to %s: %s",
         //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
+        RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+            "Could not transform %s to %s: %s",  
+            BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
     }
-
-    // listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
-
-    // auto node = std::make_shared<rclcpp::Node>("MoveGripperToPregraspPose");
-    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
-    // moveit::planning_interface::MoveGroupInterface move_group(node_, manipulator_options_);
 
     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
     geometry_msgs::msg::PoseStamped tomato_base_footprint;
@@ -237,10 +143,6 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
  */
 moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::msg::PoseStamped &tomato_pose)
 {
-    // manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_SMALL);
-    // tf::TransformListener listener;
-    // listener.waitForTransform(BASE_FRAME, tomato_pose.header.frame_id, ros::Time(0), ros::Duration(3.0));
-
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
@@ -256,19 +158,13 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::ms
             BASE_FRAME, tomato_pose.header.frame_id,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
-        RCLCPP_INFO(node_->get_logger(),
-            "Could not transform %s to %s: %s",
-            BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
-        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        // RCLCPP_INFO(node_->get_logger(),
         //     "Could not transform %s to %s: %s",
         //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
+        RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+            "Could not transform %s to %s: %s",
+            BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
     }
-
-    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, ros::NodeHandle());
-
-    // auto node = std::make_shared<rclcpp::Node>("MoveGripperToTomato");
-    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
-    // moveit::planning_interface::MoveGroupInterface move_group(node_, manipulator_options_);
 
     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
     geometry_msgs::msg::PoseStamped tomato_base_footprint;
@@ -324,8 +220,6 @@ double Manipulator::MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_col
  */
 double Manipulator::MoveLinearVec(float x, float y, float z){
     geometry_msgs::msg::PoseStamped ee = manipulator_->getPoseTarget();
-    // tf::TransformListener listener;
-    // listener.waitForTransform(BASE_FRAME, ee.header.frame_id,ros::Time(0), ros::Duration(3));
 
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
@@ -342,12 +236,12 @@ double Manipulator::MoveLinearVec(float x, float y, float z){
             BASE_FRAME, ee.header.frame_id,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
-        RCLCPP_INFO(node_->get_logger(),
-            "Could not transform %s to %s: %s",
-            BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
-        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        // RCLCPP_INFO(node_->get_logger(),
         //     "Could not transform %s to %s: %s",
         //     BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
+        RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+            "Could not transform %s to %s: %s",
+            BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
     }
 
     geometry_msgs::msg::PoseStamped ee_base_frame;
@@ -446,20 +340,7 @@ void Manipulator::InitializeSummitXlPoses()
  */
 void Manipulator::InitializeInitialPose()
 {
-    // std::cerr << arm_positions;
-    // std::string yaml_file;
-    // ros::param::get("arm_positions", yaml_file);
-
-    // node_->declare_parameter("yaml_file", "yaml_file");
-    // yaml_file = node_->get_parameter("yaml_file").as_string();
-
-    // node_->get_parameter("arm_positions", yaml_file);
-
-    // rclcpp::Node::get_parameter("arm_positions", yaml_file);
-    // YAML::Node arm_positions = YAML::LoadFile(yaml_file);
     std::vector<float> joint_angles = arm_positions["initial_joint_angles"].as<std::vector<float>>();
-
-    //  std::cerr << arm_positions;
 
     initial_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
     initial_position_["arm_shoulder_lift_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[1]);
@@ -475,13 +356,6 @@ void Manipulator::InitializeInitialPose()
  */
 void Manipulator::InitializeDrivingPose()
 {
-    // std::string yaml_file;
-    // ros::param::get("arm_positions", yaml_file);
-
-    // auto node = std::make_shared<rclcpp::Node>("InitializeDrivingPose");
-    // node_->get_parameter("arm_positions", yaml_file);
-
-    // YAML::Node arm_positions = YAML::LoadFile(yaml_file);
     std::vector<float> joint_angles = arm_positions["driving_joint_angles"].as<std::vector<float>>();
 
     driving_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
@@ -498,13 +372,6 @@ void Manipulator::InitializeDrivingPose()
  */
 void Manipulator::InitializeScanningPose()
 {
-    // std::string yaml_file;
-    // ros::param::get("arm_positions", yaml_file);
-
-    // auto node = std::make_shared<rclcpp::Node>("InitializeScanningPose");
-    // node_->get_parameter("arm_positions", yaml_file);
-
-    // YAML::Node arm_positions = YAML::LoadFile(yaml_file);
     std::vector<float> joint_angles = arm_positions["scan_position_joint_angles"].as<std::vector<float>>();
 
     scanning_position_["arm_shoulder_pan_joint"]=ba_helper::ConvertDegreesToRadians(joint_angles[0]);
@@ -521,12 +388,6 @@ void Manipulator::InitializeScanningPose()
  */
 void Manipulator::InitializeDropPose()
 {
-    // std::string yaml_file;
-    // ros::param::get("arm_positions", yaml_file);
-    // auto node = std::make_shared<rclcpp::Node>("InitializeDropPose");
-    // node_->get_parameter("arm_positions", yaml_file);
-
-    // YAML::Node arm_positions = YAML::LoadFile(yaml_file);
     std::vector<float> pose = arm_positions["dropping_position"].as<std::vector<float>>();
 
     drop_pose_.header.frame_id = BASE_FRAME;

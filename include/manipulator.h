@@ -4,6 +4,7 @@
 #pragma region includes
 
 #include "rclcpp/rclcpp.hpp"
+#include <memory>
 // #include "ros/message.h"
 #include <geometry_msgs/msg/pose.hpp>
 // #include "tf/tf.h"
@@ -61,7 +62,8 @@ class Manipulator
 {
 public:
     Manipulator();
-    void init(rclcpp::Node::SharedPtr node_handle);
+    // void init(rclcpp::Node::SharedPtr node_handle);
+    // void init(rclcpp::Node::UniquePtr node_handle);
 
     BT::NodeStatus GetNodeStatus(const char* name);
     moveit::core::MoveItErrorCode MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped& tomato_pose, float offset);
@@ -82,11 +84,10 @@ private:
     void InitializeDrivingPose(void);
     void InitializeScanningPose(void);
     void InitializeDropPose(void);
-    rclcpp::Node::SharedPtr node_;
+    // rclcpp::Node::SharedPtr node_;
+    static rclcpp::Node::SharedPtr node_;
     std::string yaml_file;
     YAML::Node arm_positions;
-    // static bool a;
-    // static rclcpp::Node::SharedPtr node_;
 };
 
 #pragma endregion
