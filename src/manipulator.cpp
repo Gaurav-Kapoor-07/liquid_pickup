@@ -64,15 +64,15 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
     // if (state == action_msgs::msg::GoalStatus::STATUS_SUCCEEDED)
     if (state == rclcpp_action::ResultCode::SUCCEEDED)
     {
-        // RCLCPP_DEBUG(node_->get_logger(), "[%s] reached Pose", name);
-        RCLCPP_DEBUG(rclcpp::get_logger("Manipulator"), "[%s] reached Pose", name);
+        RCLCPP_DEBUG(node_->get_logger(), "[%s] reached Pose", name);
+        // RCLCPP_DEBUG(rclcpp::get_logger("Manipulator"), "[%s] reached Pose", name);
         return BT::NodeStatus::SUCCESS;
     }
 
     else
     {
-        // RCLCPP_ERROR(node_->get_logger(), "[%s] Failed to reach Pose!", name);
-        RCLCPP_ERROR(rclcpp::get_logger("Manipulator"), "[%s] Failed to reach Pose!", name);
+        RCLCPP_ERROR(node_->get_logger(), "[%s] Failed to reach Pose!", name);
+        // RCLCPP_ERROR(rclcpp::get_logger("Manipulator"), "[%s] Failed to reach Pose!", name);
         return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
     }
 }
@@ -105,12 +105,12 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
             BASE_FRAME, tomato_pose.header.frame_id,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
-        // RCLCPP_INFO(node_->get_logger(),
-        //     "Could not transform %s to %s: %s",
-        //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
-        RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
-            "Could not transform %s to %s: %s",  
+        RCLCPP_INFO(node_->get_logger(),
+            "Could not transform %s to %s: %s",
             BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
+        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        //     "Could not transform %s to %s: %s",  
+        //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
     }
 
     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
@@ -158,12 +158,12 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::ms
             BASE_FRAME, tomato_pose.header.frame_id,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
-        // RCLCPP_INFO(node_->get_logger(),
-        //     "Could not transform %s to %s: %s",
-        //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
-        RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
             BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
+        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        //     "Could not transform %s to %s: %s",
+        //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
     }
 
     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
@@ -236,12 +236,12 @@ double Manipulator::MoveLinearVec(float x, float y, float z){
             BASE_FRAME, ee.header.frame_id,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
-        // RCLCPP_INFO(node_->get_logger(),
-        //     "Could not transform %s to %s: %s",
-        //     BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
-        RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
             BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
+        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
+        //     "Could not transform %s to %s: %s",
+        //     BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
     }
 
     geometry_msgs::msg::PoseStamped ee_base_frame;

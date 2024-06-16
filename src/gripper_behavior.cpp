@@ -8,11 +8,20 @@
  * @param name The name of the behavior
  * @param config The node configuration
  */
+
+rclcpp::Node::SharedPtr GripperActuator::node_ = nullptr;
+
 GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfiguration &config):BT::SyncActionNode(name, config){
     object_attached_ = false;
     object_attached_before_ = false;
     // ROS_LOG_INIT(this->name().c_str());
-    node_ = rclcpp::Node::make_shared("GripperActuator");
+    // node_ = rclcpp::Node::make_shared("GripperActuator");
+
+    if (node_ == nullptr)
+    {
+        node_ = rclcpp::Node::make_shared("GripperActuator");
+    }
+
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
 

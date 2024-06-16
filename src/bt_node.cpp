@@ -8,7 +8,6 @@
 #include "behaviortree_cpp/loggers/bt_file_logger.h"
 #include "behaviortree_cpp/bt_factory.h"
 #include "behaviortree_cpp/xml_parsing.h"
-// #include "behaviortree_cpp/loggers/bt_zmq_publisher.h"
 #include "behaviortree_cpp/loggers/groot2_publisher.h"
 #include <string>
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -19,19 +18,13 @@
 #include "time_logger.h"
 #endif
 
-// #include "navigation_behaviors.h"
-// #include "vision_behaviors.h"
 #include "manipulator_behaviors.h"  
 #include "gripper_behavior.h"
 
 #include "manipulator.h"
 #include "helper.h"
-// // #include "basket.h"
-// // #include "tomato_queue.h"
-// // #include "path_queue.h"
 #include "robot.h"
 #include "ba_types.h"
-
 
 #include <unistd.h>
 #include <stdio.h>
@@ -39,7 +32,6 @@
 #include "ba_interfaces.h"
 
 using namespace BT;
-// using namespace DummyNodes;
 
 class LiquidPickup : public rclcpp::Node
 {
@@ -48,8 +40,6 @@ class LiquidPickup : public rclcpp::Node
     : Node("bt_node")
     {
       // auto self = std::shared_ptr<LiquidPickup>(this, [](LiquidPickup*){});
-      auto self = std::shared_ptr<LiquidPickup>(this);
-      // ros::param::get("behavior_tree_type", behavior_tree_type);
       
       this->declare_parameter("behavior_tree_type", "behavior_tree_type");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
@@ -63,7 +53,7 @@ class LiquidPickup : public rclcpp::Node
       // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
       // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
       // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
-      factory.registerNodeType<ManipulatorScanPose>("ScanPose");
+      // factory.registerNodeType<ManipulatorScanPose>("ScanPose");
       factory.registerNodeType<GripperActuator>("ChangeGripper");
       factory.registerNodeType<BatteryCharge>("BatteryCharge");
       factory.registerNodeType<BatteryCheck>("BatteryCheck");  
@@ -71,29 +61,15 @@ class LiquidPickup : public rclcpp::Node
       std::string xml_models = BT::writeTreeNodesModelXML(factory);
       std::cerr << xml_models;
 
-      // int x{0};
-      // std::cerr << "Enter a no.";
-      // std::cin >> x;
-
       try
       {
         // this->declare_parameter("bt_xml", "test.xml");
         this->declare_parameter("bt_xml", "test_2.xml");
         bt_xml = this->get_parameter("bt_xml").as_string(); 
-        // ros::param::get("bt_xml", bt_xml);
-        // factory.createTreeFromFile("/home/ros/rap/gaurav_ws/src/liquid_pickup/config/test.xml");
 
         std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
 
-        // strcat(package_share_directory)
-        // std::cerr << package_share_directory;
-
         std::string path_to_xml = package_share_directory + "/config/";
-
-        // factory.createTreeFromFile("src/liquid_pickup/config/test.xml");
-        // int x{0};
-        // std::cerr << "Enter a no.";
-        // std::cin >> x;
 
         tree = factory.createTreeFromFile(path_to_xml + bt_xml);
       }
@@ -103,33 +79,18 @@ class LiquidPickup : public rclcpp::Node
         std::cerr << e.what() << '\n';
       }
 
-      // int x{0};
-      // std::cerr << "Enter a no.";
-      // std::cin >> x;
-
       BT::Groot2Publisher publisher(tree, server_port);
 
       auto node = tree.rootNode();
 
-      if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node))
-      {
-        vis_node->init(self);
-        // vis_node->init(this);
-      }
+      // if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node))
+      // {
+      //   vis_node->init(self);
+      // }
       if (auto vis_node = dynamic_cast<IBAInitManipulatorNode *>(node))
       {
         vis_node->init(manipulator);
       }
-      // if (auto vis_node = dynamic_cast<IBAInitTomatoQueue *>(node.get()))
-      // {
-      //   vis_node->init(tomato_queue_);
-      // }
-      // if (auto vis_node = dynamic_cast<IBAInitPathQueue *>(node))
-      // {
-      //   vis_node->init(p_queue);
-      // }
-
-      // BT::PublisherZMQ publisher_zmq(tree, max_msg_per_second, publisher_port, server_port);
 
       // Tick the tree until it reaches a terminal state
       BT::NodeStatus status = BT::NodeStatus::RUNNING;
@@ -139,24 +100,6 @@ class LiquidPickup : public rclcpp::Node
       BATimeLogger::InitFiles();
       #endif
 
-      // int x{0};
-      // std::cerr << "Enter a no.";
-      // std::cin >> x;
-
-      // while (status == BT::NodeStatus::RUNNING)
-      // {
-      //   status = tree.tickRoot();
-      //   // ros::Duration(0.1).sleep();
-      //   rclcpp::sleep_for(std::chrono::nanoseconds(100000000));
-      // }
-
-      // Use Tree::sleep and wait for either SUCCESS or FAILURE
-      // while(!BT::isStatusCompleted(status)) 
-      // {
-      //   status = tree.tickOnce();
-      //   tree.sleep(sleep_ms);
-      // }
-      //---- or, even better ------
       status = tree.tickWhileRunning(std::chrono::milliseconds(100)); 
 
       // Output final results
@@ -170,9 +113,8 @@ class LiquidPickup : public rclcpp::Node
           status_str = "FAILURE";
       }
       auto stop = this->now().seconds();
-      auto seconds = stop-start;
-      // ROS_INFO("Done with status %s!", status_str.c_str());
-      // ROS_INFO("Used time: %.2lf", seconds);
+      auto seconds = stop - start;
+
       RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
       RCLCPP_INFO(this->get_logger(), "Used time: %.2lf seconds", seconds);
       
@@ -184,12 +126,6 @@ class LiquidPickup : public rclcpp::Node
       do
       {
       } while (std::cin.get() != '\n');
-
-      // int x{0};
-      // std::cerr << "Enter a no.";
-      // std::cin >> x;
-      // RCLCPP_INFO(this->get_logger(), "Used time: %.2lf", seconds);
-      // Manipulator t;
     }
 
   private:
@@ -198,8 +134,6 @@ class LiquidPickup : public rclcpp::Node
     BT::Tree tree;
     BT::BehaviorTreeFactory factory;
     std::string bt_xml;
-    unsigned max_msg_per_second = 25;
-    unsigned publisher_port = 1666;
     unsigned server_port = 1667;
 };
 
@@ -212,13 +146,6 @@ int main(int argc, char *argv[])
     executor.add_node(mnode);
     executor.spin();
     // rclcpp::spin(std::make_shared<LiquidPickup>());
-    // ros::NodeHandle nh;
-    // ros::AsyncSpinner async_spinner(1);
-    // async_spinner.start();
-    // Manipulator manipulator;
-
-    // TomatoQueue tomato_queue_;
-    // PathQueue p_queue;
 
     rclcpp::shutdown();
 

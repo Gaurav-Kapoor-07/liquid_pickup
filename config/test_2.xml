@@ -9,8 +9,9 @@
             <!-- <dropTomato name="drop_tomato" /> -->
             <!-- <RetreatZ name="post_grasp_retreat" target_x="{target_x}" target_y="{target_y}" target_z="{target_z}" /> -->
             <!-- <RetreatZ name="post_grasp_retreat" target_x="0.0" target_y="0.0" target_z="0.0" /> -->
-            <ScanPose name="init_scanpose" />
-            <ChangeGripper name="close_gripper" gripper_param="0.1" />
+            <!-- <ScanPose name="init_scanpose" /> -->
+            <ChangeGripper name="close_gripper" gripper_param="0.7" />
+            <ChangeGripper name="open_gripper" gripper_param="0.0" />
             <BatteryCheck />
             <BatteryCharge />
         </Sequence>

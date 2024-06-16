@@ -95,7 +95,7 @@ public:
     static BT::PortsList providedPorts();
 
 private:
-    rclcpp::Node::SharedPtr node_;
+    static rclcpp::Node::SharedPtr node_;
     rclcpp_action::Client<moveit_msgs::action::MoveGroup>::SharedPtr client_;
     Manipulator manipulator_;
 };

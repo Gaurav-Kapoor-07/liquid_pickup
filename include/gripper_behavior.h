@@ -35,7 +35,8 @@ public:
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 private:
-    rclcpp::Node::SharedPtr node_;
+    // rclcpp::Node::SharedPtr node_;
+    static rclcpp::Node::SharedPtr node_;
     // ros::Publisher grasp_publisher_;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr grasp_publisher_;
     // ros::Subscriber grasp_subscriber_;

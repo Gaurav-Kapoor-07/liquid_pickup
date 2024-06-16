@@ -31,10 +31,10 @@ void RobotInitializer::init(Manipulator manipulator)
  * 
  * @param node_handle Reference to the NodeHandle 
  */
-void RobotInitializer::init(std::shared_ptr<rclcpp::Node> node_handle)
-{
-    node_handle_ = node_handle;
-}
+// void RobotInitializer::init(std::shared_ptr<rclcpp::Node> node_handle)
+// {
+//     node_handle_ = node_handle;
+// }
 
 /**
  * @brief Handles the tick from the behavior tree
@@ -144,22 +144,26 @@ moveit::core::MoveItErrorCode RobotInitializer::SetInitialPosition()
  * @param name The name of the behavior
  * @param config The node configuration
  */
+
+rclcpp::Node::SharedPtr BatteryCheck::node_handle_ = nullptr;
+
 BatteryCheck::BatteryCheck(const std::string &name, const BT::NodeConfiguration &config) : BT::ConditionNode(name, config)
 {
-    // ROS_LOG_INIT(this->name().c_str());
     battery_empty_ = false;
-    node_handle_ = rclcpp::Node::make_shared("BatteryCheck");
+
+    if (node_handle_ == nullptr)
+    {
+        node_handle_ = rclcpp::Node::make_shared("BatteryCheck");
+    }
+
     node_handle_->declare_parameter<double>("battery_timer", timer_duration_);
-    // this->node_handle_->declare_parameter<float>("battery_timer", timer_duration_);
-    // ros::param::get("battery_timer", timer_duration_);
-    // timer_ = node_handle_.createTimer(ros::Duration(timer_duration_), &BatteryCheck::TimerCallback, this);
+
     RCLCPP_INFO(node_handle_->get_logger(), "[%s] Initialized!", this->name().c_str());
 
     int64_t nanoseconds = static_cast<int64_t>(timer_duration_ * 1e9);
 
     timer_ = node_handle_->create_wall_timer(std::chrono::nanoseconds(nanoseconds), std::bind(&BatteryCheck::TimerCallback, this));
     start_ = rclcpp::Clock{RCL_ROS_TIME}.now().seconds();
-    // start_ = ros::Time::now().toSec();
 }
 
 /**
@@ -167,10 +171,10 @@ BatteryCheck::BatteryCheck(const std::string &name, const BT::NodeConfiguration 
  *
  * @param node_handle The NodeHandle reference
  */
-void BatteryCheck::init(std::shared_ptr<rclcpp::Node> node_handle)
-{
-    node_handle_ = node_handle;
-}
+// void BatteryCheck::init(std::shared_ptr<rclcpp::Node> node_handle)
+// {
+//     node_handle_ = node_handle;
+// }
 
 /**
  * @brief Handles the tick from the behavior tree
@@ -289,80 +293,4 @@ BT::PortsList BatteryCharge::providedPorts()
 }
 
 #pragma endregion
-
-// #include "robot.h"
-
-// // This function must be implemented in the .cpp file to create
-// // a plugin that can be loaded at run-time
-// // BT_REGISTER_NODES(factory)
-// // {
-// //     DummyNodes::RegisterNodes(factory);
-// // }
-
-// namespace DummyNodes
-// {
-
-// // BT::NodeStatus CheckBattery()
-// // {
-// //     std::cout << "[ Battery: OK ]" << std::endl;
-// //     return BT::NodeStatus::SUCCESS;
-// // }
-
-// // BT::NodeStatus CheckTemperature()
-// // {
-// //     std::cout << "[ Temperature: OK ]" << std::endl;
-// //     return BT::NodeStatus::SUCCESS;
-// // }
-
-// // BT::NodeStatus SayHello()
-// // {
-// //     std::cout << "Robot says: Hello World" << std::endl;
-// //     return BT::NodeStatus::SUCCESS;
-// // }
-
-// // BT::NodeStatus GripperInterface::open()
-// // {
-// //     _opened = true;
-// //     std::cout << "GripperInterface::open" << std::endl;
-// //     return BT::NodeStatus::SUCCESS;
-// // }
-
-// // BT::NodeStatus GripperInterface::close()
-// // {
-// //     std::cout << "GripperInterface::close" << std::endl;
-// //     _opened = false;
-// //     return BT::NodeStatus::SUCCESS;
-// // }
-
-// BT::NodeStatus ApproachObject::tick()
-// {
-//     std::cerr << "ApproachObject: " << this->name() << std::endl;
-//     return BT::NodeStatus::SUCCESS;
-// }
-
-// BT::NodeStatus SaySomething::tick()
-// {
-//     auto msg = getInput<std::string>("message");
-//     if (!msg)
-//     {
-//         throw BT::RuntimeError( "missing required input [message]: ", msg.error() );
-//     }
-
-//     std::cerr << "Robot says: " << msg.value() << std::endl;
-//     return BT::NodeStatus::SUCCESS;
-// }
-
-// // BT::NodeStatus SaySomethingSimple(BT::TreeNode &self)
-// // {
-// //     auto msg = self.getInput<std::string>("message");
-// //     if (!msg)
-// //     {
-// //         throw BT::RuntimeError( "missing required input [message]: ", msg.error() );
-// //     }
-
-// //     std::cout << "Robot says: " << msg.value() << std::endl;
-// //     return BT::NodeStatus::SUCCESS;
-// // }
-
-// }
 
