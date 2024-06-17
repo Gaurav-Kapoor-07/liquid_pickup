@@ -177,6 +177,8 @@ ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT
     }
 
     client_ = rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(node_, "/summit/move_action");
+    // client_ = rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(node_, "/move_action");
+
     client_->wait_for_action_server();
 
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
@@ -410,9 +412,7 @@ void ManipulatorPostgraspRetreat::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorPostgraspRetreat::onStart()
 {
     LOG_MANI_START(this->name());
-    RCLCPP_ERROR(rclcpp::get_logger("ManipulatorPostgraspRetreat"), "above MoveLinearVec");
     manipulator_.MoveLinearVec(0, 0, 0.12);
-    RCLCPP_ERROR(rclcpp::get_logger("ManipulatorPostgraspRetreat"), "below MoveLinearVec");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -563,7 +563,6 @@ BT::NodeStatus ManipulatorScanPose::onStart()
 {
     LOG_MANI_START(this->name());
     manipulator_.MoveToScanningPosition();
-    // ROS_INFO("moving EE to scan position");
     RCLCPP_INFO(rclcpp::get_logger("ManipulatorScanPose"), "moving EE to scan position");
     return BT::NodeStatus::RUNNING;
 }

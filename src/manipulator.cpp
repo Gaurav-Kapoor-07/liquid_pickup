@@ -36,7 +36,9 @@ Manipulator::Manipulator()
 
     Manipulator::InitializeSummitXlPoses();
 
-    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, "summit");
+    moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, "/summit");
+    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
+
     manipulator_ = new moveit::planning_interface::MoveGroupInterface(node_, manipulator_options_);
 
     manipulator_->allowReplanning(true);
@@ -95,33 +97,26 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
 
-    geometry_msgs::msg::TransformStamped t;
+    geometry_msgs::msg::TransformStamped transform_tomato_base_footprint;
 
-    // Look up for the transformation between target_frame and turtle2 frames
-    // and send velocity commands for turtle2 to reach target_frame
     try {
-        t = tf_buffer_->lookupTransform(
+        transform_tomato_base_footprint = tf_buffer_->lookupTransform(
             BASE_FRAME, tomato_pose.header.frame_id,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
         RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
             BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
-        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
-        //     "Could not transform %s to %s: %s",  
-        //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
     }
 
     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
     geometry_msgs::msg::PoseStamped tomato_base_footprint;
-    // listener.transformPose(BASE_FRAME, tomato_pose, tomato_base_footprint);
-    tf2::doTransform(tomato_pose, tomato_base_footprint, tf_buffer_->lookupTransform(
-            BASE_FRAME, tomato_pose.header.frame_id,
-            tf2::TimePointZero));
+
+    tf2::doTransform(tomato_pose, tomato_base_footprint, transform_tomato_base_footprint);
     
     tomato_base_footprint.pose.position.z += TCP_OFFSET_Z;
     float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
-    // tomato_base_footprint.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI / 6, angle);
+
     tf2::Quaternion tf2_quat;
     tf2_quat.setRPY(0, M_PI / 6, angle);
     geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
@@ -143,36 +138,28 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
  */
 moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::msg::PoseStamped &tomato_pose)
 {
-    geometry_msgs::msg::TransformStamped t;
+    manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_SMALL);
+    geometry_msgs::msg::TransformStamped transform_tomato_base_footprint;
 
-    // Look up for the transformation between target_frame and turtle2 frames
-    // and send velocity commands for turtle2 to reach target_frame
     try {
-        t = tf_buffer_->lookupTransform(
+        transform_tomato_base_footprint = tf_buffer_->lookupTransform(
             BASE_FRAME, tomato_pose.header.frame_id,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
         RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
             BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
-        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
-        //     "Could not transform %s to %s: %s",
-        //     BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
     }
 
     float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
     geometry_msgs::msg::PoseStamped tomato_base_footprint;
-    // listener.transformPose(BASE_FRAME, tomato_pose, tomato_base_footprint);
 
-    tf2::doTransform(tomato_pose, tomato_base_footprint, tf_buffer_->lookupTransform(
-            BASE_FRAME, tomato_pose.header.frame_id,
-            tf2::TimePointZero));
+    tf2::doTransform(tomato_pose, tomato_base_footprint, transform_tomato_base_footprint);
 
     float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
     tomato_base_footprint.pose.position.x -= cos(angle) * TCP_OFFSET_XY;
     tomato_base_footprint.pose.position.y -= sin(angle) * TCP_OFFSET_XY;
     tomato_base_footprint.pose.position.z += TCP_OFFSET_Z;
-    // tomato_base_footprint.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI / 6, angle);
     
     tf2::Quaternion tf2_quat;
     tf2_quat.setRPY(0, M_PI / 6, angle);
@@ -213,37 +200,24 @@ double Manipulator::MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_col
  * @return double Return a value that is between 0.0 and 1.0 indicating the fraction of the path achieved as described by the waypoints. Return -1.0 in case of error.
  */
 double Manipulator::MoveLinearVec(float x, float y, float z){
-
-    RCLCPP_ERROR(rclcpp::get_logger("MoveLinearVec"), "above getPoseTarget");
     geometry_msgs::msg::PoseStamped ee = manipulator_->getPoseTarget();
-    RCLCPP_ERROR(rclcpp::get_logger("MoveLinearVec"), "below getPoseTarget");
-    RCLCPP_INFO(node_->get_logger(),
-            "%s", ee.header.frame_id.c_str());
 
-    geometry_msgs::msg::TransformStamped t;
+    geometry_msgs::msg::TransformStamped transform_ee_base_frame;
 
-    // Look up for the transformation between target_frame and turtle2 frames
-    // and send velocity commands for turtle2 to reach target_frame
     try {
-        t = tf_buffer_->lookupTransform(
+        transform_ee_base_frame = tf_buffer_->lookupTransform(
             BASE_FRAME, ee.header.frame_id,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
         RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
             BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
-        // RCLCPP_INFO(rclcpp::get_logger("Manipulator"),
-        //     "Could not transform %s to %s: %s",
-        //     BASE_FRAME, ee.header.frame_id.c_str(), ex.what());
     }
 
     geometry_msgs::msg::PoseStamped ee_base_frame;
     ee_base_frame.header.frame_id = BASE_FRAME;
-    // listener.transformPose(BASE_FRAME, ee,ee_base_frame);
-    
-    tf2::doTransform(ee, ee_base_frame, tf_buffer_->lookupTransform(
-            BASE_FRAME, ee.header.frame_id,
-            tf2::TimePointZero));
+
+    tf2::doTransform(ee, ee_base_frame, transform_ee_base_frame);
 
     ee_base_frame.pose.position.x += x;
     ee_base_frame.pose.position.y += y;

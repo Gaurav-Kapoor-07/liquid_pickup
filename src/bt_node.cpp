@@ -42,11 +42,7 @@ class LiquidPickup : public rclcpp::Node
       this->declare_parameter("behavior_tree_type", "behavior_tree_type");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
 
-      int x{0};
-      std::cerr << "Enter a no.";
-      std::cin >> x;
-      
-      // factory.registerNodeType<RobotInitializer>("RobotInitializer");
+      factory.registerNodeType<RobotInitializer>("RobotInitializer");
       // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
       // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
       // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
