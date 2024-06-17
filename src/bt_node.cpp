@@ -38,9 +38,7 @@ class LiquidPickup : public rclcpp::Node
   public:
     LiquidPickup()
     : Node("bt_node")
-    {
-      // auto self = std::shared_ptr<LiquidPickup>(this, [](LiquidPickup*){});
-      
+    {    
       this->declare_parameter("behavior_tree_type", "behavior_tree_type");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
 
@@ -48,15 +46,15 @@ class LiquidPickup : public rclcpp::Node
       std::cerr << "Enter a no.";
       std::cin >> x;
       
-      factory.registerNodeType<RobotInitializer>("RobotInitializer");
+      // factory.registerNodeType<RobotInitializer>("RobotInitializer");
       // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
-      factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
+      // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
       // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
-      // factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
+      factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
       // factory.registerNodeType<ManipulatorScanPose>("ScanPose");
-      factory.registerNodeType<GripperActuator>("ChangeGripper");
-      factory.registerNodeType<BatteryCharge>("BatteryCharge");
-      factory.registerNodeType<BatteryCheck>("BatteryCheck");  
+      // factory.registerNodeType<GripperActuator>("ChangeGripper");
+      // factory.registerNodeType<BatteryCharge>("BatteryCharge");
+      // factory.registerNodeType<BatteryCheck>("BatteryCheck");  
 
       std::string xml_models = BT::writeTreeNodesModelXML(factory);
       std::cerr << xml_models;
@@ -83,10 +81,6 @@ class LiquidPickup : public rclcpp::Node
 
       auto node = tree.rootNode();
 
-      // if (auto vis_node = dynamic_cast<IBAInitNodeHandle *>(node))
-      // {
-      //   vis_node->init(self);
-      // }
       if (auto vis_node = dynamic_cast<IBAInitManipulatorNode *>(node))
       {
         vis_node->init(manipulator);

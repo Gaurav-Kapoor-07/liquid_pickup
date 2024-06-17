@@ -175,9 +175,10 @@ ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT
     {
         node_ = rclcpp::Node::make_shared("ManipulatorGraspTomato");
     }
-    client_ = rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(node_, "/summit/move_group");
+
+    client_ = rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(node_, "/summit/move_action");
     client_->wait_for_action_server();
-    // ROS_LOG_INIT(this->name().c_str());
+
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
 
@@ -333,10 +334,8 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
     tf2_quat.setRPY(0, 0, 0);
     geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
     tomato.pose.orientation = msg_quat;
-
-    RCLCPP_ERROR(rclcpp::get_logger("ManipulatorPregrasp"), "above MoveGripperToPregraspPose");   
+  
     manipulator_.MoveGripperToPregraspPose(tomato, pregresp_offset.value());
-    RCLCPP_ERROR(rclcpp::get_logger("ManipulatorPregrasp"), "below MoveGripperToPregraspPose");
 
     return BT::NodeStatus::RUNNING;
 }
@@ -389,7 +388,6 @@ BT::PortsList ManipulatorPregrasp::providedPorts()
 ManipulatorPostgraspRetreat::ManipulatorPostgraspRetreat(const std::string &name, const BT::NodeConfiguration &config)
     : BT::StatefulActionNode(name, config)
 {
-    // ROS_LOG_INIT(this->name().c_str());
     RCLCPP_INFO(rclcpp::get_logger("ManipulatorPostgraspRetreat"), "[%s] Initialized!", this->name().c_str());
 }
 
@@ -412,7 +410,9 @@ void ManipulatorPostgraspRetreat::init(Manipulator manipulator)
 BT::NodeStatus ManipulatorPostgraspRetreat::onStart()
 {
     LOG_MANI_START(this->name());
+    RCLCPP_ERROR(rclcpp::get_logger("ManipulatorPostgraspRetreat"), "above MoveLinearVec");
     manipulator_.MoveLinearVec(0, 0, 0.12);
+    RCLCPP_ERROR(rclcpp::get_logger("ManipulatorPostgraspRetreat"), "below MoveLinearVec");
     return BT::NodeStatus::RUNNING;
 }
 

@@ -213,7 +213,12 @@ double Manipulator::MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_col
  * @return double Return a value that is between 0.0 and 1.0 indicating the fraction of the path achieved as described by the waypoints. Return -1.0 in case of error.
  */
 double Manipulator::MoveLinearVec(float x, float y, float z){
+
+    RCLCPP_ERROR(rclcpp::get_logger("MoveLinearVec"), "above getPoseTarget");
     geometry_msgs::msg::PoseStamped ee = manipulator_->getPoseTarget();
+    RCLCPP_ERROR(rclcpp::get_logger("MoveLinearVec"), "below getPoseTarget");
+    RCLCPP_INFO(node_->get_logger(),
+            "%s", ee.header.frame_id.c_str());
 
     geometry_msgs::msg::TransformStamped t;
 
@@ -245,7 +250,6 @@ double Manipulator::MoveLinearVec(float x, float y, float z){
     ee_base_frame.pose.position.z += z;
     double res = MoveLinear(ee_base_frame.pose, false);
     return res;
-    return 0;
 }
 
 /**

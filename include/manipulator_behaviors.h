@@ -112,7 +112,7 @@ class ManipulatorPregrasp : public BT::StatefulActionNode, public IBAInitManipul
 {
 public:
     ManipulatorPregrasp(const std::string &name, const BT::NodeConfiguration &config);
-    void init(Manipulator manipulator);
+    void init(Manipulator manipulator) override;
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
