@@ -37,28 +37,30 @@ class LiquidPickup : public rclcpp::Node
 {
   public:
     LiquidPickup()
-    : Node("bt_node")
-    {    
+    : Node("bt_node", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true))
+    {
+      this->declare_parameter("yaml_file", "arm_positions.yaml");
       this->declare_parameter("behavior_tree_type", "behavior_tree_type");
+      // this->declare_parameter("bt_xml", "test.xml");
+      this->declare_parameter("bt_xml", "test_2.xml");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
+    }
 
-      factory.registerNodeType<RobotInitializer>("RobotInitializer");
-      // factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato");
-      // factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato");
-      // factory.registerNodeType<ManipulatorDropTomato>("dropTomato");
-      factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ");
-      // factory.registerNodeType<ManipulatorScanPose>("ScanPose");
-      // factory.registerNodeType<GripperActuator>("ChangeGripper");
-      // factory.registerNodeType<BatteryCharge>("BatteryCharge");
-      // factory.registerNodeType<BatteryCheck>("BatteryCheck");  
+    void run()
+    {    
+      factory.registerNodeType<RobotInitializer>("RobotInitializer", shared_from_this());
+      factory.registerNodeType<ManipulatorGraspTomato>("GraspTomato", shared_from_this());
+      factory.registerNodeType<ManipulatorPregrasp>("pregraspTomato", shared_from_this());
+      factory.registerNodeType<ManipulatorDropTomato>("dropTomato", shared_from_this());
+      factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ", shared_from_this());
+      factory.registerNodeType<ManipulatorScanPose>("ScanPose", shared_from_this());
+      factory.registerNodeType<GripperActuator>("ChangeGripper", shared_from_this());
 
       std::string xml_models = BT::writeTreeNodesModelXML(factory);
       std::cerr << xml_models;
 
       try
       {
-        // this->declare_parameter("bt_xml", "test.xml");
-        this->declare_parameter("bt_xml", "test_2.xml");
         bt_xml = this->get_parameter("bt_xml").as_string(); 
 
         std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
@@ -74,13 +76,6 @@ class LiquidPickup : public rclcpp::Node
       }
 
       BT::Groot2Publisher publisher(tree, server_port);
-
-      auto node = tree.rootNode();
-
-      if (auto vis_node = dynamic_cast<IBAInitManipulatorNode *>(node))
-      {
-        vis_node->init(manipulator);
-      }
 
       // Tick the tree until it reaches a terminal state
       BT::NodeStatus status = BT::NodeStatus::RUNNING;
@@ -119,7 +114,7 @@ class LiquidPickup : public rclcpp::Node
     }
 
   private:
-    Manipulator manipulator;
+    
     std::string behavior_tree_type;
     BT::Tree tree;
     BT::BehaviorTreeFactory factory;
@@ -129,15 +124,16 @@ class LiquidPickup : public rclcpp::Node
 
 int main(int argc, char *argv[])
 {
-    // Initialize ROS node
-    rclcpp::init(argc, argv);
-    rclcpp::Node::SharedPtr mnode = std::make_shared<LiquidPickup>();
-    rclcpp::executors::MultiThreadedExecutor executor;
-    executor.add_node(mnode);
-    executor.spin();
-    // rclcpp::spin(std::make_shared<LiquidPickup>());
+  // Initialize ROS node
+  rclcpp::init(argc, argv);
+  auto lp = std::make_shared<LiquidPickup>();
+  lp->run();
+  rclcpp::Node::SharedPtr mnode = lp;
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(mnode);
+  executor.spin();
 
-    rclcpp::shutdown();
+  rclcpp::shutdown();
 
-    return 0;
+  return 0;
 }

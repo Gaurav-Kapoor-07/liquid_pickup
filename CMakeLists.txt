@@ -14,8 +14,6 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-# find_package(std_msgs REQUIRED)
-# find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(behaviortree_cpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
@@ -27,40 +25,14 @@ find_package(moveit_ros_planning_interface REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(moveit_msgs REQUIRED)
-# find_package(actionlib_msgs REQUIRED)
 
-# find_package(rclcpp_action REQUIRED)
-
-# add_library(action_client SHARED
-#   src/navigation_behaviors.cpp)
-# target_include_directories(action_client PRIVATE
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>)
-# target_compile_definitions(action_client
-#   PRIVATE "ACTION_TUTORIALS_CPP_BUILDING_DLL")
-# ament_target_dependencies(action_client
-#   "rclcpp"
-#   "rclcpp_action"
-#   "rclcpp_components")
-# rclcpp_components_register_node(action_client PLUGIN "action_tutorials_cpp::FibonacciActionClient" EXECUTABLE fibonacci_action_client)
-
-# install(TARGETS
-#   action_client
-#   ARCHIVE DESTINATION lib
-#   LIBRARY DESTINATION lib
-#   RUNTIME DESTINATION bin)
-
-# include_directories(include ${CMAKE_SOURCE_DIR}/../BehaviorTree.CPP/src) 
 include_directories(include config) 
 
 set(BT_SOURCES
-    # src/navigation_behaviors.cpp 
-    # src/vision_behaviors.cpp
     src/manipulator.cpp
     src/manipulator_behaviors.cpp
     src/gripper_behavior.cpp
     src/robot.cpp
-    # src/path_queue.cpp
     src/helper.cpp
     src/time_logger.cpp
 )

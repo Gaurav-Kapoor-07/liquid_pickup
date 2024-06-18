@@ -19,13 +19,13 @@ namespace BT
  * @brief Interface for all classes which depend on the Manipulator
  *
  */
-class IBAInitManipulatorNode
-{
-public:
-    IBAInitManipulatorNode(){};
-    virtual ~IBAInitManipulatorNode(){};
-    virtual void init(Manipulator manipulator) = 0;
-};
+// class IBAInitManipulatorNode
+// {
+// public:
+//     IBAInitManipulatorNode(){};
+//     virtual ~IBAInitManipulatorNode(){};
+//     virtual void init(Manipulator manipulator) = 0;
+// };
 
 #pragma endregion
 
@@ -35,13 +35,13 @@ public:
  * @brief Interface for all classes which depend on the ros::NodeHandle
  *
  */
-class IBAInitNodeHandle
-{
-public:
-    IBAInitNodeHandle(){};
-    virtual ~IBAInitNodeHandle(){};
-    // virtual void init(std::shared_ptr<rclcpp::Node> node_handle) = 0;
-};
+// class IBAInitNodeHandle
+// {
+// public:
+//     IBAInitNodeHandle(){};
+//     virtual ~IBAInitNodeHandle(){};
+//     virtual void init(std::shared_ptr<rclcpp::Node> node_handle) = 0;
+// };
 #pragma endregion
 
 // #pragma region IBAInitTomatoQueue

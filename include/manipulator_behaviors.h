@@ -78,24 +78,23 @@
 
 // #pragma endregion
 
-// #pragma region ManipulatorGraspTomato
+#pragma region ManipulatorGraspTomato
 
 /**
  * @brief Class/Behavior which grasps a tomato
  * 
  */
-class ManipulatorGraspTomato : public BT::StatefulActionNode, public IBAInitManipulatorNode
+class ManipulatorGraspTomato : public BT::StatefulActionNode
 {
 public:
-    ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config);
-    void init(Manipulator manipulator) override;
+    ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
     static BT::PortsList providedPorts();
 
 private:
-    static rclcpp::Node::SharedPtr node_;
+    rclcpp::Node::SharedPtr node_;
     rclcpp_action::Client<moveit_msgs::action::MoveGroup>::SharedPtr client_;
     Manipulator manipulator_;
 };
@@ -108,17 +107,17 @@ private:
  * @brief Class/Behavior to go into the pregrasp pose
  * 
  */
-class ManipulatorPregrasp : public BT::StatefulActionNode, public IBAInitManipulatorNode
+class ManipulatorPregrasp : public BT::StatefulActionNode
 {
 public:
-    ManipulatorPregrasp(const std::string &name, const BT::NodeConfiguration &config);
-    void init(Manipulator manipulator) override;
+    ManipulatorPregrasp(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
     static BT::PortsList providedPorts();
 
 private:
+    rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
 };
 
@@ -130,17 +129,17 @@ private:
  * @brief Class/Behavior to retreat the robot of the arm after grasping
  * 
  */
-class ManipulatorPostgraspRetreat : public BT::StatefulActionNode, public IBAInitManipulatorNode
+class ManipulatorPostgraspRetreat : public BT::StatefulActionNode
 {
 public:
-    ManipulatorPostgraspRetreat(const std::string &name, const BT::NodeConfiguration &config);
-    void init(Manipulator manipulator) override;
+    ManipulatorPostgraspRetreat(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
     static BT::PortsList providedPorts();
 
 private:
+    rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
 };
 
@@ -152,20 +151,18 @@ private:
  * @brief Class/Behavior to drop the tomato into the attached basket after grasping
  * 
  */
-// class ManipulatorDropTomato : public BT::StatefulActionNode, public IBAInitManipulatorNode, public IBAInitTomatoQueue
-class ManipulatorDropTomato : public BT::StatefulActionNode, public IBAInitManipulatorNode
+class ManipulatorDropTomato : public BT::StatefulActionNode
 {
 public:
-    ManipulatorDropTomato(const std::string &name);
-    void init(Manipulator manipulator) override;
-    // void init(TomatoQueue &tomato_queue) override;
+    ManipulatorDropTomato(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
+    static BT::PortsList providedPorts();
 
 private:
+    rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
-    // TomatoQueue *tomato_queue_;
 };
 
 #pragma endregion
@@ -176,17 +173,18 @@ private:
  * @brief Class/Behavior to move the robots arm into the scanning position
  * 
  */
-class ManipulatorScanPose : public BT::StatefulActionNode, public IBAInitManipulatorNode
+class ManipulatorScanPose : public BT::StatefulActionNode
 {
 public:
-    ManipulatorScanPose(const std::string &name);
-    void init(Manipulator manipulator) override;
+    ManipulatorScanPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
+    static BT::PortsList providedPorts();
+    
 private:
+    rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
-    // rclcpp::Node::SharedPtr node_;
 };
 
 #pragma endregion

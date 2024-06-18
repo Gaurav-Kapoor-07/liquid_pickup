@@ -55,16 +55,10 @@
  * @brief Class which actually controls the manipulator
  * 
  */
-
-// using moveit::planning_interface::MoveGroupInterface;
-
 class Manipulator 
 {
 public:
-    Manipulator();
-    // void init(rclcpp::Node::SharedPtr node_handle);
-    // void init(rclcpp::Node::UniquePtr node_handle);
-
+    Manipulator(rclcpp::Node::SharedPtr node);
     BT::NodeStatus GetNodeStatus(const char* name);
     moveit::core::MoveItErrorCode MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped& tomato_pose, float offset);
     moveit::core::MoveItErrorCode MoveGripperToTomato(geometry_msgs::msg::PoseStamped& tomato_pose);
@@ -78,19 +72,17 @@ private:
     moveit::planning_interface::MoveGroupInterface *manipulator_;
     geometry_msgs::msg::PoseStamped drop_pose_;
     std::map<std::string, double> initial_position_, driving_position_, scanning_position_;
-    // rclcpp::Node::SharedPtr node_handle_;
     void InitializeSummitXlPoses(void);
     void InitializeInitialPose(void);
     void InitializeDrivingPose(void);
     void InitializeScanningPose(void);
     void InitializeDropPose(void);
-    // rclcpp::Node::SharedPtr node_;
-    static rclcpp::Node::SharedPtr node_;
+    rclcpp::Node::SharedPtr node_;
     std::string yaml_file;
     YAML::Node arm_positions;
     
-    static std::shared_ptr<tf2_ros::TransformListener> tf_listener_;    
-    static std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+    std::shared_ptr<tf2_ros::TransformListener> tf_listener_;    
+    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 };
 
 #pragma endregion

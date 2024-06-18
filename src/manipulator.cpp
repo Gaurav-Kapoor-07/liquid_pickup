@@ -8,23 +8,21 @@
  * @brief Construct a new Manipulator:: Manipulator object
  * 
  */
-
-rclcpp::Node::SharedPtr Manipulator::node_ = nullptr;
-
-std::shared_ptr<tf2_ros::TransformListener> Manipulator::tf_listener_ = nullptr;
-        
-std::unique_ptr<tf2_ros::Buffer> Manipulator::tf_buffer_ = nullptr;
-
-Manipulator::Manipulator()
+Manipulator::Manipulator(rclcpp::Node::SharedPtr node)
 {
-    if (node_ == nullptr)
+    if (node == nullptr)
     {
-        node_ = rclcpp::Node::make_shared("Manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
-        node_->declare_parameter("yaml_file", "arm_positions.yaml");
-
-        tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
-        tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+        RCLCPP_ERROR(rclcpp::get_logger("Manipulator"), "nullptr was passed!");
+        return;
     }
+       
+    node_ = node; //rclcpp::Node::make_shared("Manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
+    // node_->declare_parameter("yaml_file", "arm_positions.yaml");
+
+    RCLCPP_INFO(node_->get_logger(), "Node shared pointer was passed!");
+
+    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
+    tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
     yaml_file = node_->get_parameter("yaml_file").as_string();
 
@@ -372,7 +370,5 @@ void Manipulator::InitializeDropPose()
     drop_pose_.pose.position.y = pose[1];
     drop_pose_.pose.position.z = pose[2];
 }
-
-#pragma endregion
 
 #pragma endregion

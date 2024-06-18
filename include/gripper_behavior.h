@@ -5,7 +5,6 @@
 
 #include "behaviortree_cpp/behavior_tree.h"
 #include "std_msgs/msg/float64.hpp"
-// #include "ros_logs.h"
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
 #include "ba_interfaces.h"
@@ -31,19 +30,15 @@ using namespace std::chrono_literals;
 class GripperActuator : public BT::SyncActionNode
 {
 public:
-    GripperActuator(const std::string &name, const BT::NodeConfiguration &config);
+    GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 private:
-    // rclcpp::Node::SharedPtr node_;
-    static rclcpp::Node::SharedPtr node_;
-    // ros::Publisher grasp_publisher_;
+    rclcpp::Node::SharedPtr node_;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr grasp_publisher_;
-    // ros::Subscriber grasp_subscriber_;
     rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr grasp_subscriber_;
     bool object_attached_;
     bool object_attached_before_;
-    // void ResultCallback(const std_msgs::msg::Float64 &message);
     void ResultCallback(const std_msgs::msg::Float64::SharedPtr message);
 };
 
