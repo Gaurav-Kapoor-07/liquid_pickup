@@ -200,8 +200,12 @@ double Manipulator::MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_col
  * @return double Return a value that is between 0.0 and 1.0 indicating the fraction of the path achieved as described by the waypoints. Return -1.0 in case of error.
  */
 double Manipulator::MoveLinearVec(float x, float y, float z){
-    geometry_msgs::msg::PoseStamped ee = manipulator_->getPoseTarget();
-
+    // geometry_msgs::msg::PoseStamped ee = manipulator_->getPoseTarget();
+    
+    // workaround for above function
+    geometry_msgs::msg::PoseStamped ee;
+    ee.header.frame_id = "arm_tool0";
+    
     geometry_msgs::msg::TransformStamped transform_ee_base_frame;
 
     try {
