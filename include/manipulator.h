@@ -5,30 +5,24 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include <memory>
-// #include "ros/message.h"
 #include <geometry_msgs/msg/pose.hpp>
-// #include "tf/tf.h"
 #include "geometry_msgs/msg/vector3.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "tf2/LinearMath/Transform.h"
 #include "tf2_ros/transform_listener.h"
+#include "tf2_ros/buffer.h"
+#include "tf2/exceptions.h"
 #include <moveit/move_group_interface/move_group_interface.h>
-#include "helper.h"
 #include <stdio.h>
 #include "yaml-cpp/yaml.h"
 #include <math.h>
-
+#include "helper.h"
 #include "behaviortree_cpp/behavior_tree.h"
 #include "rclcpp/logger.hpp"
-#include "rclcpp_action/rclcpp_action.hpp"
-#include "rclcpp_components/register_node_macro.hpp"
-// #include <move_base_msgs/MoveBaseAction.h>
 #include <string>
 
 #include "ba_frames_summit_xl.h"
 #include <ament_index_cpp/get_package_share_directory.hpp>
-
-// #include "actionlib_msgs/msg/goal_status.hpp"
 
 #pragma endregion
 
@@ -58,10 +52,10 @@
 class Manipulator 
 {
 public:
-    Manipulator(rclcpp::Node::SharedPtr node);
-    BT::NodeStatus GetNodeStatus(const char* name);
-    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped& tomato_pose, float offset);
-    moveit::core::MoveItErrorCode MoveGripperToTomato(geometry_msgs::msg::PoseStamped& tomato_pose);
+    Manipulator(const rclcpp::Node::SharedPtr node);
+
+    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(float offset);
+    moveit::core::MoveItErrorCode MoveGripperToTomato();
     double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
     double MoveLinearVec(float x, float y, float z);
     moveit::core::MoveItErrorCode DropTomatoInBasket(void);
@@ -80,8 +74,8 @@ private:
     rclcpp::Node::SharedPtr node_;
     std::string yaml_file;
     YAML::Node arm_positions;
-    
-    std::shared_ptr<tf2_ros::TransformListener> tf_listener_;    
+
+    std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};    
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 };
 

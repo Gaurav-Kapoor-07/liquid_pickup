@@ -1,16 +1,14 @@
  <root BTCPP_format="4" >
     <BehaviorTree ID="MainTree">
         <Sequence name="root_sequence">
-            <RobotInitializer   name="RobotInitializer" message="RobotInitializer"/>
-            <!-- <GraspTomato name="grasp_tomato" target_x="{target_x}" target_y="{target_y}" target_z="{target_z}" /> -->
-            <GraspTomato name="grasp_tomato" target_x="1.0" target_y="0.0" target_z="1.0" />
-            <!-- <pregraspTomato name="pregrasp_tomato" target_x="{target_x}" target_y="{target_y}" target_z="{target_z}" pregrasp_offset="0.1" /> -->
-            <pregraspTomato name="pregrasp_tomato" target_x="1.0" target_y="0.0" target_z="1.0" pregrasp_offset="0.1" />
-            <dropTomato name="drop_tomato" />
-            <!-- <RetreatZ name="post_grasp_retreat" target_x="{target_x}" target_y="{target_y}" target_z="{target_z}" /> -->
-            <RetreatZ name="post_grasp_retreat" target_x="1.0" target_y="0.0" target_z="1.0" />
+            <!-- <RobotInitializer   name="RobotInitializer" message="RobotInitializer"/> -->
+            <!-- <GraspTomato name="grasp_tomato" /> -->
+            <!-- <pregraspTomato name="pregrasp_tomato" pregrasp_offset="0.1" /> -->
+            <!-- <pregraspTomato name="pregrasp_tomato" pregrasp_offset="0.1" /> -->
+            <!-- <dropTomato name="drop_tomato" /> -->
+            <!-- <RetreatZ name="post_grasp_retreat" /> -->
             <ScanPose name="init_scanpose" />
-            <ChangeGripper name="close_gripper" gripper_param="0.7" />
+            <!-- <ChangeGripper name="close_gripper" gripper_param="0.7" /> -->
             <!-- <ChangeGripper name="open_gripper" gripper_param="0.0" /> -->
             <!-- <BatteryCheck /> -->
             <!-- <BatteryCharge /> -->
@@ -27,9 +25,6 @@
         </Action>
         <Action ID="pregraspTomato">
             <input_port name="pregrasp_offset" type="float"/>
-            <input_port name="target_z" type="float"/>
-            <input_port name="target_y" type="float"/>
-            <input_port name="target_x" type="float"/>
         </Action>
     </TreeNodesModel>
  </root>

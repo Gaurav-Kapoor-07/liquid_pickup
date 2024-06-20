@@ -8,7 +8,7 @@
  * @brief Construct a new Manipulator:: Manipulator object
  * 
  */
-Manipulator::Manipulator(rclcpp::Node::SharedPtr node)
+Manipulator::Manipulator(const rclcpp::Node::SharedPtr node)
 {
     if (node == nullptr)
     {
@@ -16,8 +16,7 @@ Manipulator::Manipulator(rclcpp::Node::SharedPtr node)
         return;
     }
        
-    node_ = node; //rclcpp::Node::make_shared("Manipulator", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true));
-    // node_->declare_parameter("yaml_file", "arm_positions.yaml");
+    node_ = node;
 
     RCLCPP_INFO(node_->get_logger(), "Node shared pointer was passed!");
 
@@ -35,53 +34,10 @@ Manipulator::Manipulator(rclcpp::Node::SharedPtr node)
     Manipulator::InitializeSummitXlPoses();
 
     moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, "/summit");
-    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION);
 
     manipulator_ = new moveit::planning_interface::MoveGroupInterface(node_, manipulator_options_);
 
     manipulator_->allowReplanning(true);
-}
-
-/**
- * @brief Set the NodeHandle reference object
- * 
- * @param node_handle Reference to the NodeHandle 
- */
-// // void Manipulator::init(rclcpp::Node::UniquePtr node_handle)
-// void Manipulator::init(rclcpp::Node::SharedPtr node_handle)
-// {
-//     node_ = node_handle;
-//     // node_handle_ = node_handle;
-// }
-
-/**
- * @brief Gets the current status of the node
- * 
- * @param name The name of the behavior
- * @return BT::NodeStatus The status of the node
- */
-BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
-{
-    using MoveGoalHandle = rclcpp_action::ClientGoalHandle<moveit_msgs::action::MoveGroup>;
-
-    MoveGoalHandle::WrappedResult result_;
-
-    auto state = result_.code;
-
-    // if (state == action_msgs::msg::GoalStatus::STATUS_SUCCEEDED)
-    if (state == rclcpp_action::ResultCode::SUCCEEDED)
-    {
-        RCLCPP_DEBUG(node_->get_logger(), "[%s] reached Pose", name);
-        // RCLCPP_DEBUG(rclcpp::get_logger("Manipulator"), "[%s] reached Pose", name);
-        return BT::NodeStatus::SUCCESS;
-    }
-
-    else
-    {
-        RCLCPP_ERROR(node_->get_logger(), "[%s] Failed to reach Pose!", name);
-        // RCLCPP_ERROR(rclcpp::get_logger("Manipulator"), "[%s] Failed to reach Pose!", name);
-        return BT::NodeStatus::FAILURE; // TBD --> ignore non-reachable poses just for now
-    }
 }
 
 /**
@@ -91,28 +47,33 @@ BT::NodeStatus Manipulator::GetNodeStatus(const char* name)
  * @param offset The offset to the end pose
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_msgs::msg::PoseStamped &tomato_pose, float offset)
+moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(float offset)
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
 
-    geometry_msgs::msg::TransformStamped transform_tomato_base_footprint;
+    geometry_msgs::msg::TransformStamped base_footprint_to_tomato_frame;
 
     try {
-        transform_tomato_base_footprint = tf_buffer_->lookupTransform(
-            BASE_FRAME, tomato_pose.header.frame_id,
+        base_footprint_to_tomato_frame = tf_buffer_->lookupTransform(
+            BASE_FRAME, LIQUID_FRAME,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
         RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
-            BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
+            BASE_FRAME, LIQUID_FRAME, ex.what());
     }
 
-    float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
+    float y_offset = (base_footprint_to_tomato_frame.transform.translation.y) < 0 ? 0.1 : -0.1;
+
     geometry_msgs::msg::PoseStamped tomato_base_footprint;
 
-    tf2::doTransform(tomato_pose, tomato_base_footprint, transform_tomato_base_footprint);
-    
+    tomato_base_footprint.header = base_footprint_to_tomato_frame.header;
+    tomato_base_footprint.pose.position.x = base_footprint_to_tomato_frame.transform.translation.x;
+    tomato_base_footprint.pose.position.y = base_footprint_to_tomato_frame.transform.translation.y;
+    tomato_base_footprint.pose.position.z = base_footprint_to_tomato_frame.transform.translation.z;
+
     tomato_base_footprint.pose.position.z += TCP_OFFSET_Z;
+
     float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
 
     tf2::Quaternion tf2_quat;
@@ -134,25 +95,30 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(geometry_ms
  * @param tomato_pose The endpose to reach
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato(geometry_msgs::msg::PoseStamped &tomato_pose)
+moveit::core::MoveItErrorCode Manipulator::MoveGripperToTomato()
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_SMALL);
-    geometry_msgs::msg::TransformStamped transform_tomato_base_footprint;
+
+    geometry_msgs::msg::TransformStamped base_footprint_to_tomato_frame;
 
     try {
-        transform_tomato_base_footprint = tf_buffer_->lookupTransform(
-            BASE_FRAME, tomato_pose.header.frame_id,
+        base_footprint_to_tomato_frame = tf_buffer_->lookupTransform(
+            BASE_FRAME, LIQUID_FRAME,
             tf2::TimePointZero);
     }   catch (const tf2::TransformException & ex) {
         RCLCPP_INFO(node_->get_logger(),
             "Could not transform %s to %s: %s",
-            BASE_FRAME, tomato_pose.header.frame_id.c_str(), ex.what());
+            BASE_FRAME, LIQUID_FRAME, ex.what());
     }
 
-    float y_offset = (tomato_pose.pose.position.y) < 0 ? 0.1 : -0.1;
+    float y_offset = (base_footprint_to_tomato_frame.transform.translation.y) < 0 ? 0.1 : -0.1;
+    
     geometry_msgs::msg::PoseStamped tomato_base_footprint;
 
-    tf2::doTransform(tomato_pose, tomato_base_footprint, transform_tomato_base_footprint);
+    tomato_base_footprint.header = base_footprint_to_tomato_frame.header;
+    tomato_base_footprint.pose.position.x = base_footprint_to_tomato_frame.transform.translation.x;
+    tomato_base_footprint.pose.position.y = base_footprint_to_tomato_frame.transform.translation.y;
+    tomato_base_footprint.pose.position.z = base_footprint_to_tomato_frame.transform.translation.z;
 
     float angle = atan2(tomato_base_footprint.pose.position.y, tomato_base_footprint.pose.position.x);
     tomato_base_footprint.pose.position.x -= cos(angle) * TCP_OFFSET_XY;
@@ -217,9 +183,15 @@ double Manipulator::MoveLinearVec(float x, float y, float z){
     }
 
     geometry_msgs::msg::PoseStamped ee_base_frame;
-    ee_base_frame.header.frame_id = BASE_FRAME;
 
-    tf2::doTransform(ee, ee_base_frame, transform_ee_base_frame);
+    ee_base_frame.header = transform_ee_base_frame.header;
+    ee_base_frame.pose.position.x = transform_ee_base_frame.transform.translation.x;
+    ee_base_frame.pose.position.y = transform_ee_base_frame.transform.translation.y;
+    ee_base_frame.pose.position.z = transform_ee_base_frame.transform.translation.z;
+    ee_base_frame.pose.orientation.x = transform_ee_base_frame.transform.rotation.x;
+    ee_base_frame.pose.orientation.y = transform_ee_base_frame.transform.rotation.y;
+    ee_base_frame.pose.orientation.z = transform_ee_base_frame.transform.rotation.z;
+    ee_base_frame.pose.orientation.w = transform_ee_base_frame.transform.rotation.w;
 
     ee_base_frame.pose.position.x += x;
     ee_base_frame.pose.position.y += y;
@@ -359,7 +331,6 @@ void Manipulator::InitializeDropPose()
     std::vector<float> pose = arm_positions["dropping_position"].as<std::vector<float>>();
 
     drop_pose_.header.frame_id = BASE_FRAME;
-    // drop_pose_.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(ba_helper::ConvertDegreesToRadians(pose[3]), ba_helper::ConvertDegreesToRadians(pose[4]), ba_helper::ConvertDegreesToRadians(pose[5]));
 
     tf2::Quaternion tf2_quat;
     tf2_quat.setRPY(ba_helper::ConvertDegreesToRadians(pose[3]), ba_helper::ConvertDegreesToRadians(pose[4]), ba_helper::ConvertDegreesToRadians(pose[5]));

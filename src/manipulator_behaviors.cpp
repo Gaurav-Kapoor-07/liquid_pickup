@@ -18,11 +18,6 @@ ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT
         RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
     }
 
-    client_ = rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(node_, "/summit/move_action");
-    // client_ = rclcpp_action::create_client<moveit_msgs::action::MoveGroup>(node_, "/move_action");
-
-    client_->wait_for_action_server();
-
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
 
@@ -35,30 +30,9 @@ ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT
 BT::NodeStatus ManipulatorGraspTomato::onStart()
 {
     LOG_MANI_START(this->name());
-    BT::Optional<float> tomato_map_x = getInput<float>("target_x");
-    BT::Optional<float> tomato_map_y = getInput<float>("target_y");
-    BT::Optional<float> tomato_map_z = getInput<float>("target_z");
-
-    if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
-    {
-        RCLCPP_ERROR(node_->get_logger(), "GOT NO POSE!");
-
-        return BT::NodeStatus::FAILURE;
-    }
-    geometry_msgs::msg::Point armlink_loc = ba_helper::GetCurrentArmbaseLocation();
-    float phi = atan2(tomato_map_y.value() - armlink_loc.y, tomato_map_x.value() - armlink_loc.x);
-    geometry_msgs::msg::PoseStamped tomato;
-    tomato.header.frame_id = MAP_FRAME;
-    tomato.pose.position.x = tomato_map_x.value() - sin(phi) * 0;
-    tomato.pose.position.y = tomato_map_y.value() - cos(phi) * 0;
-    tomato.pose.position.z = tomato_map_z.value();
-
-    tf2::Quaternion tf2_quat;
-    tf2_quat.setRPY(0, 0, 0);
-    geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
-    tomato.pose.orientation = msg_quat;
-
-    manipulator_.MoveGripperToTomato(tomato);
+    RCLCPP_INFO(node_->get_logger(), "moving gripper to tomato");
+    manipulator_.MoveGripperToTomato();
+    RCLCPP_INFO(node_->get_logger(), "moved gripper to tomato");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -69,13 +43,7 @@ BT::NodeStatus ManipulatorGraspTomato::onStart()
  */
 BT::NodeStatus ManipulatorGraspTomato::onRunning()
 {
-    BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
-    if (state != BT::NodeStatus::RUNNING)
-    {   
-        LOG_MANI_STOP(this->name());
-    }
-    return state;
-
+    return BT::NodeStatus::SUCCESS;
 }
 
 /**
@@ -92,7 +60,8 @@ void ManipulatorGraspTomato::onHalted() {}
  */
 BT::PortsList ManipulatorGraspTomato::providedPorts()
 {
-    return {BT::InputPort<float>("target_x"), BT::InputPort<float>("target_y"), BT::InputPort<float>("target_z")};
+    RCLCPP_WARN(rclcpp::get_logger("ManipulatorGraspTomato"), "returning empty BT::PortsList!"); 
+    return {};
 }
 
 #pragma endregion
@@ -127,32 +96,11 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
 {
     LOG_MANI_START(this->name());
 
-    BT::Optional<float> tomato_map_x = getInput<float>("target_x");
-    BT::Optional<float> tomato_map_y = getInput<float>("target_y");
-    BT::Optional<float> tomato_map_z = getInput<float>("target_z");
-
     BT::Optional<float> pregresp_offset = getInput<float>("pregrasp_offset");
-
-    if (!tomato_map_x || !tomato_map_y || !tomato_map_z)
-    {
-        RCLCPP_ERROR(node_->get_logger(), "GOT NO POSE!");
-        return BT::NodeStatus::FAILURE;
-    }
-    geometry_msgs::msg::PoseStamped tomato;
-    tomato.header.frame_id = MAP_FRAME;
-    geometry_msgs::msg::Point armlink_loc = ba_helper::GetCurrentArmbaseLocation();
-    float phi = atan2(tomato_map_y.value() - armlink_loc.y, tomato_map_x.value() - armlink_loc.x);
-    tomato.pose.position.x = tomato_map_x.value() - sin(phi) * 0;
-    tomato.pose.position.y = tomato_map_y.value() - cos(phi) * 0;
-    tomato.pose.position.z = tomato_map_z.value();
-
-    tf2::Quaternion tf2_quat;
-    tf2_quat.setRPY(0, 0, 0);
-    geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
-    tomato.pose.orientation = msg_quat;
   
-    manipulator_.MoveGripperToPregraspPose(tomato, pregresp_offset.value());
-
+    RCLCPP_INFO(node_->get_logger(), "pregrasp started");
+    manipulator_.MoveGripperToPregraspPose(pregresp_offset.value());
+    RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -163,12 +111,7 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
  */
 BT::NodeStatus ManipulatorPregrasp::onRunning()
 {
-    BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
-    if (state != BT::NodeStatus::RUNNING)
-    {   
-        LOG_MANI_STOP(this->name());
-    }
-    return state;
+    return BT::NodeStatus::SUCCESS;
 }
 
 /**
@@ -185,10 +128,7 @@ void ManipulatorPregrasp::onHalted() {}
  */
 BT::PortsList ManipulatorPregrasp::providedPorts()
 {
-    return {BT::InputPort<float>("target_x"),
-            BT::InputPort<float>("target_y"),
-            BT::InputPort<float>("target_z"),
-            BT::InputPort<float>("pregrasp_offset")};
+    return {BT::InputPort<float>("pregrasp_offset")};
 }
 
 #pragma endregion
@@ -222,7 +162,9 @@ ManipulatorPostgraspRetreat::ManipulatorPostgraspRetreat(const std::string &name
 BT::NodeStatus ManipulatorPostgraspRetreat::onStart()
 {
     LOG_MANI_START(this->name());
+    RCLCPP_INFO(node_->get_logger(), "post grasp started");
     manipulator_.MoveLinearVec(0, 0, 0.12);
+    RCLCPP_INFO(node_->get_logger(), "post grasp finished");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -233,12 +175,7 @@ BT::NodeStatus ManipulatorPostgraspRetreat::onStart()
  */
 BT::NodeStatus ManipulatorPostgraspRetreat::onRunning()
 {   
-    BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
-    if (state != BT::NodeStatus::RUNNING)
-    {   
-        LOG_MANI_STOP(this->name());
-    }
-    return state;
+    return BT::NodeStatus::SUCCESS;
 }
 
 /**
@@ -255,9 +192,8 @@ void ManipulatorPostgraspRetreat::onHalted() {}
  */
 BT::PortsList ManipulatorPostgraspRetreat::providedPorts()
 {
-    return {BT::InputPort<float>("target_x"),
-            BT::InputPort<float>("target_y"),
-            BT::InputPort<float>("target_z")};
+    RCLCPP_WARN(rclcpp::get_logger("ManipulatorPostgraspRetreat"), "returning empty BT::PortsList!");
+    return {};
 }
 
 #pragma endregion
@@ -290,8 +226,9 @@ ManipulatorDropTomato::ManipulatorDropTomato(const std::string &name, const BT::
 BT::NodeStatus ManipulatorDropTomato::onStart()
 {
     LOG_MANI_START(this->name());
-    manipulator_.DropTomatoInBasket();
     RCLCPP_INFO(node_->get_logger(), "going to drop tomato in basket");
+    manipulator_.DropTomatoInBasket();
+    RCLCPP_INFO(node_->get_logger(), "tomato dropped");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -302,16 +239,7 @@ BT::NodeStatus ManipulatorDropTomato::onStart()
  */
 BT::NodeStatus ManipulatorDropTomato::onRunning()
 {
-    BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
-    if (state == BT::NodeStatus::SUCCESS)
-    {   
-        // tomato_queue_->SetTomatoAsPicked();
-        // tomato_queue_->AddTomatoToBasketQueue();
-    }
-    if(state != BT::NodeStatus::RUNNING){
-        LOG_MANI_STOP(this->name());
-    }
-    return state;
+    return BT::NodeStatus::SUCCESS;
 }
 
 /**
@@ -363,8 +291,9 @@ ManipulatorScanPose::ManipulatorScanPose(const std::string &name, const BT::Node
 BT::NodeStatus ManipulatorScanPose::onStart()
 {
     LOG_MANI_START(this->name());
-    manipulator_.MoveToScanningPosition();
     RCLCPP_INFO(node_->get_logger(), "moving EE to scan position");
+    manipulator_.MoveToScanningPosition();
+    RCLCPP_INFO(node_->get_logger(), "moved EE to scan position");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -375,12 +304,7 @@ BT::NodeStatus ManipulatorScanPose::onStart()
  */
 BT::NodeStatus ManipulatorScanPose::onRunning()
 {
-    BT::NodeStatus state = manipulator_.GetNodeStatus(this->name().c_str());
-    if (state != BT::NodeStatus::RUNNING)
-    {   
-        LOG_MANI_STOP(this->name());
-    }
-    return state;
+    return BT::NodeStatus::SUCCESS;
 }
 
 /**

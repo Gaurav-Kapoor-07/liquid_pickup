@@ -22,7 +22,6 @@
 #include "gripper_behavior.h"
 
 #include "manipulator.h"
-#include "helper.h"
 #include "robot.h"
 #include "ba_types.h"
 
@@ -62,11 +61,8 @@ class LiquidPickup : public rclcpp::Node
       try
       {
         bt_xml = this->get_parameter("bt_xml").as_string(); 
-
         std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
-
         std::string path_to_xml = package_share_directory + "/config/";
-
         tree = factory.createTreeFromFile(path_to_xml + bt_xml);
       }
       catch (const std::exception &e)
@@ -79,7 +75,7 @@ class LiquidPickup : public rclcpp::Node
 
       // Tick the tree until it reaches a terminal state
       BT::NodeStatus status = BT::NodeStatus::RUNNING;
-      auto start = this->now().seconds();
+      auto start = this->get_clock()->now().seconds();
       
       #ifdef LOG_TIME
       BATimeLogger::InitFiles();
@@ -97,7 +93,7 @@ class LiquidPickup : public rclcpp::Node
       {
           status_str = "FAILURE";
       }
-      auto stop = this->now().seconds();
+      auto stop = this->get_clock()->now().seconds();
       auto seconds = stop - start;
 
       RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
@@ -106,15 +102,9 @@ class LiquidPickup : public rclcpp::Node
       #ifdef LOG_TIME
       BATimeLogger::CloseFiles();
       #endif
-      std::cerr << '\n'
-                << "Press a key to continue...";
-      do
-      {
-      } while (std::cin.get() != '\n');
     }
 
   private:
-    
     std::string behavior_tree_type;
     BT::Tree tree;
     BT::BehaviorTreeFactory factory;
@@ -129,9 +119,14 @@ int main(int argc, char *argv[])
   auto lp = std::make_shared<LiquidPickup>();
   lp->run();
   rclcpp::Node::SharedPtr mnode = lp;
+  
+  // THIS 
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(mnode);
   executor.spin();
+  
+  // // OR
+  // rclcpp::spin(mnode);
 
   rclcpp::shutdown();
 

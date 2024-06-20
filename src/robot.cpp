@@ -10,7 +10,7 @@
  * @param name The name of the behavior
  * @param config The node configuration
  */
-RobotInitializer::RobotInitializer(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node) : BT::SyncActionNode(name, config), manipulator_(node)
+RobotInitializer::RobotInitializer(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node): BT::SyncActionNode(name, config), manipulator_(node)
 {
     if (node != nullptr)
     {
@@ -20,26 +20,6 @@ RobotInitializer::RobotInitializer(const std::string &name, const BT::NodeConfig
 
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
-
-/**
- * @brief Set the Manipulator object
- * 
- * @param manipulator The manipulator 
- */
-// void RobotInitializer::init(Manipulator manipulator)
-// {
-//     manipulator_ = manipulator;
-// }
-
-/**
- * @brief Set the NodeHandle reference object
- * 
- * @param node_handle Reference to the NodeHandle 
- */
-// void RobotInitializer::init(std::shared_ptr<rclcpp::Node> node_handle)
-// {
-//     node_handle_ = node_handle;
-// }
 
 /**
  * @brief Handles the tick from the behavior tree

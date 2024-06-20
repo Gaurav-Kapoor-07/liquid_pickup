@@ -8,16 +8,11 @@
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
 #include "ba_interfaces.h"
+#include "rclcpp_action/rclcpp_action.hpp"
+#include "rclcpp_components/register_node_macro.hpp"
 
 using std::placeholders::_1;
 using namespace std::chrono_literals;
-
-#pragma endregion
-
-#pragma region defines
-
-#define DEFAULT_CONTACT_TOPIC   "gazebo/default/summit_xl/contacts"
-#define GRIPPER_TOPIC           "gripper_left_controller/command"
 
 #pragma endregion
 
