@@ -4,15 +4,11 @@
 #pragma region includes
 
 #include "behaviortree_cpp/behavior_tree.h"
-#include "std_msgs/msg/float64.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
 #include "ba_interfaces.h"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "rclcpp_components/register_node_macro.hpp"
-
-using std::placeholders::_1;
-using namespace std::chrono_literals;
+#include "control_msgs/action/gripper_command.hpp"
 
 #pragma endregion
 
@@ -30,11 +26,7 @@ public:
     static BT::PortsList providedPorts();
 private:
     rclcpp::Node::SharedPtr node_;
-    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr grasp_publisher_;
-    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr grasp_subscriber_;
-    bool object_attached_;
-    bool object_attached_before_;
-    void ResultCallback(const std_msgs::msg::Float64::SharedPtr message);
+    rclcpp_action::Client<control_msgs::action::GripperCommand>::SharedPtr action_client_;
 };
 
 #pragma endregion

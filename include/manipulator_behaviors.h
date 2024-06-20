@@ -9,7 +9,6 @@
 #include "manipulator.h"
 #include <math.h>
 #include "ba_interfaces.h"
-#include "std_msgs/msg/float64.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include <moveit_msgs/action/move_group.hpp>
