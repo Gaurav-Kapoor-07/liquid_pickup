@@ -40,7 +40,7 @@ void BATimeLogger::CloseFiles(void){
  * @param pose PoseStamped pose of the tomato in map_frame
  * @param radius radius of the tomato in m
  */
-void BATimeLogger::LogValidate(geometry_msgs::msg::PoseStamped pose, float radius){
+void BATimeLogger::LogValidate(geometry_msgs::msg::PoseStamped pose, double radius){
     file_validate<<pose.pose.position.x<<";"<<pose.pose.position.y<<";"<<pose.pose.position.z<<";"<<radius<<"\n";
 }
 
@@ -50,7 +50,7 @@ void BATimeLogger::LogValidate(geometry_msgs::msg::PoseStamped pose, float radiu
  * @param pose PoseStamped pose of the tomato in map_frame
  * @param radius radius of the tomato in m
  */
-void BATimeLogger::LogScan(geometry_msgs::msg::PoseStamped pose, float radius){
+void BATimeLogger::LogScan(geometry_msgs::msg::PoseStamped pose, double radius){
     file_scan<<pose.pose.position.x<<";"<<pose.pose.position.y<<";"<<pose.pose.position.z<<";"<<radius<<"\n";
 }
 

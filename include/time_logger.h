@@ -26,8 +26,8 @@ enum LogType{log_start, log_stop};
 class BATimeLogger
 {
     public:
-    static void LogScan(geometry_msgs::msg::PoseStamped pose, float radius);
-    static void LogValidate(geometry_msgs::msg::PoseStamped pose, float raduis);
+    static void LogScan(geometry_msgs::msg::PoseStamped pose, double radius);
+    static void LogValidate(geometry_msgs::msg::PoseStamped pose, double raduis);
     // static void LogMoveBase(std::string source, LogType type);
     static void LogMoveGroup(std::string source, LogType type);
     static void LogPlanArm(std::string source, LogType type);

@@ -30,8 +30,17 @@ ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT
 BT::NodeStatus ManipulatorGraspTomato::onStart()
 {
     LOG_MANI_START(this->name());
+
+    BT::Optional<std::string> tomato_action = getInput<std::string>("action");
+    BT::Optional<double> tomato_base_footprint_x = getInput<double>("target_x");
+    BT::Optional<double> tomato_base_footprint_y = getInput<double>("target_y");
+    BT::Optional<double> tomato_base_footprint_z = getInput<double>("target_z");
+    BT::Optional<double> tomato_base_footprint_roll = getInput<double>("target_roll");
+    BT::Optional<double> tomato_base_footprint_pitch = getInput<double>("target_pitch");
+    BT::Optional<double> tomato_base_footprint_yaw = getInput<double>("target_yaw");
+
     RCLCPP_INFO(node_->get_logger(), "moving gripper to tomato");
-    manipulator_.MoveGripperToTomato();
+    manipulator_.MoveGripperToTomato(tomato_action.value(), tomato_base_footprint_x.value(), tomato_base_footprint_y.value(), tomato_base_footprint_z.value(), tomato_base_footprint_roll.value(), tomato_base_footprint_pitch.value(), tomato_base_footprint_yaw.value());
     RCLCPP_INFO(node_->get_logger(), "moved gripper to tomato");
     return BT::NodeStatus::RUNNING;
 }
@@ -60,8 +69,7 @@ void ManipulatorGraspTomato::onHalted() {}
  */
 BT::PortsList ManipulatorGraspTomato::providedPorts()
 {
-    RCLCPP_WARN(rclcpp::get_logger("ManipulatorGraspTomato"), "returning empty BT::PortsList!"); 
-    return {};
+    return {BT::InputPort<std::string>("action"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
 }
 
 #pragma endregion
@@ -96,10 +104,17 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
 {
     LOG_MANI_START(this->name());
 
-    BT::Optional<float> pregresp_offset = getInput<float>("pregrasp_offset");
+    BT::Optional<std::string> tomato_action = getInput<std::string>("action");
+    BT::Optional<double> tomato_base_footprint_x = getInput<double>("target_x");
+    BT::Optional<double> tomato_base_footprint_y = getInput<double>("target_y");
+    BT::Optional<double> tomato_base_footprint_z = getInput<double>("target_z");
+    BT::Optional<double> tomato_base_footprint_roll = getInput<double>("target_roll");
+    BT::Optional<double> tomato_base_footprint_pitch = getInput<double>("target_pitch");
+    BT::Optional<double> tomato_base_footprint_yaw = getInput<double>("target_yaw");
+    BT::Optional<double> pregresp_offset = getInput<double>("pregrasp_offset");
   
     RCLCPP_INFO(node_->get_logger(), "pregrasp started");
-    manipulator_.MoveGripperToPregraspPose(pregresp_offset.value());
+    manipulator_.MoveGripperToPregraspPose(tomato_action.value(), tomato_base_footprint_x.value(), tomato_base_footprint_y.value(), tomato_base_footprint_z.value(), tomato_base_footprint_roll.value(), tomato_base_footprint_pitch.value(), tomato_base_footprint_yaw.value(), pregresp_offset.value());
     RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
     return BT::NodeStatus::RUNNING;
 }
@@ -128,7 +143,7 @@ void ManipulatorPregrasp::onHalted() {}
  */
 BT::PortsList ManipulatorPregrasp::providedPorts()
 {
-    return {BT::InputPort<float>("pregrasp_offset")};
+    return {BT::InputPort<std::string>("action"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
 }
 
 #pragma endregion

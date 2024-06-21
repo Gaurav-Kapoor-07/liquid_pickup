@@ -20,13 +20,13 @@
 
 namespace ba_helper
 {
-    float ConvertDegreesToRadians(float degrees);
-    float ConvertQuaternionToAngle(geometry_msgs::msg::Quaternion quat);
-    float CalculateGripperParameterFromDesiredAirgap(float airgap);
+    double ConvertDegreesToRadians(double degrees);
+    double ConvertQuaternionToAngle(geometry_msgs::msg::Quaternion quat);
+    double CalculateGripperParameterFromDesiredAirgap(double airgap);
     geometry_msgs::msg::Point GetCurrentArmbaseLocation(void);
     geometry_msgs::msg::PoseStamped GetCurrentPoseInMapFrame(const char frame[],
-                                                          float x = 0, float y = 0, float z = 0,
-                                                          float roll = 0, float pitch = 0, float yaw = 0);
+                                                          double x = 0, double y = 0, double z = 0,
+                                                          double roll = 0, double pitch = 0, double yaw = 0);
 }
 
 #endif

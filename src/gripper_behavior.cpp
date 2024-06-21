@@ -114,7 +114,7 @@ BT::NodeStatus GripperActuator::tick()
  */
 BT::PortsList GripperActuator::providedPorts()
 {
-    return {BT::InputPort<float>("position"), BT::InputPort<float>("max_effort")};
+    return {BT::InputPort<double>("position"), BT::InputPort<double>("max_effort")};
 }
 
 #pragma endregion

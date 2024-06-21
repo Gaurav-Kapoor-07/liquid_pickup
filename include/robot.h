@@ -11,21 +11,16 @@
 
 #pragma endregion
 
-// typedef actionlib::SimpleActionClient<moveit_msgs::MoveGroupAction> MoveGroupClient;
-
 #pragma region RobotInitializer
 
 /**
  * @brief Class/Behavior to initialize the robot in the beginning
  *
  */
-// class RobotInitializer : public BT::SyncActionNode, public IBAInitManipulatorNode, public IBAInitNodeHandle
 class RobotInitializer : public BT::SyncActionNode
 {
 public:
     RobotInitializer(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
-    // void init(std::shared_ptr<rclcpp::Node> node_handle) override;
-    // void init(Manipulator manipulator) override;
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 

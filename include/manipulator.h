@@ -54,10 +54,10 @@ class Manipulator
 public:
     Manipulator(const rclcpp::Node::SharedPtr node);
 
-    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(float offset);
-    moveit::core::MoveItErrorCode MoveGripperToTomato();
+    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(std::string action_, double tomato_base_footprint_x_, double tomato_base_footprint_y_, double tomato_base_footprint_z_, double tomato_base_footprint_roll_, double tomato_base_footprint_pitch_, double tomato_base_footprint_yaw_, double offset);
+    moveit::core::MoveItErrorCode MoveGripperToTomato(std::string action_, double tomato_base_footprint_x_, double tomato_base_footprint_y_, double tomato_base_footprint_z_, double tomato_base_footprint_roll_, double tomato_base_footprint_pitch_, double tomato_base_footprint_yaw_);
     double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
-    double MoveLinearVec(float x, float y, float z);
+    double MoveLinearVec(double x, double y, double z);
     moveit::core::MoveItErrorCode DropTomatoInBasket(void);
     moveit::core::MoveItErrorCode MoveToInitialPosition(void);
     moveit::core::MoveItErrorCode MoveToDrivingPosition(void);

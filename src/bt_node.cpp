@@ -36,11 +36,10 @@ class LiquidPickup : public rclcpp::Node
 {
   public:
     LiquidPickup()
-    : Node("bt_node", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true))
+    : Node("bt_node")
     {
       this->declare_parameter("yaml_file", "arm_positions.yaml");
       this->declare_parameter("behavior_tree_type", "behavior_tree_type");
-      // this->declare_parameter("bt_xml", "test.xml");
       this->declare_parameter("bt_xml", "test_2.xml");
       behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
     }
