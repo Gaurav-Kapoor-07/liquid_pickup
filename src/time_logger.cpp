@@ -37,8 +37,8 @@ void BATimeLogger::CloseFiles(void){
 /**
  * @brief log the parameters to file loc_validate.csv
  * 
- * @param pose PoseStamped pose of the tomato in map_frame
- * @param radius radius of the tomato in m
+ * @param pose PoseStamped pose of the target in map_frame
+ * @param radius radius of the target in m
  */
 void BATimeLogger::LogValidate(geometry_msgs::msg::PoseStamped pose, double radius){
     file_validate<<pose.pose.position.x<<";"<<pose.pose.position.y<<";"<<pose.pose.position.z<<";"<<radius<<"\n";
@@ -47,8 +47,8 @@ void BATimeLogger::LogValidate(geometry_msgs::msg::PoseStamped pose, double radi
 /**
  * @brief log the parameters to file loc_scan.csv
  * 
- * @param pose PoseStamped pose of the tomato in map_frame
- * @param radius radius of the tomato in m
+ * @param pose PoseStamped pose of the target in map_frame
+ * @param radius radius of the target in m
  */
 void BATimeLogger::LogScan(geometry_msgs::msg::PoseStamped pose, double radius){
     file_scan<<pose.pose.position.x<<";"<<pose.pose.position.y<<";"<<pose.pose.position.z<<";"<<radius<<"\n";

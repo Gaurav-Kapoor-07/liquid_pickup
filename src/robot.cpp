@@ -73,7 +73,7 @@ moveit::core::MoveItErrorCode RobotInitializer::SetInitialPosition()
     // std::srand(std::time(NULL));
     // int model_id = std::rand() % 1000;
     // sprintf(modelname, "basket_%d", model_id);
-    // sprintf(linkname, "tomato_basket_link_%d", model_id);
+    // sprintf(linkname, "target_basket_link_%d", model_id);
     // ros::ServiceClient spawn_model_client = node_handle_.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_urdf_model");
     // gazebo_msgs::SpawnModel spawn_model;
     // spawn_model.request.model_name = modelname;

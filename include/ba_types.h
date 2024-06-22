@@ -8,16 +8,16 @@
 #pragma endregion
 
 /**
- * @brief Struct to store tomato coordinates
+ * @brief Struct to store coordinates
  * 
  */
-struct TomatoCoordinates{
+struct Coordinates{
     double x;
     double y;
     double z;
     double r;
     bool is_picked;
-    inline bool operator==(const TomatoCoordinates t1){
+    inline bool operator==(const Coordinates t1){
         return (pow(x-t1.x,2)+pow(y-t1.y,2)+pow(z-t1.z,2))<std::max(r, t1.r)+0.01;
     };
 } ;

@@ -32,7 +32,7 @@
 #define GROUP_NAME                      "arm"
 
 #define MY_PI                           3.14159
-#define PREGRASP_DISTANCE               0.35    // distance offset of ee from tomato for validation scan
+#define PREGRASP_DISTANCE               0.35    // distance offset of ee from  for validation scan
 #define TCP_OFFSET_Z                    0.10    // vertical offset
 #define TCP_OFFSET_XY                   0.15    // distance offset in XY-plane
 #define MANIPULATOR_JOINT_TOLERANCE     0.01
@@ -54,11 +54,11 @@ class Manipulator
 public:
     Manipulator(const rclcpp::Node::SharedPtr node);
 
-    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(std::string action_, double tomato_base_footprint_x_, double tomato_base_footprint_y_, double tomato_base_footprint_z_, double tomato_base_footprint_roll_, double tomato_base_footprint_pitch_, double tomato_base_footprint_yaw_, double offset);
-    moveit::core::MoveItErrorCode MoveGripperToTomato(std::string action_, double tomato_base_footprint_x_, double tomato_base_footprint_y_, double tomato_base_footprint_z_, double tomato_base_footprint_roll_, double tomato_base_footprint_pitch_, double tomato_base_footprint_yaw_);
+    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset);
+    moveit::core::MoveItErrorCode MoveGripperToTarget(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_);
     double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
     double MoveLinearVec(double x, double y, double z);
-    moveit::core::MoveItErrorCode DropTomatoInBasket(void);
+    moveit::core::MoveItErrorCode DropObject(void);
     moveit::core::MoveItErrorCode MoveToInitialPosition(void);
     moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
     moveit::core::MoveItErrorCode MoveToScanningPosition(void);

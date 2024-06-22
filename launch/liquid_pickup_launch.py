@@ -26,7 +26,7 @@ def generate_launch_description():
             name='base_footprint_to_liquid_frame',
             namespace='summit',
             # parameters=[{'use_sim_time': use_sim_time}],
-            arguments = ['--x', '0.8', '--y', '0.0', '--z', '0.5', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'base_footprint', '--child-frame-id', 'liquid'],
+            arguments = ['--x', '0.6', '--y', '0.1', '--z', '0.7', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'base_footprint', '--child-frame-id', 'liquid'],
             remappings=[('/tf_static', '/summit/tf_static')],
         ),
     ])

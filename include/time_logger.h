@@ -20,7 +20,7 @@
 enum LogType{log_start, log_stop};
 /**
  * @brief Class to log times for different parts of the behavîortree and the 
- * estimated poses of the tomatos found by the arm camera
+ * estimated poses of the targets found by the arm camera
  * 
  */
 class BATimeLogger

@@ -1,15 +1,15 @@
 #include "manipulator_behaviors.h"
 
-#pragma region ManipulatorGraspTomato
+#pragma region ManipulatorGrasp
 
 /**
- * @brief Construct a new Manipulator Grasp Tomato:: Manipulator Grasp Tomato object
+ * @brief Construct a new Manipulator Grasp :: Manipulator Grasp object
  * 
  * @param name The name of the behavior
  * @param config The node configuration
  */
 
-ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
+ManipulatorGrasp::ManipulatorGrasp(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
     : BT::StatefulActionNode(name, config), manipulator_(node)
 {
     if (node != nullptr)
@@ -27,21 +27,21 @@ ManipulatorGraspTomato::ManipulatorGraspTomato(const std::string &name, const BT
  * 
  * @return BT::NodeStatus The status of the node
  */
-BT::NodeStatus ManipulatorGraspTomato::onStart()
+BT::NodeStatus ManipulatorGrasp::onStart()
 {
     LOG_MANI_START(this->name());
 
-    BT::Optional<std::string> tomato_action = getInput<std::string>("action");
-    BT::Optional<double> tomato_base_footprint_x = getInput<double>("target_x");
-    BT::Optional<double> tomato_base_footprint_y = getInput<double>("target_y");
-    BT::Optional<double> tomato_base_footprint_z = getInput<double>("target_z");
-    BT::Optional<double> tomato_base_footprint_roll = getInput<double>("target_roll");
-    BT::Optional<double> tomato_base_footprint_pitch = getInput<double>("target_pitch");
-    BT::Optional<double> tomato_base_footprint_yaw = getInput<double>("target_yaw");
+    BT::Optional<std::string> action = getInput<std::string>("action");
+    BT::Optional<double> base_footprint_x = getInput<double>("target_x");
+    BT::Optional<double> base_footprint_y = getInput<double>("target_y");
+    BT::Optional<double> base_footprint_z = getInput<double>("target_z");
+    BT::Optional<double> base_footprint_roll = getInput<double>("target_roll");
+    BT::Optional<double> base_footprint_pitch = getInput<double>("target_pitch");
+    BT::Optional<double> base_footprint_yaw = getInput<double>("target_yaw");
 
-    RCLCPP_INFO(node_->get_logger(), "moving gripper to tomato");
-    manipulator_.MoveGripperToTomato(tomato_action.value(), tomato_base_footprint_x.value(), tomato_base_footprint_y.value(), tomato_base_footprint_z.value(), tomato_base_footprint_roll.value(), tomato_base_footprint_pitch.value(), tomato_base_footprint_yaw.value());
-    RCLCPP_INFO(node_->get_logger(), "moved gripper to tomato");
+    RCLCPP_INFO(node_->get_logger(), "moving gripper to target");
+    manipulator_.MoveGripperToTarget(action.value(), base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value());
+    RCLCPP_INFO(node_->get_logger(), "moved gripper to target");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -50,7 +50,7 @@ BT::NodeStatus ManipulatorGraspTomato::onStart()
  * 
  * @return BT::NodeStatus The status of the node
  */
-BT::NodeStatus ManipulatorGraspTomato::onRunning()
+BT::NodeStatus ManipulatorGrasp::onRunning()
 {
     return BT::NodeStatus::SUCCESS;
 }
@@ -60,14 +60,14 @@ BT::NodeStatus ManipulatorGraspTomato::onRunning()
  *        This is a convenient place todo a cleanup, if needed.
  * 
  */
-void ManipulatorGraspTomato::onHalted() {}
+void ManipulatorGrasp::onHalted() {}
 
 /**
  * @brief Gets the ports provided by this behavior.
  *
  * @return BT::PortsList The list of the ports
  */
-BT::PortsList ManipulatorGraspTomato::providedPorts()
+BT::PortsList ManipulatorGrasp::providedPorts()
 {
     return {BT::InputPort<std::string>("action"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
 }
@@ -104,17 +104,17 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
 {
     LOG_MANI_START(this->name());
 
-    BT::Optional<std::string> tomato_action = getInput<std::string>("action");
-    BT::Optional<double> tomato_base_footprint_x = getInput<double>("target_x");
-    BT::Optional<double> tomato_base_footprint_y = getInput<double>("target_y");
-    BT::Optional<double> tomato_base_footprint_z = getInput<double>("target_z");
-    BT::Optional<double> tomato_base_footprint_roll = getInput<double>("target_roll");
-    BT::Optional<double> tomato_base_footprint_pitch = getInput<double>("target_pitch");
-    BT::Optional<double> tomato_base_footprint_yaw = getInput<double>("target_yaw");
+    BT::Optional<std::string> action = getInput<std::string>("action");
+    BT::Optional<double> base_footprint_x = getInput<double>("target_x");
+    BT::Optional<double> base_footprint_y = getInput<double>("target_y");
+    BT::Optional<double> base_footprint_z = getInput<double>("target_z");
+    BT::Optional<double> base_footprint_roll = getInput<double>("target_roll");
+    BT::Optional<double> base_footprint_pitch = getInput<double>("target_pitch");
+    BT::Optional<double> base_footprint_yaw = getInput<double>("target_yaw");
     BT::Optional<double> pregresp_offset = getInput<double>("pregrasp_offset");
   
     RCLCPP_INFO(node_->get_logger(), "pregrasp started");
-    manipulator_.MoveGripperToPregraspPose(tomato_action.value(), tomato_base_footprint_x.value(), tomato_base_footprint_y.value(), tomato_base_footprint_z.value(), tomato_base_footprint_roll.value(), tomato_base_footprint_pitch.value(), tomato_base_footprint_yaw.value(), pregresp_offset.value());
+    manipulator_.MoveGripperToPregraspPose(action.value(), base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
     RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
     return BT::NodeStatus::RUNNING;
 }
@@ -213,14 +213,14 @@ BT::PortsList ManipulatorPostgraspRetreat::providedPorts()
 
 #pragma endregion
 
-#pragma region ManipulatorDropTomato
+#pragma region ManipulatorDrop
 
 /**
- * @brief Construct a new Manipulator Drop Tomato:: Manipulator Drop Tomato object
+ * @brief Construct a new Manipulator Drop :: Manipulator Drop an object
  * 
  * @param name The name of the behavior
  */
-ManipulatorDropTomato::ManipulatorDropTomato(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
+ManipulatorDrop::ManipulatorDrop(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
     : BT::StatefulActionNode(name, config), manipulator_(node)
 {
     if (node != nullptr)
@@ -238,12 +238,12 @@ ManipulatorDropTomato::ManipulatorDropTomato(const std::string &name, const BT::
  * 
  * @return BT::NodeStatus The status of the node
  */
-BT::NodeStatus ManipulatorDropTomato::onStart()
+BT::NodeStatus ManipulatorDrop::onStart()
 {
     LOG_MANI_START(this->name());
-    RCLCPP_INFO(node_->get_logger(), "going to drop tomato in basket");
-    manipulator_.DropTomatoInBasket();
-    RCLCPP_INFO(node_->get_logger(), "tomato dropped");
+    RCLCPP_INFO(node_->get_logger(), "going to drop object");
+    manipulator_.DropObject();
+    RCLCPP_INFO(node_->get_logger(), "object dropped");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -252,7 +252,7 @@ BT::NodeStatus ManipulatorDropTomato::onStart()
  * 
  * @return BT::NodeStatus The status of the node
  */
-BT::NodeStatus ManipulatorDropTomato::onRunning()
+BT::NodeStatus ManipulatorDrop::onRunning()
 {
     return BT::NodeStatus::SUCCESS;
 }
@@ -262,16 +262,16 @@ BT::NodeStatus ManipulatorDropTomato::onRunning()
  *        This is a convenient place todo a cleanup, if needed.
  * 
  */
-void ManipulatorDropTomato::onHalted() {}
+void ManipulatorDrop::onHalted() {}
 
 /**
  * @brief Gets the ports provided by this behavior.
  *
  * @return BT::PortsList The list of the ports
  */
-BT::PortsList ManipulatorDropTomato::providedPorts()
+BT::PortsList ManipulatorDrop::providedPorts()
 {
-    RCLCPP_WARN(rclcpp::get_logger("ManipulatorDropTomato"), "returning empty BT::PortsList!");
+    RCLCPP_WARN(rclcpp::get_logger("ManipulatorDrop"), "returning empty BT::PortsList!");
     return {};
 }
 

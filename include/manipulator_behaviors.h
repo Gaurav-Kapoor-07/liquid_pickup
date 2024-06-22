@@ -26,16 +26,16 @@
 
 #define UR5_WORKING_RADIUS 0.95
 
-#pragma region ManipulatorGraspTomato
+#pragma region ManipulatorGrasp
 
 /**
- * @brief Class/Behavior which grasps a tomato
+ * @brief Class/Behavior which grasps an object
  * 
  */
-class ManipulatorGraspTomato : public BT::StatefulActionNode
+class ManipulatorGrasp : public BT::StatefulActionNode
 {
 public:
-    ManipulatorGraspTomato(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
+    ManipulatorGrasp(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
@@ -92,16 +92,16 @@ private:
 
 #pragma endregion
 
-#pragma region ManipulatorDropTomato
+#pragma region ManipulatorDrop
 
 /**
- * @brief Class/Behavior to drop the tomato into the attached basket after grasping
+ * @brief Class/Behavior to drop the object into the attached basket after grasping
  * 
  */
-class ManipulatorDropTomato : public BT::StatefulActionNode
+class ManipulatorDrop : public BT::StatefulActionNode
 {
 public:
-    ManipulatorDropTomato(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
+    ManipulatorDrop(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
