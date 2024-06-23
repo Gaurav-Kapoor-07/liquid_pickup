@@ -59,27 +59,26 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(std::string
 
     if (action_ == "collect_liquid_sample")
     { 
-        // try {
-        //     base_footprint_to_target_frame = tf_buffer_->lookupTransform(
-        //         BASE_FRAME, LIQUID_FRAME,
-        //         tf2::TimePointZero);
-        // }   catch (const tf2::TransformException & ex) {
-        //     RCLCPP_INFO(node_->get_logger(),
-        //         "Could not transform %s to %s: %s",
-        //         BASE_FRAME, LIQUID_FRAME, ex.what());
-        // }
+        try {
+            base_footprint_to_target_frame = tf_buffer_->lookupTransform(
+                BASE_FRAME, LIQUID_FRAME,
+                tf2::TimePointZero);
+        }   catch (const tf2::TransformException & ex) {
+            RCLCPP_INFO(node_->get_logger(),
+                "Could not transform %s to %s: %s",
+                BASE_FRAME, LIQUID_FRAME, ex.what());
+        }
         
-        // target_base_footprint.header = base_footprint_to_target_frame.header;
-        // target_base_footprint.pose.position.x = base_footprint_to_target_frame.transform.translation.x;
-        // target_base_footprint.pose.position.y = base_footprint_to_target_frame.transform.translation.y;
-        // target_base_footprint.pose.position.z = base_footprint_to_target_frame.transform.translation.z;
-        // target_base_footprint.pose.orientation.x = base_footprint_to_target_frame.transform.rotation.x;
-        // target_base_footprint.pose.orientation.y = base_footprint_to_target_frame.transform.rotation.y;
-        // target_base_footprint.pose.orientation.z = base_footprint_to_target_frame.transform.rotation.z;
-        // target_base_footprint.pose.orientation.w = base_footprint_to_target_frame.transform.rotation.w;
+        target_base_footprint.header = base_footprint_to_target_frame.header;
+        target_base_footprint.pose.position.x = base_footprint_to_target_frame.transform.translation.x;
+        target_base_footprint.pose.position.y = base_footprint_to_target_frame.transform.translation.y;
+        target_base_footprint.pose.position.z = base_footprint_to_target_frame.transform.translation.z;
+        target_base_footprint.pose.orientation.x = base_footprint_to_target_frame.transform.rotation.x;
+        target_base_footprint.pose.orientation.y = base_footprint_to_target_frame.transform.rotation.y;
+        target_base_footprint.pose.orientation.z = base_footprint_to_target_frame.transform.rotation.z;
+        target_base_footprint.pose.orientation.w = base_footprint_to_target_frame.transform.rotation.w;
 
-        target_base_footprint.header.frame_id = LIQUID_FRAME;
-
+        // target_base_footprint.header.frame_id = LIQUID_FRAME;
     }
 
     else
@@ -111,7 +110,7 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(std::string
     
     // manipulator_->setPoseTarget(target_base_footprint, "arm_flange");
     manipulator_->setPoseTarget(target_base_footprint);
-    manipulator_->setPlanningTime(5);
+    manipulator_->setPlanningTime(30);
     
     // // Now, we call the planner to compute the plan and visualize it.
     // // Note that we are just planning, not asking move_group
@@ -152,6 +151,7 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(std::string
     // visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
     // visual_tools.trigger();
     // visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+    
     // return manipulator_->asyncMove();
     return manipulator_->move();
 }
