@@ -21,6 +21,7 @@
   <depend>rclcpp_components</depend>
   <depend>moveit_msgs</depend>
   <depend>control_msgs</depend>
+  <depend>moveit_visual_tools</depend>
   
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

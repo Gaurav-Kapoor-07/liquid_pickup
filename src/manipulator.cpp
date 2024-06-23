@@ -109,9 +109,51 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(std::string
     // manipulator_->setPoseReferenceFrame(target_base_footprint.header.frame_id);
     // RCLCPP_INFO(node_->get_logger(), "moving end effector to pose: %s", str(target_base_footprint);
     
-    manipulator_->setPoseTarget(target_base_footprint, "arm_flange");
+    // manipulator_->setPoseTarget(target_base_footprint, "arm_flange");
+    manipulator_->setPoseTarget(target_base_footprint);
     manipulator_->setPlanningTime(5);
-    return manipulator_->asyncMove();
+    
+    // // Now, we call the planner to compute the plan and visualize it.
+    // // Note that we are just planning, not asking move_group
+    // // to actually move the robot.
+    // moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+    // bool success = (manipulator_->plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+
+    // RCLCPP_INFO(node_->get_logger(), "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
+
+    // // Raw pointers are frequently used to refer to the planning group for improved performance.
+    // const moveit::core::JointModelGroup* joint_model_group = manipulator_->getCurrentState()->getJointModelGroup(GROUP_NAME);
+
+    // // Visualization
+    // // ^^^^^^^^^^^^^
+    // namespace rvt = rviz_visual_tools;
+    // moveit_visual_tools::MoveItVisualTools visual_tools(node_, ARM_BASE_FRAME, "/summit/move_group", manipulator_->getRobotModel());
+
+    // visual_tools.deleteAllMarkers();
+
+    // /* Remote control is an introspection tool that allows users to step through a high level script */
+    // /* via buttons and keyboard shortcuts in RViz */
+    // visual_tools.loadRemoteControl();
+    
+    // RCLCPP_INFO(node_->get_logger(), "Visualizing plan 1 as trajectory line");
+    
+    // geometry_msgs::msg::Pose target_base_footprint_;
+
+    // target_base_footprint_.position = target_base_footprint.pose.position; 
+    
+    // visual_tools.publishAxisLabeled(target_base_footprint_, "pose1");
+
+    // // RViz provides many types of markers, in this demo we will use text, cylinders, and spheres
+    // Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+    // text_pose.translation().z() = 1.0;
+    // visual_tools.publishText(text_pose, "Pose_Goal", rvt::WHITE, rvt::XLARGE);
+    
+    // visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
+    // visual_tools.trigger();
+    // visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+    // return manipulator_->asyncMove();
+    return manipulator_->move();
 }
 
 /**
