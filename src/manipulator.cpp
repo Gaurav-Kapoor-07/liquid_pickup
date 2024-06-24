@@ -35,9 +35,10 @@ Manipulator::Manipulator(const rclcpp::Node::SharedPtr node)
 
     moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, "/summit");
 
-    manipulator_ = new moveit::planning_interface::MoveGroupInterface(node_, manipulator_options_);
+    // manipulator_ = new moveit::planning_interface::MoveGroupInterface(node_, manipulator_options_);
+    manipulator_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, manipulator_options_);
 
-    manipulator_->allowReplanning(true);
+    // manipulator_->allowReplanning(true);
 }
 
 /**
@@ -110,7 +111,7 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(std::string
     
     // manipulator_->setPoseTarget(target_base_footprint, "arm_flange");
     manipulator_->setPoseTarget(target_base_footprint);
-    manipulator_->setPlanningTime(30);
+    manipulator_->setPlanningTime(5.0);
     
     // // Now, we call the planner to compute the plan and visualize it.
     // // Note that we are just planning, not asking move_group

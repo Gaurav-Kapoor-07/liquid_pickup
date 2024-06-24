@@ -6,9 +6,12 @@
 #include "rclcpp/rclcpp.hpp"
 #include <memory>
 #include <geometry_msgs/msg/pose.hpp>
-#include "geometry_msgs/msg/vector3.hpp"
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include "geometry_msgs/msg/quaternion.hpp"
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "tf2/LinearMath/Transform.h"
+#include <tf2/LinearMath/Quaternion.h>
 #include "tf2_ros/transform_listener.h"
 #include "tf2_ros/buffer.h"
 #include "tf2/exceptions.h"
@@ -64,7 +67,8 @@ public:
     moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
     moveit::core::MoveItErrorCode MoveToScanningPosition(void);
 private:
-    moveit::planning_interface::MoveGroupInterface *manipulator_;
+    // moveit::planning_interface::MoveGroupInterface *manipulator_;
+    std::shared_ptr<moveit::planning_interface::MoveGroupInterface> manipulator_;
     geometry_msgs::msg::PoseStamped drop_pose_;
     std::map<std::string, double> initial_position_, driving_position_, scanning_position_;
     void InitializeSummitXlPoses(void);
