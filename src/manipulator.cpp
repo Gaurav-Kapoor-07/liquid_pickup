@@ -112,6 +112,9 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(std::string
     // manipulator_->setPoseTarget(target_base_footprint, "arm_flange");
     manipulator_->setPoseTarget(target_base_footprint);
     manipulator_->setPlanningTime(5.0);
+
+    RCLCPP_INFO(node_->get_logger(), "Reference frame: %s", manipulator_->getPlanningFrame().c_str());
+    RCLCPP_INFO(node_->get_logger(), "End effector link: %s", manipulator_->getEndEffectorLink().c_str());
     
     // // Now, we call the planner to compute the plan and visualize it.
     // // Note that we are just planning, not asking move_group
