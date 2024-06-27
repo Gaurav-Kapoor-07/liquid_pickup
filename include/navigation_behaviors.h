@@ -1,0 +1,49 @@
+#pragma region includes
+
+#include "behaviortree_cpp/behavior_tree.h"
+#include "behaviortree_cpp/bt_factory.h"
+
+#include "yaml-cpp/yaml.h"
+#include <rclcpp/rclcpp.hpp>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include "ba_interfaces.h"
+#include "manipulator.h"
+
+#include "nav2_msgs/action/navigate_to_pose.hpp"
+
+#include "helper.h"
+
+#include "time_logger.h"
+#ifdef TIME_LOGGER_ON
+#define LOG_NAV_START(val) BATimeLogger::LogNav(val, log_start)
+#define LOG_NAV_STOP(val) BATimeLogger::LogNav(val, log_stop)
+#else
+#define LOG_NAV_START(val)
+#define LOG_NAV_STOP(val)
+#endif
+
+#pragma endregion
+
+#pragma region GoToPose
+
+/**
+ * @brief Go to a target location (wraps around `Nav2`)
+ *
+ */
+class GoToPose : public BT::StatefulActionNode
+{
+public:
+  GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
+  BT::NodeStatus onStart() override;
+  BT::NodeStatus onRunning() override;
+  void onHalted() override;
+  static BT::PortsList providedPorts();
+
+private:
+  rclcpp::Node::SharedPtr node_;
+  Manipulator manipulator_;
+  rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SharedPtr action_client_;
+};
+
+#pragma endregion

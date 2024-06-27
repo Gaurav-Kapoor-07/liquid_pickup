@@ -1,8 +1,7 @@
 #include "time_logger.h"
 
-// std::ofstream BATimeLogger::file_movebase;
+std::ofstream BATimeLogger::file_nav;
 std::ofstream BATimeLogger::file_movegroup;
-// std::ofstream BATimeLogger::file_imageprocessing;
 std::ofstream BATimeLogger::file_scan;
 std::ofstream BATimeLogger::file_validate;
 
@@ -12,14 +11,12 @@ std::ofstream BATimeLogger::file_validate;
  * 
  */
 void BATimeLogger::InitFiles(void){
-    // file_movebase.open(FILE_MOVEBASE,std::ios_base::app);
+    file_nav.open(FILE_NAV,std::ios_base::app);
     file_movegroup.open(FILE_MOVEARM,std::ios_base::app);
-    // file_imageprocessing.open(FILE_VISION,std::ios_base::app);
     file_scan.open(FILE_SCAN,std::ios_base::app);
     file_validate.open(FILE_VALIDATE, std::ios_base::app);
-    // file_movebase << "\n\n NEW RUN\n";
+    file_nav << "\n\n NEW RUN\n";
     file_movegroup << "\n\n NEW RUN\n";
-    // file_imageprocessing << "\n\n NEW RUN\n";
 }
 
 /**
@@ -27,9 +24,8 @@ void BATimeLogger::InitFiles(void){
  * 
  */
 void BATimeLogger::CloseFiles(void){
-    // file_movebase.close();
+    file_nav.close();
     file_movegroup.close();
-    // file_imageprocessing.close();
     file_scan.close();
     file_validate.close();
 }
@@ -71,14 +67,14 @@ void BATimeLogger::LogFile(std::string source, LogType type, std::ofstream &file
 }
 
 /**
- * @brief log time of movebase task
+ * @brief log time of Nav2 task
  * 
  * @param source name of the behavior; is logged in first column
  * @param type logtype start or stop
  */
-// void BATimeLogger::LogMoveBase(std::string source, LogType type){
-//     LogFile(source, type, file_movebase);
-// }
+void BATimeLogger::LogNav(std::string source, LogType type){
+    LogFile(source, type, file_nav);
+}
 
 /**
  * @brief log time of movegroup task
@@ -89,13 +85,3 @@ void BATimeLogger::LogFile(std::string source, LogType type, std::ofstream &file
 void BATimeLogger::LogMoveGroup(std::string source, LogType type){
     LogFile(source, type, file_movegroup);
 }
-
-/**
- * @brief log time of image processing task
- * 
- * @param source name of the behavior; is logged in first column
- * @param type logtype start or stop
- */
-// void BATimeLogger::LogImageProcessing(std::string source, LogType type){
-//     LogFile(source, type, file_imageprocessing);
-// }

@@ -26,6 +26,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(moveit_msgs REQUIRED)
 find_package(control_msgs REQUIRED)
 find_package(moveit_visual_tools REQUIRED)
+find_package(nav2_msgs REQUIRED)
 
 include_directories(include config) 
 
@@ -36,10 +37,11 @@ set(BT_SOURCES
     src/robot.cpp
     src/helper.cpp
     src/time_logger.cpp
+    src/navigation_behaviors.cpp
 )
 
 add_executable(liquid_pickup_node src/bt_node.cpp ${BT_SOURCES})
-ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp moveit_ros_planning_interface rclcpp_action rclcpp_components moveit_msgs control_msgs moveit_visual_tools)
+ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp moveit_ros_planning_interface rclcpp_action rclcpp_components moveit_msgs control_msgs moveit_visual_tools nav2_msgs)
 
 target_link_libraries(liquid_pickup_node yaml-cpp)
 

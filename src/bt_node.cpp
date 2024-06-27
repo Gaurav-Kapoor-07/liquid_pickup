@@ -20,6 +20,7 @@
 
 #include "manipulator_behaviors.h"  
 #include "gripper_behavior.h"
+#include "navigation_behaviors.h"
 
 #include "manipulator.h"
 #include "robot.h"
@@ -53,6 +54,7 @@ class LiquidPickup : public rclcpp::Node
       factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ", shared_from_this());
       factory.registerNodeType<ManipulatorScanPose>("ScanPose", shared_from_this());
       factory.registerNodeType<GripperActuator>("ChangeGripper", shared_from_this());
+      factory.registerNodeType<GoToPose>("GoToPose", shared_from_this());
 
       std::string xml_models = BT::writeTreeNodesModelXML(factory);
       std::cerr << xml_models;

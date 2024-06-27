@@ -8,10 +8,9 @@
 
 #include "ba_types.h"
 
-// #define FILE_MOVEBASE   "move_base.csv"
+#define FILE_NAV        "nav.csv"
 #define FILE_MOVEARM    "move_group.csv"
 #define FILE_PLANARM    "plan_move_group.csv"
-// #define FILE_VISION     "image_processing.csv"
 #define FILE_SCAN       "loc_scan.csv"
 #define FILE_VALIDATE   "loc_validate.csv"
 
@@ -28,17 +27,15 @@ class BATimeLogger
     public:
     static void LogScan(geometry_msgs::msg::PoseStamped pose, double radius);
     static void LogValidate(geometry_msgs::msg::PoseStamped pose, double raduis);
-    // static void LogMoveBase(std::string source, LogType type);
+    static void LogNav(std::string source, LogType type);
     static void LogMoveGroup(std::string source, LogType type);
     static void LogPlanArm(std::string source, LogType type);
-    // static void LogImageProcessing(std::string source, LogType type);
     static void InitFiles(void);
     static void CloseFiles(void);
-    // static std::ofstream file_movebase;
+    static std::ofstream file_nav;
     static std::ofstream file_movegroup;
     static std::ofstream file_scan;
     static std::ofstream file_validate;
-    // static std::ofstream file_imageprocessing;
     static void LogFile(std::string source, LogType type, std::ofstream &file);
 };
 

@@ -11,7 +11,6 @@
 #include "ba_interfaces.h"
 
 #include "rclcpp/rclcpp.hpp"
-#include <moveit_msgs/action/move_group.hpp>
 
 #include "time_logger.h"
 #ifdef TIME_LOGGER_ON

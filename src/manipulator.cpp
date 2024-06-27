@@ -38,7 +38,7 @@ Manipulator::Manipulator(const rclcpp::Node::SharedPtr node)
     // manipulator_ = new moveit::planning_interface::MoveGroupInterface(node_, manipulator_options_);
     manipulator_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, manipulator_options_);
 
-    // manipulator_->allowReplanning(true);
+    manipulator_->allowReplanning(true);
 }
 
 /**
