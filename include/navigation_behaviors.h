@@ -44,6 +44,7 @@ private:
   rclcpp::Node::SharedPtr node_;
   Manipulator manipulator_;
   rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SharedPtr action_client_;
+  rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateToPose>::SharedPtr goal_handle_;
 };
 
 #pragma endregion

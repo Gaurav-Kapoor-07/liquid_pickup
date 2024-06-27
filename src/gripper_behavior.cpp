@@ -34,13 +34,13 @@ GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfigur
  */
 BT::NodeStatus GripperActuator::tick()
 {
-    double gripper_position = getInput<double>("position").value();
-    double gripper_max_effort = getInput<double>("max_effort").value();
-    RCLCPP_INFO(node_->get_logger(), "Gripping -> value: %f", gripper_position);
+    BT::Optional<double> gripper_position = getInput<double>("position");
+    BT::Optional<double> gripper_max_effort = getInput<double>("max_effort");
+    RCLCPP_INFO(node_->get_logger(), "Gripping -> value: %f", gripper_position.value());
 
     auto grippercommand_msg = control_msgs::action::GripperCommand::Goal(); 
-    grippercommand_msg.command.position = gripper_position;
-    grippercommand_msg.command.max_effort = gripper_max_effort;
+    grippercommand_msg.command.position = gripper_position.value();
+    grippercommand_msg.command.max_effort = gripper_max_effort.value();
 
     RCLCPP_INFO(node_->get_logger(), "Sending goal");
 
