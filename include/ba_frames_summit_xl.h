@@ -1,8 +1,7 @@
 #ifndef BA_FRAMES_SUMMIT_XL_H
 #define BA_FRAMES_SUMMIT_XL_H
 
-// #define MAP_FRAME       "map"
-#define MAP_FRAME       "base_footprint" // for testing
+#define MAP_FRAME       "map"
 #define ODOM_FRAME      "odom"
 #define CAMERA_FRAME    "arm_camera_depth_frame"
 #define BASE_FRAME      "base_footprint"

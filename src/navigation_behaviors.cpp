@@ -56,9 +56,11 @@ BT::NodeStatus GoToPose::onStart()
     nav_msg.pose.pose.orientation.z = std::sin(target_yaw_.value() / 2.0);
     nav_msg.pose.pose.orientation.w = std::cos(target_yaw_.value() / 2.0);
 
-    nav_msg.behavior_tree = behavior_tree.value();
+    std::string package_share_directory = ament_index_cpp::get_package_share_directory("nav2_bt_navigator");
+    std::string path_to_xml = package_share_directory + "/behavior_trees/";
+    nav_msg.behavior_tree = path_to_xml + behavior_tree.value();
 
-    RCLCPP_INFO(node_->get_logger(), "Sending goal: header.frame_id: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f", nav_msg.pose.header.frame_id.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w);
+    RCLCPP_INFO(node_->get_logger(), "Sending goal: header.frame_id: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", nav_msg.pose.header.frame_id.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
 
     // Ask server to achieve some goal and wait until it's accepted
     auto goal_handle_future = action_client_->async_send_goal(nav_msg);
@@ -114,6 +116,7 @@ BT::NodeStatus GoToPose::onRunning()
 
     RCLCPP_INFO(node_->get_logger(), "result received");
     LOG_NAV_STOP(this->name());  
+    return BT::NodeStatus::SUCCESS;
 }
 
 /**
