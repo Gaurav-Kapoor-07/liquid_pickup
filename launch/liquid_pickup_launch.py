@@ -16,15 +16,4 @@ def generate_launch_description():
             remappings=[('/tf', '/summit/tf'), ('/tf_static', '/summit/tf_static')],
             emulate_tty=True,
         ),
-
-        # for testing
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='base_footprint_to_liquid_frame',
-            namespace='summit',
-            parameters=[{'use_sim_time': True}],
-            arguments = ['--x', '0.6', '--y', '0.01', '--z', '0.5', '--roll', '0.01', '--pitch', '3.14', '--yaw', '0.01', '--frame-id', 'base_footprint', '--child-frame-id', 'liquid'],
-            remappings=[('/tf_static', '/summit/tf_static')],
-        ),
     ])

@@ -1,6 +1,11 @@
 <root BTCPP_format="4" >
     <BehaviorTree ID="MainTree">
         <Sequence name="root_sequence"> 
+            <Sequence name="GoToPose">
+            <!-- choose behavior_tree XML from here: https://github.com/ros-navigation/navigation2/tree/main/nav2_bt_navigator/behavior_trees, default: navigate_to_pose_w_replanning_and_recovery.xml -->
+            <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" target_x="3.0" target_y="0.01" target_yaw = "1.57"/>
+            </Sequence>
+
             <Sequence name="RobotInitializer">
             <RobotInitializer name="RobotInitializer" message="RobotInitializer"/>
             <ChangeGripper name="open_gripper" position="0.3" max_effort = "0.0"/>
@@ -28,6 +33,13 @@
             <input_port name="position" type="double"/>
         </Action>
         <Action ID="Drop"/>
+        <Action ID="GoToPose">
+            <input_port name="pose_from_tf" type="bool"/>
+            <input_port name="target_yaw" type="double"/>
+            <input_port name="target_x" type="double"/>
+            <input_port name="target_y" type="double"/>
+            <input_port name="behavior_tree" type="std::string"/>
+        </Action>
         <Action ID="Grasp">
             <input_port name="target_roll" type="double"/>
             <input_port name="target_pitch" type="double"/>

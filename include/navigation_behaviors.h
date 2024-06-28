@@ -45,6 +45,9 @@ private:
   Manipulator manipulator_;
   rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SharedPtr action_client_;
   rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateToPose>::SharedPtr goal_handle_;
+  
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};    
+  std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 };
 
 #pragma endregion

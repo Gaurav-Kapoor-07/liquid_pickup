@@ -24,6 +24,9 @@ GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config,
     return;
     }
 
+    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
+    tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
 
@@ -38,27 +41,59 @@ BT::NodeStatus GoToPose::onStart()
     LOG_NAV_START(this->name());
     manipulator_.MoveToDrivingPosition();
 
-    BT::Optional<std::string> behavior_tree = getInput<std::string>("behavior_tree");
+    BT::Optional<std::string> behavior_tree_ = getInput<std::string>("behavior_tree");
+    BT::Optional<bool> pose_from_tf_ = getInput<bool>("pose_from_tf");
     BT::Optional<double> target_x_ = getInput<double>("target_x").value();
     BT::Optional<double> target_y_ = getInput<double>("target_y").value();
     BT::Optional<double> target_yaw_ = getInput<double>("target_yaw").value();
 
     auto nav_msg = nav2_msgs::action::NavigateToPose::Goal(); 
-    
-    // 2D pose goal
-    nav_msg.pose.header.stamp = node_->get_clock()->now();
-    nav_msg.pose.header.frame_id = MAP_FRAME;
-    nav_msg.pose.pose.position.x = target_x_.value();
-    nav_msg.pose.pose.position.y = target_y_.value();
-    nav_msg.pose.pose.position.z = 0.0;
-    nav_msg.pose.pose.orientation.x = 0.0;
-    nav_msg.pose.pose.orientation.y = 0.0;
-    nav_msg.pose.pose.orientation.z = std::sin(target_yaw_.value() / 2.0);
-    nav_msg.pose.pose.orientation.w = std::cos(target_yaw_.value() / 2.0);
+
+    if (pose_from_tf_.value())
+    {
+        RCLCPP_INFO(node_->get_logger(), "receiving 2D pose goal from TF");
+
+        geometry_msgs::msg::TransformStamped map_to_target_frame;
+
+        try {
+            map_to_target_frame = tf_buffer_->lookupTransform(
+                MAP_FRAME, LIQUID_FRAME,
+                tf2::TimePointZero);
+        }   catch (const tf2::TransformException & ex) {
+            RCLCPP_INFO(node_->get_logger(),
+                "Could not transform %s to %s: %s",
+                MAP_FRAME, LIQUID_FRAME, ex.what());
+        }
+
+        // 2D pose goal
+        nav_msg.pose.header = map_to_target_frame.header;
+        nav_msg.pose.pose.position.x = map_to_target_frame.transform.translation.x;
+        nav_msg.pose.pose.position.y = map_to_target_frame.transform.translation.y;
+        nav_msg.pose.pose.position.z = map_to_target_frame.transform.translation.z;
+        nav_msg.pose.pose.orientation.x = map_to_target_frame.transform.rotation.x;
+        nav_msg.pose.pose.orientation.y = map_to_target_frame.transform.rotation.y;
+        nav_msg.pose.pose.orientation.z = map_to_target_frame.transform.rotation.z;
+        nav_msg.pose.pose.orientation.w = map_to_target_frame.transform.rotation.w;
+    }
+
+    else
+    {
+        RCLCPP_INFO(node_->get_logger(), "receiving 2D pose goal from XML string");
+        // 2D pose goal
+        nav_msg.pose.header.stamp = node_->get_clock()->now();
+        nav_msg.pose.header.frame_id = MAP_FRAME;
+        nav_msg.pose.pose.position.x = target_x_.value();
+        nav_msg.pose.pose.position.y = target_y_.value();
+        nav_msg.pose.pose.position.z = 0.0;
+        nav_msg.pose.pose.orientation.x = 0.0;
+        nav_msg.pose.pose.orientation.y = 0.0;
+        nav_msg.pose.pose.orientation.z = std::sin(target_yaw_.value() / 2.0);
+        nav_msg.pose.pose.orientation.w = std::cos(target_yaw_.value() / 2.0);
+    }
 
     std::string package_share_directory = ament_index_cpp::get_package_share_directory("nav2_bt_navigator");
     std::string path_to_xml = package_share_directory + "/behavior_trees/";
-    nav_msg.behavior_tree = path_to_xml + behavior_tree.value();
+    nav_msg.behavior_tree = path_to_xml + behavior_tree_.value();
 
     RCLCPP_INFO(node_->get_logger(), "Sending goal: header.frame_id: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", nav_msg.pose.header.frame_id.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
 
@@ -133,7 +168,7 @@ void GoToPose::onHalted(){};
  */
 BT::PortsList GoToPose::providedPorts()
 {
-    return {BT::InputPort<std::string>("behavior_tree"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_yaw")};
+    return {BT::InputPort<std::string>("behavior_tree"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_yaw")};
 }
 
 #pragma endregion
