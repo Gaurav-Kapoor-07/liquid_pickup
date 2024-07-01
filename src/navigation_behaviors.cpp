@@ -9,12 +9,18 @@
  * @param name The name of the behavior
  * @param config The node configuration
  */
-GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node) : BT::StatefulActionNode(name, config), manipulator_(node)
+GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config), manipulator_(node)
 {
     if (node != nullptr)
     {
         node_ = node;
         RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
+    }
+
+    if (executor != nullptr)
+    {
+        executor_ = executor;
+        RCLCPP_INFO(node_->get_logger(), "[%s] Executor shared pointer was passed!", this->name().c_str());
     }
 
     action_client_ = rclcpp_action::create_client<nav2_msgs::action::NavigateToPose>(node_, "/summit/navigate_to_pose");
@@ -99,12 +105,14 @@ BT::NodeStatus GoToPose::onStart()
 
     // Ask server to achieve some goal and wait until it's accepted
     auto goal_handle_future = action_client_->async_send_goal(nav_msg);
-    if (rclcpp::spin_until_future_complete(node_, goal_handle_future) !=
-    rclcpp::FutureReturnCode::SUCCESS)
-    {
-    RCLCPP_ERROR(node_->get_logger(), "send goal call failed :(");
-    return BT::NodeStatus::FAILURE;
-    }
+
+    // if (executor_->spin_until_future_complete(goal_handle_future) !=
+    // if (rclcpp::spin_until_future_complete(node_, goal_handle_future) !=
+    // rclcpp::FutureReturnCode::SUCCESS)
+    // {
+    // RCLCPP_ERROR(node_->get_logger(), "send goal call failed :(");
+    // return BT::NodeStatus::FAILURE;
+    // }
 
     goal_handle_ = goal_handle_future.get();
     if (!goal_handle_) {
@@ -126,12 +134,12 @@ BT::NodeStatus GoToPose::onRunning()
     auto result_future = action_client_->async_get_result(goal_handle_);
 
     RCLCPP_INFO(node_->get_logger(), "Waiting for result");
-    if (rclcpp::spin_until_future_complete(node_, result_future) !=
-    rclcpp::FutureReturnCode::SUCCESS)
-    {
-    RCLCPP_ERROR(node_->get_logger(), "get result call failed :(");
-    return BT::NodeStatus::FAILURE;
-    }
+    // if (rclcpp::spin_until_future_complete(node_, result_future) !=
+    // rclcpp::FutureReturnCode::SUCCESS)
+    // {
+    // RCLCPP_ERROR(node_->get_logger(), "get result call failed :(");
+    // return BT::NodeStatus::FAILURE;
+    // }
 
     rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateToPose>::WrappedResult wrapped_result = result_future.get();
 

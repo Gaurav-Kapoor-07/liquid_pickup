@@ -70,6 +70,7 @@ public:
 private:
     // moveit::planning_interface::MoveGroupInterface *manipulator_;
     std::shared_ptr<moveit::planning_interface::MoveGroupInterface> manipulator_;
+
     geometry_msgs::msg::PoseStamped drop_pose_;
     std::map<std::string, double> initial_position_, driving_position_, scanning_position_;
     void InitializeSummitXlPoses(void);
@@ -83,6 +84,11 @@ private:
 
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};    
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+
+    rclcpp::Publisher<moveit_msgs::msg::RobotState>::SharedPtr start_state_publisher_;
+    rclcpp::Publisher<moveit_msgs::msg::RobotTrajectory>::SharedPtr trajectory__publisher_;
+
+    moveit_visual_tools::MoveItVisualToolsPtr visual_tools_;
 };
 
 #pragma endregion

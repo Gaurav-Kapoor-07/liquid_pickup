@@ -23,6 +23,9 @@ Manipulator::Manipulator(const rclcpp::Node::SharedPtr node)
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
+    start_state_publisher_ = node_->create_publisher<moveit_msgs::msg::RobotState>("/summit/move_group/start_state", 10);
+    trajectory__publisher_ = node_->create_publisher<moveit_msgs::msg::RobotTrajectory>("/summit/move_group/trajectory", 10);
+
     yaml_file = node_->get_parameter("yaml_file").as_string();
 
     std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
@@ -37,8 +40,10 @@ Manipulator::Manipulator(const rclcpp::Node::SharedPtr node)
 
     // manipulator_ = new moveit::planning_interface::MoveGroupInterface(node_, manipulator_options_);
     manipulator_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, manipulator_options_);
-
+    
     manipulator_->allowReplanning(true);
+
+    visual_tools_ = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, BASE_FRAME, rviz_visual_tools::RVIZ_MARKER_TOPIC, manipulator_->getRobotModel());
 }
 
 /**
@@ -116,48 +121,50 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(std::string
     RCLCPP_INFO(node_->get_logger(), "Reference frame: %s", manipulator_->getPlanningFrame().c_str());
     RCLCPP_INFO(node_->get_logger(), "End effector link: %s", manipulator_->getEndEffectorLink().c_str());
     
-    // // Now, we call the planner to compute the plan and visualize it.
-    // // Note that we are just planning, not asking move_group
-    // // to actually move the robot.
-    // moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+    // Create a plan to that target pose
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
-    // bool success = (manipulator_->plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+    bool success = (manipulator_->plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
 
-    // RCLCPP_INFO(node_->get_logger(), "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
+    start_state_publisher_->publish(my_plan.start_state_);
+    trajectory__publisher_->publish(my_plan.trajectory_);
 
-    // // Raw pointers are frequently used to refer to the planning group for improved performance.
-    // const moveit::core::JointModelGroup* joint_model_group = manipulator_->getCurrentState()->getJointModelGroup(GROUP_NAME);
+    visual_tools_->deleteAllMarkers();
 
-    // // Visualization
-    // // ^^^^^^^^^^^^^
-    // namespace rvt = rviz_visual_tools;
-    // moveit_visual_tools::MoveItVisualTools visual_tools(node_, ARM_BASE_FRAME, "/summit/move_group", manipulator_->getRobotModel());
-
-    // visual_tools.deleteAllMarkers();
-
-    // /* Remote control is an introspection tool that allows users to step through a high level script */
-    // /* via buttons and keyboard shortcuts in RViz */
-    // visual_tools.loadRemoteControl();
+    RCLCPP_INFO(node_->get_logger(), "Visualizing plan as trajectory line");
     
-    // RCLCPP_INFO(node_->get_logger(), "Visualizing plan 1 as trajectory line");
-    
-    // geometry_msgs::msg::Pose target_base_footprint_;
+    geometry_msgs::msg::Pose target_pose;
 
-    // target_base_footprint_.position = target_base_footprint.pose.position; 
-    
-    // visual_tools.publishAxisLabeled(target_base_footprint_, "pose1");
+    target_pose.position = target_base_footprint.pose.position;
+    target_pose.orientation = target_base_footprint.pose.orientation;
 
-    // // RViz provides many types of markers, in this demo we will use text, cylinders, and spheres
-    // Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
-    // text_pose.translation().z() = 1.0;
-    // visual_tools.publishText(text_pose, "Pose_Goal", rvt::WHITE, rvt::XLARGE);
+    visual_tools_->publishAxisLabeled(target_pose, "pose");
     
-    // visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
-    // visual_tools.trigger();
-    // visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
+    // RViz provides many types of markers, in this demo we will use text, cylinders, and spheres
+    Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+    text_pose.translation().z() = 1.0;
+    visual_tools_->publishText(text_pose, "Trajectory", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE); 
+    const moveit::core::JointModelGroup* joint_model_group =
+    manipulator_->getCurrentState()->getJointModelGroup(GROUP_NAME);
+    
+    visual_tools_->publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
+
+    // Batch publishing is used to reduce the number of messages being sent to RViz for large visualizations
+    visual_tools_->trigger();
+
+    // Execute the plan
+    if (success)
+    {
+        return manipulator_->execute(my_plan);
+    }
+    
+    else
+    {
+        return moveit::core::MoveItErrorCode::FAILURE;
+    }
     
     // return manipulator_->asyncMove();
-    return manipulator_->move();
+    // return manipulator_->move();
 }
 
 /**

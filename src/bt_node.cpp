@@ -31,103 +31,85 @@
 
 #include "ba_interfaces.h"
 
-using namespace BT;
-
-class LiquidPickup : public rclcpp::Node
-{
-  public:
-    LiquidPickup()
-    : Node("bt_node")
-    {
-      this->declare_parameter("yaml_file", "arm_positions.yaml");
-      this->declare_parameter("behavior_tree_type", "behavior_tree_type");
-      this->declare_parameter("bt_xml", "test_2.xml");
-      behavior_tree_type = this->get_parameter("behavior_tree_type").as_string();
-    }
-
-    void run()
-    {    
-      factory.registerNodeType<RobotInitializer>("RobotInitializer", shared_from_this());
-      factory.registerNodeType<ManipulatorGrasp>("Grasp", shared_from_this());
-      factory.registerNodeType<ManipulatorPregrasp>("Pregrasp", shared_from_this());
-      factory.registerNodeType<ManipulatorDrop>("Drop", shared_from_this());
-      factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ", shared_from_this());
-      factory.registerNodeType<ManipulatorScanPose>("ScanPose", shared_from_this());
-      factory.registerNodeType<GripperActuator>("ChangeGripper", shared_from_this());
-      factory.registerNodeType<GoToPose>("GoToPose", shared_from_this());
-
-      std::string xml_models = BT::writeTreeNodesModelXML(factory);
-      std::cerr << xml_models;
-
-      try
-      {
-        bt_xml = this->get_parameter("bt_xml").as_string(); 
-        std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
-        std::string path_to_xml = package_share_directory + "/config/";
-        tree = factory.createTreeFromFile(path_to_xml + bt_xml);
-      }
-      catch (const std::exception &e)
-      {
-        std::cerr << "Error creating BT from xml file!" << std::endl;
-        std::cerr << e.what() << '\n';
-      }
-
-      BT::Groot2Publisher publisher(tree, server_port);
-
-      // Tick the tree until it reaches a terminal state
-      BT::NodeStatus status = BT::NodeStatus::RUNNING;
-      auto start = this->get_clock()->now().seconds();
-      
-      #ifdef LOG_TIME
-      BATimeLogger::InitFiles();
-      #endif
-
-      status = tree.tickWhileRunning(std::chrono::milliseconds(100)); 
-
-      // Output final results
-      std::string status_str;
-      if (status == BT::NodeStatus::SUCCESS)
-      {
-          status_str = "SUCCESS";
-      }
-      else
-      {
-          status_str = "FAILURE";
-      }
-      auto stop = this->get_clock()->now().seconds();
-      auto seconds = stop - start;
-
-      RCLCPP_INFO(this->get_logger(), "Done with status %s!", status_str.c_str());
-      RCLCPP_INFO(this->get_logger(), "Used time: %.2lf seconds", seconds);
-      
-      #ifdef LOG_TIME
-      BATimeLogger::CloseFiles();
-      #endif
-    }
-
-  private:
-    std::string behavior_tree_type;
-    BT::Tree tree;
-    BT::BehaviorTreeFactory factory;
-    std::string bt_xml;
-    unsigned server_port = 1667;
-};
-
 int main(int argc, char *argv[])
 {
-  // Initialize ROS node
   rclcpp::init(argc, argv);
-  auto lp = std::make_shared<LiquidPickup>();
-  lp->run();
-  rclcpp::Node::SharedPtr mnode = lp;
+  auto node_ = rclcpp::Node::make_shared("bt_node");
   
-  // THIS 
-  rclcpp::executors::MultiThreadedExecutor executor;
-  executor.add_node(mnode);
-  executor.spin();
+  auto executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+
+  executor->add_node(node_);
+
+  std::thread([&executor]() { executor->spin(); }).detach();
+
+  node_->declare_parameter("yaml_file", "arm_positions.yaml");
+  node_->declare_parameter("behavior_tree_type", "behavior_tree_type");
+  node_->declare_parameter("bt_xml", "test_2.xml");
+  std::string behavior_tree_type = node_->get_parameter("behavior_tree_type").as_string();
+
+  BT::BehaviorTreeFactory factory;
+  factory.registerNodeType<RobotInitializer>("RobotInitializer", node_);
+  factory.registerNodeType<ManipulatorGrasp>("Grasp", node_);
+  factory.registerNodeType<ManipulatorPregrasp>("Pregrasp", node_);
+  factory.registerNodeType<ManipulatorDrop>("Drop", node_);
+  factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ", node_);
+  factory.registerNodeType<ManipulatorScanPose>("ScanPose", node_);
+  factory.registerNodeType<GripperActuator>("ChangeGripper", node_, executor);
+  factory.registerNodeType<GoToPose>("GoToPose", node_, executor);
+
+  std::string xml_models = BT::writeTreeNodesModelXML(factory);
+  std::cerr << xml_models;
+
+  BT::Tree tree;
+  try
+  {
+    std::string bt_xml = node_->get_parameter("bt_xml").as_string(); 
+    std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
+    std::string path_to_xml = package_share_directory + "/config/";
+
+    tree = factory.createTreeFromFile(path_to_xml + bt_xml);
+  }
   
-  // // OR
-  // rclcpp::spin(mnode);
+  catch (const std::exception &e)
+  {
+    std::cerr << "Error creating BT from xml file!" << std::endl;
+    std::cerr << e.what() << '\n';
+  }
+
+  unsigned server_port = 1667;
+  BT::Groot2Publisher publisher(tree, server_port);
+
+  // Tick the tree until it reaches a terminal state
+  BT::NodeStatus status = BT::NodeStatus::RUNNING;
+  auto start = node_->get_clock()->now().seconds();
+      
+  #ifdef LOG_TIME
+  BATimeLogger::InitFiles();
+  #endif
+
+  status = tree.tickWhileRunning(std::chrono::milliseconds(100)); 
+
+  // Output final results
+  std::string status_str;
+  if (status == BT::NodeStatus::SUCCESS)
+  {
+    status_str = "SUCCESS";
+  }
+      
+  else
+  {
+    status_str = "FAILURE";
+  }
+
+  auto stop = node_->get_clock()->now().seconds();
+  auto seconds = stop - start;
+
+  RCLCPP_INFO(node_->get_logger(), "Done with status %s!", status_str.c_str());
+  RCLCPP_INFO(node_->get_logger(), "Used time: %.2lf seconds", seconds);
+      
+  #ifdef LOG_TIME
+    BATimeLogger::CloseFiles();
+  #endif
 
   rclcpp::shutdown();
 

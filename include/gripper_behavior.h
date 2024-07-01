@@ -21,11 +21,12 @@
 class GripperActuator : public BT::SyncActionNode
 {
 public:
-    GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
+    GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor);
     BT::NodeStatus tick() override;
     static BT::PortsList providedPorts();
 private:
     rclcpp::Node::SharedPtr node_;
+    rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
     rclcpp_action::Client<control_msgs::action::GripperCommand>::SharedPtr action_client_;
 };
 

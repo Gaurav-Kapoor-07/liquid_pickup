@@ -9,12 +9,18 @@
  * @param config The node configuration
  */
 
-GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node): BT::SyncActionNode(name, config)
+GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor): BT::SyncActionNode(name, config)
 {
     if (node != nullptr)
     {
         node_ = node;
         RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
+    }
+
+    if (executor != nullptr)
+    {
+        executor_ = executor;
+        RCLCPP_INFO(node_->get_logger(), "[%s] Executor shared pointer was passed!", this->name().c_str());
     }
 
     action_client_ = rclcpp_action::create_client<control_msgs::action::GripperCommand>(node_, "/summit/robotiq_gripper_controller/gripper_cmd");
@@ -46,12 +52,13 @@ BT::NodeStatus GripperActuator::tick()
 
     // Ask server to achieve some goal and wait until it's accepted
     auto goal_handle_future = action_client_->async_send_goal(grippercommand_msg);
-    if (rclcpp::spin_until_future_complete(node_, goal_handle_future) !=
-    rclcpp::FutureReturnCode::SUCCESS)
-    {
-    RCLCPP_ERROR(node_->get_logger(), "send goal call failed :(");
-    return BT::NodeStatus::FAILURE;
-    }
+
+    // if (rclcpp::spin_until_future_complete(node_, goal_handle_future) !=
+    // rclcpp::FutureReturnCode::SUCCESS)
+    // {
+    // RCLCPP_ERROR(node_->get_logger(), "send goal call failed :(");
+    // return BT::NodeStatus::FAILURE;
+    // }
 
     rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::SharedPtr goal_handle = goal_handle_future.get();
     if (!goal_handle) {
@@ -63,12 +70,12 @@ BT::NodeStatus GripperActuator::tick()
     auto result_future = action_client_->async_get_result(goal_handle);
 
     RCLCPP_INFO(node_->get_logger(), "Waiting for result");
-    if (rclcpp::spin_until_future_complete(node_, result_future) !=
-    rclcpp::FutureReturnCode::SUCCESS)
-    {
-    RCLCPP_ERROR(node_->get_logger(), "get result call failed :(");
-    return BT::NodeStatus::FAILURE;
-    }
+    // if (rclcpp::spin_until_future_complete(node_, result_future) !=
+    // rclcpp::FutureReturnCode::SUCCESS)
+    // {
+    // RCLCPP_ERROR(node_->get_logger(), "get result call failed :(");
+    // return BT::NodeStatus::FAILURE;
+    // }
 
     rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::WrappedResult wrapped_result = result_future.get();
 
