@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<robot name="basket" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="PI" value="3.1415926535897931"/>
+  <xacro:arg name="basket_link_id" default="basket_link"/>
+  <xacro:macro name="basket" params="prefix parent link_id">
+    <material name="basket_green">
+      <color rgba="0 1 0 1" />
+      <ambient>0 0 0 1</ambient>
+      <diffuse>1 0.39 0.28 1</diffuse>
+      <specular>0.01 0.01 0.01 1</specular>
+      <emissive>0 0 0 1</emissive>
+    </material>
+    <link name="${link_id}">
+      <inertial>
+        <mass value="1" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://liquid_pickup/meshes/basket/Basket_V2.stl" scale="0.95 0.95 0.95" />
+        </geometry>
+        <material name="darkgrey">
+          <color rgba="0.2 0.2 0.2 1"/>
+       </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://liquid_pickup/meshes/basket/Basket_V2.stl" scale="0.95 0.95 0.95" />
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${link_id}">
+      <gravity>0</gravity>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:basket prefix="summit" parent="base_footprint" link_id="$(arg basket_link_id)" /> 
+</robot>

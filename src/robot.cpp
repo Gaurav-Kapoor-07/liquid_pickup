@@ -29,7 +29,7 @@ RobotInitializer::RobotInitializer(const std::string &name, const BT::NodeConfig
 BT::NodeStatus RobotInitializer::tick()
 {
     moveit::core::MoveItErrorCode code = SetInitialPosition();
-    // LaunchBasket();
+    LaunchBasket();
     return BT::NodeStatus::SUCCESS;
 }
 
@@ -81,7 +81,7 @@ void RobotInitializer::LaunchBasket()
     std::srand(std::time(NULL));
     int model_id = std::rand() % 1000;
     sprintf(modelname, "basket_%d", model_id);
-    sprintf(linkname, "tomato_basket_link_%d", model_id);   
+    sprintf(linkname, "basket_link_%d", model_id);   
 
     // generate urdf-file from xacro
     std::string package_share_directory = ament_index_cpp::get_package_share_directory("liquid_pickup");
@@ -109,7 +109,8 @@ void RobotInitializer::LaunchBasket()
 
     pose.position.x = -0.52;
     pose.position.y = 0.0;
-    pose.position.z = 0.38;
+    // pose.position.z = 0.38;
+    pose.position.z = 1.0;
     pose.orientation.x = 0.0;
     pose.orientation.y = 0.0;
     pose.orientation.z = 0.0;
@@ -117,7 +118,7 @@ void RobotInitializer::LaunchBasket()
 
     spawn_entity_request->initial_pose = pose;
 
-    spawn_entity_request->reference_frame = "base_footprint";
+    spawn_entity_request->reference_frame = BASE_FRAME;
 
     auto result_future = client->async_send_request(spawn_entity_request);
 
