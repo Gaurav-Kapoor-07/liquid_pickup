@@ -47,13 +47,13 @@ Manipulator::Manipulator(const rclcpp::Node::SharedPtr node)
 }
 
 /**
- * @brief Moves the gripper to the pregrasp pose in a certain distance off the target
+ * @brief Moves the gripper to a pose in a certain distance off the target
  * 
  * @param target_pose The endpose to reach
  * @param offset The offset to the end pose
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset)
+moveit::core::MoveItErrorCode Manipulator::MoveGripperToPose(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset)
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
 
@@ -168,12 +168,12 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPregraspPose(std::string
 }
 
 /**
- * @brief Moves the gripper to the target
+ * @brief Moves the gripper to the target linearly
  * 
  * @param target_pose The endpose to reach
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToTarget(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_)
+moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_)
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_SMALL);
 

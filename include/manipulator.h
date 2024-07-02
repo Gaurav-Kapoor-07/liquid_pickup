@@ -59,8 +59,8 @@ class Manipulator
 public:
     Manipulator(const rclcpp::Node::SharedPtr node);
 
-    moveit::core::MoveItErrorCode MoveGripperToPregraspPose(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset);
-    moveit::core::MoveItErrorCode MoveGripperToTarget(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_);
+    moveit::core::MoveItErrorCode MoveGripperToPose(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset);
+    moveit::core::MoveItErrorCode MoveGripperToPoseLinear(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_);
     double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
     double MoveLinearVec(double x, double y, double z);
     moveit::core::MoveItErrorCode DropObject(void);

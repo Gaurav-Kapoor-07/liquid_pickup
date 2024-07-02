@@ -40,7 +40,7 @@ BT::NodeStatus ManipulatorGrasp::onStart()
     BT::Optional<double> base_footprint_yaw = getInput<double>("target_yaw");
 
     RCLCPP_INFO(node_->get_logger(), "moving gripper to target");
-    manipulator_.MoveGripperToTarget(action.value(), base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value());
+    manipulator_.MoveGripperToPoseLinear(action.value(), base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value());
     RCLCPP_INFO(node_->get_logger(), "moved gripper to target");
     return BT::NodeStatus::RUNNING;
 }
@@ -114,7 +114,7 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
     BT::Optional<double> pregresp_offset = getInput<double>("pregrasp_offset");
   
     RCLCPP_INFO(node_->get_logger(), "pregrasp started");
-    manipulator_.MoveGripperToPregraspPose(action.value(), base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
+    manipulator_.MoveGripperToPose(action.value(), base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
     RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
     return BT::NodeStatus::RUNNING;
 }
