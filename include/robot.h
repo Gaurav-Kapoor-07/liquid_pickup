@@ -8,6 +8,10 @@
 
 #include "behaviortree_cpp/behavior_tree.h"
 #include "manipulator.h"
+#include "gazebo_msgs/srv/spawn_entity.hpp"
+#include "geometry_msgs/msg/pose.hpp"
+
+#include "tinyxml.h"
 
 #pragma endregion
 
@@ -28,7 +32,7 @@ private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
     moveit::core::MoveItErrorCode SetInitialPosition();
-    // void LaunchBasket();
+    void LaunchBasket();
 };
 
 #pragma endregion

@@ -27,6 +27,7 @@ find_package(moveit_msgs REQUIRED)
 find_package(control_msgs REQUIRED)
 find_package(moveit_visual_tools REQUIRED)
 find_package(nav2_msgs REQUIRED)
+find_package(gazebo_msgs REQUIRED)
 
 include_directories(include config) 
 
@@ -41,7 +42,7 @@ set(BT_SOURCES
 )
 
 add_executable(liquid_pickup_node src/bt_node.cpp ${BT_SOURCES})
-ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp moveit_ros_planning_interface rclcpp_action rclcpp_components moveit_msgs control_msgs moveit_visual_tools nav2_msgs)
+ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp moveit_ros_planning_interface rclcpp_action rclcpp_components moveit_msgs control_msgs moveit_visual_tools nav2_msgs gazebo_msgs)
 
 target_link_libraries(liquid_pickup_node yaml-cpp)
 
@@ -52,6 +53,7 @@ install(TARGETS
 install(DIRECTORY
   launch 
   config
+  urdf
   DESTINATION share/${PROJECT_NAME}/
 )
 
