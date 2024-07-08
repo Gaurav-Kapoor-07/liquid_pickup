@@ -9,7 +9,8 @@
             <!-- </Sequence> -->
             
             <Sequence name="RobotInitializer">
-            <RobotInitializer name="RobotInitializer" message="RobotInitializer"/>
+            <!-- Basket pose wrt base_footprint frame -->
+            <RobotInitializer name="RobotInitializer" basket_x="-0.5" basket_y="0.0" basket_z="0.41" basket_yaw = "0.0"/>
             <!-- <ChangeGripper name="open_gripper" position="0.3" max_effort = "0.0"/> -->
             </Sequence>
             

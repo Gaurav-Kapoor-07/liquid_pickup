@@ -40,7 +40,7 @@ BT::NodeStatus RobotInitializer::tick()
  */
 BT::PortsList RobotInitializer::providedPorts()
 {
-    return {BT::InputPort<std::string>("message")};
+    return {BT::InputPort<double>("basket_x"), BT::InputPort<double>("basket_y"), BT::InputPort<double>("basket_z"), BT::InputPort<double>("basket_yaw")};
 }
 
 #pragma endregion
@@ -105,16 +105,20 @@ void RobotInitializer::LaunchBasket()
     spawn_entity_request->name = "swab_container";
     spawn_entity_request->robot_namespace = "/summit";
     
+    BT::Optional<double> basket_x_ = getInput<double>("basket_x").value();
+    BT::Optional<double> basket_y_ = getInput<double>("basket_y").value();
+    BT::Optional<double> basket_z_ = getInput<double>("basket_z").value();
+    BT::Optional<double> basket_yaw_ = getInput<double>("basket_yaw").value();
+    
     geometry_msgs::msg::Pose pose;
 
-    pose.position.x = -0.52;
-    pose.position.y = 0.0;
-    // pose.position.z = 0.38;
-    pose.position.z = 1.0;
+    pose.position.x = basket_x_.value();
+    pose.position.y = basket_y_.value();
+    pose.position.z = basket_z_.value();
     pose.orientation.x = 0.0;
     pose.orientation.y = 0.0;
-    pose.orientation.z = 0.0;
-    pose.orientation.w = 1.0;
+    pose.orientation.z = std::sin(basket_yaw_.value() / 2.0);
+    pose.orientation.w = std::cos(basket_yaw_.value() / 2.0);
 
     spawn_entity_request->initial_pose = pose;
 

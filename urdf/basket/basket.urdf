@@ -11,7 +11,7 @@
     <specular>0.01 0.01 0.01 1</specular>
     <emissive>0 0 0 1</emissive>
   </material>
-  <link name="basket_link_86">
+  <link name="basket_link_368">
     <inertial>
       <mass value="1"/>
       <origin xyz="0 0 0"/>
@@ -33,7 +33,7 @@
       </geometry>
     </collision>
   </link>
-  <gazebo reference="basket_link_86">
+  <gazebo reference="basket_link_368">
     <gravity>0</gravity>
   </gazebo>
 </robot>
