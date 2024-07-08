@@ -94,7 +94,7 @@ private:
 #pragma region ManipulatorDrop
 
 /**
- * @brief Class/Behavior to drop the object into the attached basket after grasping
+ * @brief Class/Behavior to drop the object into the attached swab container after grasping
  * 
  */
 class ManipulatorDrop : public BT::StatefulActionNode

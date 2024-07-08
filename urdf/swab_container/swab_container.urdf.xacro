@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<robot name="basket" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="swab_container" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:property name="PI" value="3.1415926535897931"/>
-  <xacro:arg name="basket_link_id" default="basket_link"/>
-  <xacro:macro name="basket" params="prefix parent link_id">
-    <material name="basket_green">
+  <xacro:arg name="swab_container_link_id" default="swab_container_link"/>
+  <xacro:macro name="swab_container" params="prefix parent link_id">
+    <material name="swab_container_green">
       <color rgba="0 1 0 1" />
       <ambient>0 0 0 1</ambient>
       <diffuse>1 0.39 0.28 1</diffuse>
@@ -20,7 +20,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://liquid_pickup/meshes/basket/Basket_V2.stl" scale="0.95 0.95 0.95" />
+          <mesh filename="package://liquid_pickup/meshes/swab_container/Basket_V2.stl" scale="0.95 0.95 0.95" />
         </geometry>
         <material name="darkgrey">
           <color rgba="0.2 0.2 0.2 1"/>
@@ -29,7 +29,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://liquid_pickup/meshes/basket/Basket_V2.stl" scale="0.95 0.95 0.95" />
+          <mesh filename="package://liquid_pickup/meshes/swab_container/Basket_V2.stl" scale="0.95 0.95 0.95" />
         </geometry>
       </collision>
     </link>
@@ -38,5 +38,5 @@
     </gazebo>
   </xacro:macro>
 
-  <xacro:basket prefix="summit" parent="base_footprint" link_id="$(arg basket_link_id)" /> 
+  <xacro:swab_container prefix="summit" parent="base_footprint" link_id="$(arg swab_container_link_id)" /> 
 </robot>

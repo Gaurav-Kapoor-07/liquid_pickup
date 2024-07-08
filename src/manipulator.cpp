@@ -317,7 +317,7 @@ moveit::core::MoveItErrorCode Manipulator::DropObject(void)
 }
 
 /**
- * @brief Moves the UR5-Robot to its initial position due to the basket.
+ * @brief Moves the UR5-Robot to its initial position due to the swab container.
  * 
  * @return moveit::core::MoveItErrorCode 
  */
@@ -425,7 +425,7 @@ void Manipulator::InitializeScanningPose()
 }
 
 /**
- * @brief initialize drop zone: above basket facing downwards
+ * @brief initialize drop zone: above swab container facing downwards
  *
  */
 void Manipulator::InitializeDropPose()

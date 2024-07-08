@@ -32,7 +32,8 @@ private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
     moveit::core::MoveItErrorCode SetInitialPosition();
-    void LaunchBasket();
+    void LaunchSwabContainer();
+    void LaunchSwab();
 };
 
 #pragma endregion

@@ -9,8 +9,8 @@
             <!-- </Sequence> -->
             
             <Sequence name="RobotInitializer">
-            <!-- Basket pose wrt base_footprint frame -->
-            <RobotInitializer name="RobotInitializer" basket_x="-0.5" basket_y="0.0" basket_z="0.41" basket_yaw = "0.0"/>
+            <!-- swab and swab_container pose wrt base_footprint frame -->
+            <RobotInitializer name="RobotInitializer" swab_x="-0.5" swab_y="0.0" swab_z="0.45" swab_yaw = "0.0" swab_container_x="-0.5" swab_container_y="0.0" swab_container_z="0.41" swab_container_yaw = "0.0"/>
             <!-- <ChangeGripper name="open_gripper" position="0.3" max_effort = "0.0"/> -->
             </Sequence>
             
