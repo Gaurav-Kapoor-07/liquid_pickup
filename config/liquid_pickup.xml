@@ -10,15 +10,17 @@
             
             <Sequence name="RobotInitializer">
             <!-- swab and swab_container pose wrt base_footprint frame -->
-            <RobotInitializer swab_x="-0.4" swab_y="0.0" swab_z="0.45" swab_yaw = "0.0" swab_container_x="-0.43" swab_container_y="0.0" swab_container_z="0.41" swab_container_yaw = "0.0"/>
+            <!-- Format for sensor poses: sensor_1_name,sensor_1_x,sensor_1_y,;sensor_2_name,sensor_2_x,sensor_2_y,;sensor_3_name,sensor_3_x,sensor_3_y,; -->
+            <RobotInitializer sensor_poses="s1,1.0,2.0,;s2,2.0,3.0,;s3,3.0,4.0,;" swab_x="-0.4" swab_y="0.0" swab_z="0.45" swab_yaw = "0.0" swab_container_x="-0.43" swab_container_y="0.0" swab_container_z="0.41" swab_container_yaw = "0.0"/>
+            <!-- <RobotInitializer sensor_poses="{position: {x: 0.2, y: 0.1, z: 0.3}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}" swab_x="-0.4" swab_y="0.0" swab_z="0.45" swab_yaw = "0.0" swab_container_x="-0.43" swab_container_y="0.0" swab_container_z="0.41" swab_container_yaw = "0.0"/> -->
             <ChangeGripper name="open_gripper" position="0.3" max_effort = "0.0"/>
             </Sequence>
             
-            <Sequence name="pickup_swab_from_palette">
+            <!-- <Sequence name="pickup_swab_from_palette"> -->
             <!-- <Pregrasp name="pickup_swab_from_palette" action="pickup_swab_from_palette" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1"/> -->
-            <Pregrasp name="pickup_swab_from_palette" action="pickup_swab_from_palette" target_x="-0.4" target_y="0.01" target_z="0.7" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1"/> 
-            <ChangeGripper name="close_gripper" position="0.575" max_effort = "0.0"/>
-            </Sequence>
+            <!-- <Pregrasp name="pickup_swab_from_palette" action="pickup_swab_from_palette" target_x="-0.4" target_y="0.01" target_z="0.7" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1"/>  -->
+            <!-- <ChangeGripper name="close_gripper" position="0.575" max_effort = "0.0"/> -->
+            <!-- </Sequence> -->
 
             <!-- <Sequence name="collect_liquid_sample"> -->
             <!-- The target coordinates do not matter in the action collect_liquid_sample as they are provided in the TF tree -->

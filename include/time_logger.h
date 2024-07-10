@@ -6,8 +6,6 @@
 #include <fstream>
 #include "geometry_msgs/msg/pose_stamped.hpp"
 
-#include "ba_types.h"
-
 #define FILE_NAV        "nav.csv"
 #define FILE_MOVEARM    "move_group.csv"
 #define FILE_PLANARM    "plan_move_group.csv"

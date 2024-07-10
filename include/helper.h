@@ -4,11 +4,8 @@
 #pragma region includes
 
 #include <math.h>
-// #include <pcl/point_types.h>
 #include "rclcpp/rclcpp.hpp"
-// #include "ros/message.h"
 #include <geometry_msgs/msg/pose.hpp>
-// #include "tf/tf.h"
 #include "geometry_msgs/msg/vector3.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "tf2/LinearMath/Transform.h"

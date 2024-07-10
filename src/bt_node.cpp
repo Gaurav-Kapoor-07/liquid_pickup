@@ -24,7 +24,6 @@
 
 #include "manipulator.h"
 #include "robot.h"
-#include "ba_types.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -76,8 +75,9 @@ int main(int argc, char *argv[])
     std::cerr << e.what() << '\n';
   }
 
-  unsigned server_port = 1667;
-  BT::Groot2Publisher publisher(tree, server_port);
+  // unsigned server_port = 1667;
+  // BT::Groot2Publisher publisher(tree, server_port);
+  BT::Groot2Publisher publisher(tree); // default port is 1667
 
   // Tick the tree until it reaches a terminal state
   BT::NodeStatus status = BT::NodeStatus::RUNNING;
@@ -87,7 +87,8 @@ int main(int argc, char *argv[])
   BATimeLogger::InitFiles();
   #endif
 
-  status = tree.tickWhileRunning(std::chrono::milliseconds(100)); 
+  // status = tree.tickWhileRunning(std::chrono::milliseconds(100)); 
+  status = tree.tickWhileRunning(); // default sleep is 10 ms.
 
   // Output final results
   std::string status_str;
