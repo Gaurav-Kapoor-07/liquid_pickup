@@ -36,9 +36,7 @@ def generate_launch_description():
             name='port_to_map_frame',
             namespace='summit',
             parameters=[{'use_sim_time': True}],
-            arguments = ['--x', '3.0', '--y', '0.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 'map'], # for navigation
+            arguments = ['--x', '3.0', '--y', '0.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 'map'],
             remappings=[('/tf_static', '/summit/tf_static')],
         ),
-        
-
     ])

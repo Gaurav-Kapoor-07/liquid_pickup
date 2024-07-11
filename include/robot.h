@@ -10,11 +10,8 @@
 #include "manipulator.h"
 #include "gazebo_msgs/srv/spawn_entity.hpp"
 #include "geometry_msgs/msg/pose.hpp"
-#include "geometry_msgs/msg/transform_stamped.hpp"
-#include "tf2_ros/transform_broadcaster.h"
 
 #include "tinyxml.h"
-#include "vector"
 
 #pragma endregion
 
@@ -34,12 +31,9 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
-    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-    unsigned int no_of_deploy_sensors{0};
     moveit::core::MoveItErrorCode SetInitialPosition();
     void LaunchSwabContainer();
     void LaunchSwab();
-    void getDeploySensorPoses();
 };
 
 #pragma endregion

@@ -34,7 +34,8 @@
 class GoToPose : public BT::StatefulActionNode
 {
 public:
-  GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor);
+  // GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor);
+  GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor);
   BT::NodeStatus onStart() override;
   BT::NodeStatus onRunning() override;
   void onHalted() override;
@@ -42,7 +43,9 @@ public:
 
 private:
   rclcpp::Node::SharedPtr node_;
-  rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
+  // rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
+  rclcpp::executors::MultiThreadedExecutor::SharedPtr executor_;
+
   Manipulator manipulator_;
   rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SharedPtr action_client_;
   rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateToPose>::SharedPtr goal_handle_;

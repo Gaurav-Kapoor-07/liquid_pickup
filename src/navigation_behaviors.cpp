@@ -9,7 +9,8 @@
  * @param name The name of the behavior
  * @param config The node configuration
  */
-GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config), manipulator_(node)
+// GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config), manipulator_(node)
+GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config), manipulator_(node)
 {
     if (node != nullptr)
     {

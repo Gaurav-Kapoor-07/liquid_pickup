@@ -17,9 +17,6 @@ RobotInitializer::RobotInitializer(const std::string &name, const BT::NodeConfig
         node_ = node;
         RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
     }
-    
-    // Initialize the transform broadcaster
-    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(node_);
 
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
@@ -34,7 +31,6 @@ BT::NodeStatus RobotInitializer::tick()
     moveit::core::MoveItErrorCode code = SetInitialPosition();
     LaunchSwabContainer();
     LaunchSwab();
-    getDeploySensorPoses();
     return BT::NodeStatus::SUCCESS;
 }
 
@@ -45,7 +41,7 @@ BT::NodeStatus RobotInitializer::tick()
  */
 BT::PortsList RobotInitializer::providedPorts()
 {
-    return {BT::InputPort<std::string>("sensor_poses"), BT::InputPort<double>("swab_x"), BT::InputPort<double>("swab_y"), BT::InputPort<double>("swab_z"), BT::InputPort<double>("swab_yaw"), BT::InputPort<double>("swab_container_x"), BT::InputPort<double>("swab_container_y"), BT::InputPort<double>("swab_container_z"), BT::InputPort<double>("swab_container_yaw")};
+    return {BT::InputPort<double>("swab_x"), BT::InputPort<double>("swab_y"), BT::InputPort<double>("swab_z"), BT::InputPort<double>("swab_yaw"), BT::InputPort<double>("swab_container_x"), BT::InputPort<double>("swab_container_y"), BT::InputPort<double>("swab_container_z"), BT::InputPort<double>("swab_container_yaw")};
 }
 
 #pragma endregion
@@ -196,58 +192,6 @@ void RobotInitializer::LaunchSwab()
     auto result = result_future.get();
 
     RCLCPP_INFO(node_->get_logger(), "result status message: %s, success (0: False, 1: True)? = %d", result->status_message.c_str(), result->success);
-}
-
-/**
- * @brief Get the names and poses of the sensors to be deployed at the port
- *
- */
-void RobotInitializer::getDeploySensorPoses()
-{
-    // Format for sensor poses: sensor_1_name,sensor_1_x,sensor_1_y,;sensor_2_name,sensor_2_x,sensor_2_y,;sensor_3_name,sensor_3_x,sensor_3_y,;
-    
-    std::string sensor_poses_;
-    getInput<std::string>("sensor_poses", sensor_poses_);
-    
-    while (!sensor_poses_.empty())
-    {
-        std::size_t pos_semicolon = sensor_poses_.find(";");
-        std::string sensor_poses_substr = sensor_poses_.substr(0, pos_semicolon);
-
-        std::vector<std::string> pose_xy_vector;
-        unsigned int i{0};
-
-        while (!sensor_poses_substr.empty())
-        {
-            std::size_t pos_comma = sensor_poses_substr.find(",");
-
-            pose_xy_vector.push_back(sensor_poses_substr.substr(0, pos_comma));
-            
-            sensor_poses_substr.erase(0, pos_comma + 1);
-            i += 1;
-        }
-
-        geometry_msgs::msg::TransformStamped t;
-
-        t.header.stamp = node_->get_clock()->now();
-        t.header.frame_id = PORT_FRAME;
-        t.child_frame_id = pose_xy_vector.at(0);
-        t.transform.translation.x = std::stod(pose_xy_vector.at(1));
-        t.transform.translation.y = std::stod(pose_xy_vector.at(2));
-        t.transform.translation.z = 0.0;
-        t.transform.rotation.x = 0.0;
-        t.transform.rotation.y = 0.0;
-        t.transform.rotation.z = 0.0;
-        t.transform.rotation.w = 1.0;
-
-        // Send the transformation
-        tf_broadcaster_->sendTransform(t);
-
-        sensor_poses_.erase(0, pos_semicolon + 1);
-        no_of_deploy_sensors += 1;
-    }
-    
-    RCLCPP_INFO(node_->get_logger(), "all %d sensor poses parsed!", no_of_deploy_sensors); 
 }
 
 #pragma endregion
