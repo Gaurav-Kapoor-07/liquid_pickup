@@ -104,7 +104,7 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
 {
     LOG_MANI_START(this->name());
 
-    BT::Optional<std::string> action = getInput<std::string>("action");
+    BT::Optional<bool> pose_from_tf = getInput<bool>("pose_from_tf");
     BT::Optional<double> base_footprint_x = getInput<double>("target_x");
     BT::Optional<double> base_footprint_y = getInput<double>("target_y");
     BT::Optional<double> base_footprint_z = getInput<double>("target_z");
@@ -112,10 +112,25 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
     BT::Optional<double> base_footprint_pitch = getInput<double>("target_pitch");
     BT::Optional<double> base_footprint_yaw = getInput<double>("target_yaw");
     BT::Optional<double> pregresp_offset = getInput<double>("pregrasp_offset");
+
+    std::string sensor_deploy_frame_names_dynamic_;
+
+    getInput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
+
+    std::size_t pos_comma = sensor_deploy_frame_names_dynamic_.find(",");
+
+    std::string target_frame = sensor_deploy_frame_names_dynamic_.substr(0, pos_comma);
   
     RCLCPP_INFO(node_->get_logger(), "pregrasp started");
-    manipulator_.MoveGripperToPose(action.value(), base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
+
+    manipulator_.MoveGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
+
+    sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
+    
+    setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
+    
     RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
+
     return BT::NodeStatus::RUNNING;
 }
 
@@ -143,7 +158,7 @@ void ManipulatorPregrasp::onHalted() {}
  */
 BT::PortsList ManipulatorPregrasp::providedPorts()
 {
-    return {BT::InputPort<std::string>("action"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
+    return {BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
 }
 
 #pragma endregion

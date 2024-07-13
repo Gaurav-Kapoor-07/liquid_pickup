@@ -23,7 +23,7 @@ def generate_launch_description():
         #     package='tf2_ros',
         #     executable='static_transform_publisher',
         #     name='base_footprint_to_liquid_frame',
-        #     namespace='simulation',
+        #     namespace='summit',
         #     parameters=[{'use_sim_time': True}],
         #     arguments = ['--x', '3.6', '--y', '0.0', '--z', '0.5', '--roll', '0.0', '--pitch', '3.14', '--yaw', '0.0', '--frame-id', 'map', '--child-frame-id', 'liquid_sample'], # for simulation
         #     remappings=[('/tf_static', '/summit/tf_static')],
@@ -37,6 +37,39 @@ def generate_launch_description():
             namespace='summit',
             parameters=[{'use_sim_time': True}],
             arguments = ['--x', '3.0', '--y', '0.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 'map'],
+            remappings=[('/tf_static', '/summit/tf_static')],
+        ),
+
+        # for port to deploy sensor s1 static tf
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='port_to_s1_frame',
+            namespace='summit',
+            parameters=[{'use_sim_time': True}],
+            arguments = ['--x', '1.0', '--y', '2.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 's1'],
+            remappings=[('/tf', '/summit/tf'), ('/tf_static', '/summit/tf_static')],
+        ),
+
+        # for port to deploy sensor s2 static tf
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='port_to_s2_frame',
+            namespace='summit',
+            parameters=[{'use_sim_time': True}],
+            arguments = ['--x', '2.0', '--y', '3.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 's2'],
+            remappings=[('/tf_static', '/summit/tf_static')],
+        ),
+
+        # for port to deploy sensor s3 static tf
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='port_to_s3_frame',
+            namespace='summit',
+            parameters=[{'use_sim_time': True}],
+            arguments = ['--x', '3.0', '--y', '4.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 's3'],
             remappings=[('/tf_static', '/summit/tf_static')],
         ),
     ])

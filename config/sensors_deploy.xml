@@ -1,30 +1,27 @@
 <root BTCPP_format="4" >
     <BehaviorTree ID="MainTree">
         <Sequence name="root_sequence"> 
-            <!-- <Sequence name="GoToPose"> -->
-            <!-- choose behavior_tree XML from here: https://github.com/ros-navigation/navigation2/tree/main/nav2_bt_navigator/behavior_trees, default: navigate_to_pose_w_replanning_and_recovery.xml -->
-            <!-- <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" target_x="3.0" target_y="0.01" target_yaw = "1.57"/> -->
+            <!-- <Sequence name="RobotInitializer"> -->
+            <!-- <RobotInitializer name="RobotInitializer" swab_x="-0.4" swab_y="0.0" swab_z="0.45" swab_yaw = "0.0" swab_container_x="-0.43" swab_container_y="0.0" swab_container_z="0.41" swab_container_yaw = "0.0"/> -->
+            <!-- <ChangeGripper name="open_gripper" position="0.3" max_effort="0.0"/> -->
             <!-- </Sequence> -->
 
-            <Sequence name="RobotInitializer">
-            <RobotInitializer name="RobotInitializer" swab_x="-0.4" swab_y="0.0" swab_z="0.45" swab_yaw = "0.0" swab_container_x="-0.43" swab_container_y="0.0" swab_container_z="0.41" swab_container_yaw = "0.0"/>
-            <ChangeGripper name="open_gripper" position="0.3" max_effort = "0.0"/>
-            </Sequence>
-
-            <!-- Format for sensor poses: sensor_1_name,sensor_1_x,sensor_1_y,;sensor_2_name,sensor_2_x,sensor_2_y,;sensor_3_name,sensor_3_x,sensor_3_y,; -->
+            <!-- Format for sensor_deploy_frame_names: sensor_1_name,sensor_2_name,sensor_3_name, -->
             <Sequence name="SensorsDeploy">
-                <SensorsDeploy name="SensorsDeploy" sensor_poses="s1,1.0,2.0,;s2,2.0,3.0,;s3,3.0,4.0,;" no_of_deploy_sensors="{no_of_deploy_sensors}"/>
-                <Repeat name="grasp_repeater" num_cycles="{no_of_deploy_sensors}">
-                    <Sequence name="pickup_sensor_from_palette">
-                        <Pregrasp name="pickup_sensor_from_palette" action="pickup_sensor_from_palette" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1"/>
-                        <ChangeGripper name="close_gripper" position="0.6" max_effort = "0.0"/>
+                <SensorsDeploy name="SensorsDeploy" sensor_deploy_frame_names="s1,s2,s3," sensor_deploy_frame_names_dynamic="{sensor_deploy_frame_names_dynamic}" no_of_deploy_sensors="{no_of_deploy_sensors}"/>
+                <Repeat name="navigate_manipulate_repeater" num_cycles="{no_of_deploy_sensors}">
+                    <Sequence name="NavigateManipulate">
+                        <!-- choose behavior_tree XML from here: https://github.com/ros-navigation/navigation2/tree/main/nav2_bt_navigator/behavior_trees, default: navigate_to_pose_w_replanning_and_recovery.xml -->
+                        <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" sensor_deploy_frame_names_dynamic="{sensor_deploy_frame_names_dynamic}" pose_from_tf="true" target_x="3.0" target_y="0.01" target_yaw = "1.57"/>
+                        <Pregrasp name="pickup_sensor_from_palette" pose_from_tf="true" sensor_deploy_frame_names_dynamic="{sensor_deploy_frame_names_dynamic}" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1"/>
+                        <!-- <ChangeGripper name="close_gripper" position="0.6" max_effort="0.0"/> -->
                     </Sequence>
                 </Repeat>
             </Sequence>
 
             <!-- <Sequence name="deploy_sensor"> -->
             <!-- <Pregrasp name="deploy_sensor" action="deploy_sensor" target_x="0.6" target_y="0.01" target_z="0.5" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1"/> -->
-            <!-- <ChangeGripper name="open_gripper" position="0.3" max_effort = "0.0"/> -->
+            <!-- <ChangeGripper name="open_gripper" position="0.3" max_effort="0.0"/> -->
             <!-- </Sequence> -->
 
             <!-- <Sequence name="restore_arm_pose"> -->
@@ -39,9 +36,10 @@
         </Action>
         <Action ID="Drop"/>
         <Action ID="GoToPose">
-            <input_port name="pose_from_tf" type="bool"/>
             <input_port name="target_yaw" type="double"/>
             <input_port name="target_x" type="double"/>
+            <input_port name="pose_from_tf" type="bool"/>
+            <inout_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
             <input_port name="target_y" type="double"/>
             <input_port name="behavior_tree" type="std::string"/>
         </Action>
@@ -55,19 +53,32 @@
             <input_port name="action" type="std::string"/>
         </Action>
         <Action ID="Pregrasp">
+            <input_port name="target_yaw" type="double"/>
             <input_port name="target_roll" type="double"/>
             <input_port name="target_pitch" type="double"/>
             <input_port name="pregrasp_offset" type="double"/>
             <input_port name="target_z" type="double"/>
             <input_port name="target_y" type="double"/>
             <input_port name="target_x" type="double"/>
-            <input_port name="target_yaw" type="double"/>
-            <input_port name="action" type="std::string"/>
+            <input_port name="pose_from_tf" type="bool"/>
+            <inout_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
         </Action>
         <Action ID="RetreatZ"/>
         <Action ID="RobotInitializer">
-            <input_port name="message" type="std::string"/>
+            <input_port name="swab_container_yaw" type="double"/>
+            <input_port name="swab_container_y" type="double"/>
+            <input_port name="swab_yaw" type="double"/>
+            <input_port name="swab_y" type="double"/>
+            <input_port name="swab_container_z" type="double"/>
+            <input_port name="swab_container_x" type="double"/>
+            <input_port name="swab_z" type="double"/>
+            <input_port name="swab_x" type="double"/>
         </Action>
         <Action ID="ScanPose"/>
+        <Action ID="SensorsDeploy">
+            <output_port name="no_of_deploy_sensors" type="int"/>
+            <output_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
+            <input_port name="sensor_deploy_frame_names" type="std::string"/>
+        </Action>
     </TreeNodesModel>
 </root>

@@ -7,6 +7,5 @@
 #define BASE_FRAME      "base_footprint"
 #define ARM_BASE_FRAME  "arm_base_link"
 #define LIQUID_FRAME    "liquid"
-#define PORT_FRAME      "port"
 
 #endif

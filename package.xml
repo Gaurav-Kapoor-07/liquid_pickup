@@ -23,7 +23,6 @@
   <depend>control_msgs</depend>
   <depend>moveit_visual_tools</depend>
   <depend>nav2_msgs</depend>
-  <depend>std_msgs</depend>
   <depend>gazebo_msgs</depend>
   <!-- <depend>gazebo_ros</depend> -->
   <!-- <depend>OGRE</depend> -->

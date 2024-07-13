@@ -53,7 +53,7 @@ Manipulator::Manipulator(const rclcpp::Node::SharedPtr node)
  * @param offset The offset to the end pose
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToPose(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset)
+moveit::core::MoveItErrorCode Manipulator::MoveGripperToPose(bool pose_from_tf_, std::string target_frame_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset)
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
 
@@ -61,18 +61,16 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPose(std::string action_
 
     geometry_msgs::msg::PoseStamped target_base_footprint;
 
-    RCLCPP_INFO(node_->get_logger(), "Action: %s", action_.c_str());
-
-    if (action_ == "collect_liquid_sample")
+    if (pose_from_tf_)
     { 
         try {
             base_footprint_to_target_frame = tf_buffer_->lookupTransform(
-                BASE_FRAME, LIQUID_FRAME,
-                tf2::TimePointZero);
+                BASE_FRAME, target_frame_,
+                tf2::TimePointZero, tf2::durationFromSec(5.0));
         }   catch (const tf2::TransformException & ex) {
             RCLCPP_INFO(node_->get_logger(),
                 "Could not transform %s to %s: %s",
-                BASE_FRAME, LIQUID_FRAME, ex.what());
+                BASE_FRAME, target_frame_.c_str(), ex.what());
         }
         
         target_base_footprint.header = base_footprint_to_target_frame.header;
@@ -83,8 +81,6 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPose(std::string action_
         target_base_footprint.pose.orientation.y = base_footprint_to_target_frame.transform.rotation.y;
         target_base_footprint.pose.orientation.z = base_footprint_to_target_frame.transform.rotation.z;
         target_base_footprint.pose.orientation.w = base_footprint_to_target_frame.transform.rotation.w;
-
-        // target_base_footprint.header.frame_id = LIQUID_FRAME;
     }
 
     else
@@ -109,7 +105,7 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPose(std::string action_
     // target_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
     // target_base_footprint.pose.position.z += TCP_OFFSET_Z;
 
-    RCLCPP_INFO(node_->get_logger(), "going to: header.frame_id: %s, x: %f, y: %f, z: %f, rotation qx: %f, qy: %f, qz: %f, qw: %f", target_base_footprint.header.frame_id.c_str(), target_base_footprint.pose.position.x, target_base_footprint.pose.position.y, target_base_footprint.pose.position.z, target_base_footprint.pose.orientation.x, target_base_footprint.pose.orientation.y, target_base_footprint.pose.orientation.z, target_base_footprint.pose.orientation.w);
+    RCLCPP_INFO(node_->get_logger(), "going to: header.frame_id: %s, target_frame: %s, x: %f, y: %f, z: %f, rotation qx: %f, qy: %f, qz: %f, qw: %f", target_base_footprint.header.frame_id.c_str(), target_frame_.c_str(), target_base_footprint.pose.position.x, target_base_footprint.pose.position.y, target_base_footprint.pose.position.z, target_base_footprint.pose.orientation.x, target_base_footprint.pose.orientation.y, target_base_footprint.pose.orientation.z, target_base_footprint.pose.orientation.w);
     
     // manipulator_->setPoseReferenceFrame(target_base_footprint.header.frame_id);
     // RCLCPP_INFO(node_->get_logger(), "moving end effector to pose: %s", str(target_base_footprint);
