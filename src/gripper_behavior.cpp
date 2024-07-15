@@ -10,7 +10,7 @@
  */
 
 // GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor): BT::SyncActionNode(name, config)
-GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor): BT::SyncActionNode(name, config)
+GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor): BT::StatefulActionNode(name, config)
 {
     if (node != nullptr)
     {
@@ -35,11 +35,12 @@ GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfigur
 }
 
 /**
- * @brief Handles the tick from the behavior tree
+ * @brief method to be called at the beginning.
+ *        If it returns RUNNING, this becomes an asychronous node.
  *
  * @return BT::NodeStatus The status of the node
  */
-BT::NodeStatus GripperActuator::tick()
+BT::NodeStatus GripperActuator::onStart()
 {
     BT::Optional<double> gripper_position = getInput<double>("position");
     BT::Optional<double> gripper_max_effort = getInput<double>("max_effort");
@@ -61,14 +62,24 @@ BT::NodeStatus GripperActuator::tick()
     // return BT::NodeStatus::FAILURE;
     // }
 
-    rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::SharedPtr goal_handle = goal_handle_future.get();
-    if (!goal_handle) {
+    rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::SharedPtr goal_handle_ = goal_handle_future.get();
+    if (!goal_handle_) {
     RCLCPP_ERROR(node_->get_logger(), "Goal was rejected by server");
     return BT::NodeStatus::FAILURE;
     }
 
+    return BT::NodeStatus::RUNNING;
+};
+
+/**
+ * @brief method invoked by a RUNNING action.
+ *
+ * @return BT::NodeStatus The status of the node
+ */
+BT::NodeStatus GripperActuator::onRunning()
+{
     // Wait for the server to be done with the goal
-    auto result_future = action_client_->async_get_result(goal_handle);
+    auto result_future = action_client_->async_get_result(goal_handle_);
 
     RCLCPP_INFO(node_->get_logger(), "Waiting for result");
     // if (rclcpp::spin_until_future_complete(node_, result_future) !=
@@ -113,7 +124,14 @@ BT::NodeStatus GripperActuator::tick()
         RCLCPP_ERROR(node_->get_logger(), "goal failed");
         return BT::NodeStatus::FAILURE;
     }
-};
+}
+
+/**
+ * @brief when the method halt() is called and the action is RUNNING, this method is invoked.
+ *        This is a convenient place todo a cleanup, if needed.
+ *
+ */
+void GripperActuator::onHalted(){};
 
 /**
  * @brief Gets the ports provided by this behavior.
