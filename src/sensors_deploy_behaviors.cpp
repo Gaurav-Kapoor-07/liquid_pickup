@@ -34,11 +34,11 @@ BT::NodeStatus SensorsDeploy::onStart()
     getInput<std::string>("sensor_deploy_frame_names", sensor_deploy_frame_names_);
     setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_);
     
-    no_of_deploy_sensors = std::count(sensor_deploy_frame_names_.begin(), sensor_deploy_frame_names_.end(), ',');
+    int no_of_deploy_sensors_ = std::count(sensor_deploy_frame_names_.begin(), sensor_deploy_frame_names_.end(), ',');
 
-    setOutput<int>("no_of_deploy_sensors", no_of_deploy_sensors);
+    setOutput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
     
-    RCLCPP_INFO(node_->get_logger(), "%d sensors to be deployed!", no_of_deploy_sensors); 
+    RCLCPP_INFO(node_->get_logger(), "%d sensors to be deployed!", no_of_deploy_sensors_); 
     
     return BT::NodeStatus::RUNNING;
 }
@@ -50,13 +50,6 @@ BT::NodeStatus SensorsDeploy::onStart()
  */
 BT::NodeStatus SensorsDeploy::onRunning()
 {
-    std::string sensor_deploy_frame_names_dynamic_;
-    getInput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
-    int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
-
-    RCLCPP_INFO(node_->get_logger(), "%d sensors already deployed!", no_of_deploy_sensors - no_of_deploy_sensors_dynamic); 
-    RCLCPP_INFO(node_->get_logger(), "%d sensors yet to be deployed!", no_of_deploy_sensors_dynamic);
-
     return BT::NodeStatus::SUCCESS;
 }
 
@@ -74,7 +67,7 @@ void SensorsDeploy::onHalted(){};
  */
 BT::PortsList SensorsDeploy::providedPorts()
 {
-    return {BT::InputPort<std::string>("sensor_deploy_frame_names"), BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::OutputPort<int>("no_of_deploy_sensors")};
+    return {BT::InputPort<std::string>("sensor_deploy_frame_names"), BT::OutputPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::OutputPort<int>("no_of_deploy_sensors")};
 }
 
 #pragma endregion

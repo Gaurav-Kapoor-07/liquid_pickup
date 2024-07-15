@@ -125,11 +125,19 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
 
     manipulator_.MoveGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
 
+    RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
+
     sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
     
     setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
-    
-    RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
+
+    int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
+
+    int no_of_deploy_sensors_{0};
+    getInput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
+
+    RCLCPP_INFO(node_->get_logger(), "%d sensors already deployed!", no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
+    RCLCPP_INFO(node_->get_logger(), "%d sensors yet to be deployed!", no_of_deploy_sensors_dynamic);
 
     return BT::NodeStatus::RUNNING;
 }
@@ -158,7 +166,7 @@ void ManipulatorPregrasp::onHalted() {}
  */
 BT::PortsList ManipulatorPregrasp::providedPorts()
 {
-    return {BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
+    return {BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
 }
 
 #pragma endregion
