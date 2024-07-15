@@ -62,7 +62,7 @@ BT::NodeStatus GripperActuator::onStart()
     // return BT::NodeStatus::FAILURE;
     // }
 
-    rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::SharedPtr goal_handle_ = goal_handle_future.get();
+    goal_handle_ = goal_handle_future.get();
     if (!goal_handle_) {
     RCLCPP_ERROR(node_->get_logger(), "Goal was rejected by server");
     return BT::NodeStatus::FAILURE;

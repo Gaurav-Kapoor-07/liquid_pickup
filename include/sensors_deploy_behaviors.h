@@ -27,6 +27,7 @@ public:
 
 private:
   rclcpp::Node::SharedPtr node_;
+  int no_of_deploy_sensors{0};
 };
 
 #pragma endregion
