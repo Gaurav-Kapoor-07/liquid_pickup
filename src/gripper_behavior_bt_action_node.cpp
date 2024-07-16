@@ -12,7 +12,7 @@ GripperAction::GripperAction(const std::string& name, const NodeConfig& conf, co
 
 PortsList GripperAction::providedPorts()
 {
-    return providedBasicPorts({InputPort<std::string>("action_name"), InputPort<double>("position"), InputPort<double>("max_effort")});
+    return providedBasicPorts({InputPort<double>("position"), InputPort<double>("max_effort")});
 }
 
 bool GripperAction::setGoal(RosActionNode::Goal& goal) 

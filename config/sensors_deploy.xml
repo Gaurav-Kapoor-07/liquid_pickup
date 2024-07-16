@@ -82,5 +82,10 @@
             <inout_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
             <input_port name="sensor_deploy_frame_names" type="std::string"/>
         </Action>
+        <Action ID="GripperAction">
+            <input_port name="position" type="double"/>
+            <input_port name="max_effort" type="double"/>
+            <input_port name="action_name" type="std::string" default="">Action server name</input_port>
+        </Action>
     </TreeNodesModel>
 </root>
