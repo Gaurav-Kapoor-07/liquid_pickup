@@ -15,6 +15,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(behaviortree_cpp REQUIRED)
+find_package(behaviortree_ros2 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
@@ -37,6 +38,7 @@ set(BT_SOURCES
   src/manipulator.cpp
   src/manipulator_behaviors.cpp
   src/gripper_behavior.cpp
+  src/gripper_behavior_bt_action_node.cpp
   src/robot.cpp
   src/helper.cpp
   src/time_logger.cpp
@@ -45,7 +47,7 @@ set(BT_SOURCES
 )
 
 add_executable(liquid_pickup_node src/bt_node.cpp ${BT_SOURCES})
-ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp moveit_ros_planning_interface rclcpp_action rclcpp_components moveit_msgs control_msgs moveit_visual_tools nav2_msgs gazebo_msgs) # gazebo_ros OGRE)
+ament_target_dependencies(liquid_pickup_node rclcpp behaviortree_cpp behaviortree_ros2 geometry_msgs tf2 tf2_ros tf2_geometry_msgs yaml-cpp moveit_ros_planning_interface rclcpp_action rclcpp_components moveit_msgs control_msgs moveit_visual_tools nav2_msgs gazebo_msgs) # gazebo_ros OGRE)
 
 target_link_libraries(liquid_pickup_node yaml-cpp)
 

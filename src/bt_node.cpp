@@ -5,7 +5,6 @@
 #include "behaviortree_cpp/behavior_tree.h"
 #include "behaviortree_cpp/loggers/bt_cout_logger.h"
 #include "behaviortree_cpp/loggers/bt_minitrace_logger.h"
-#include "behaviortree_cpp/loggers/bt_file_logger.h"
 #include "behaviortree_cpp/bt_factory.h"
 #include "behaviortree_cpp/xml_parsing.h"
 #include "behaviortree_cpp/loggers/groot2_publisher.h"
@@ -20,6 +19,7 @@
 
 #include "manipulator_behaviors.h"  
 #include "gripper_behavior.h"
+#include "gripper_behavior_bt_action_node.hpp"
 #include "navigation_behaviors.h"
 #include "sensors_deploy_behaviors.h"
 
@@ -56,6 +56,14 @@ int main(int argc, char *argv[])
   factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ", node_);
   factory.registerNodeType<ManipulatorScanPose>("ScanPose", node_);
   factory.registerNodeType<GripperActuator>("ChangeGripper", node_, executor);
+  
+  RosNodeParams params;
+  params.nh = node_;
+  params.default_port_value = "/summit/robotiq_gripper_controller/gripper_cmd";
+  params.wait_for_server_timeout = std::chrono::milliseconds(20000);
+  params.server_timeout = std::chrono::milliseconds(20000);
+  factory.registerNodeType<GripperAction>("GripperAction", params);
+  
   factory.registerNodeType<GoToPose>("GoToPose", node_, executor);
   factory.registerNodeType<SensorsDeploy>("SensorsDeploy", node_);
 
