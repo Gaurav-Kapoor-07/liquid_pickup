@@ -22,6 +22,7 @@
 #include "gripper_behavior.h"
 #include "navigation_behaviors.h"
 #include "sensors_deploy_behaviors.h"
+#include "move_it_task_constructor_behaviors.h"
 
 #include "manipulator.h"
 #include "robot.h"
@@ -58,6 +59,7 @@ int main(int argc, char *argv[])
   factory.registerNodeType<GripperActuator>("ChangeGripper", node_, executor);
   factory.registerNodeType<GoToPose>("GoToPose", node_, executor);
   factory.registerNodeType<SensorsDeploy>("SensorsDeploy", node_);
+  factory.registerNodeType<MoveItTaskConstructor>("MoveItTaskConstructor", node_);
 
   std::string xml_models = BT::writeTreeNodesModelXML(factory);
   std::cerr << xml_models;
