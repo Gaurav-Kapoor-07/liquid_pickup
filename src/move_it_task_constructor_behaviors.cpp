@@ -18,6 +18,10 @@ MoveItTaskConstructor::MoveItTaskConstructor(const std::string &name, const BT::
         RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
     }
 
+    // moveit::planning_interface::MoveGroupInterface::Options manipulator_options_(GROUP_NAME, ROBOT_DESCRIPTION, "/summit");
+
+    // manipulator_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, manipulator_options_);
+
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
 
@@ -25,16 +29,12 @@ mtc::Task MoveItTaskConstructor::createTask()
 {
   mtc::Task task;
   task.stages()->setName("demo task");
-  task.loadRobotModel(node_);
+  task.loadRobotModel(node_, ROBOT_DESCRIPTION);
 
-  const auto& arm_group_name = "panda_arm";
-  const auto& hand_group_name = "hand";
-  const auto& hand_frame = "panda_hand";
-
-  // Set task properties
-  task.setProperty("group", arm_group_name);
-  task.setProperty("eef", hand_group_name);
-  task.setProperty("ik_frame", hand_frame);
+  // Set task properties§
+  task.setProperty("group", GROUP_NAME);
+  task.setProperty("eef", "arm_tool0");
+  task.setProperty("ik_frame", "arm_tool0");
 
 // Disable warnings for this line, as it's a variable that's set but not used in this example
 #pragma GCC diagnostic push
@@ -46,19 +46,22 @@ mtc::Task MoveItTaskConstructor::createTask()
   current_state_ptr = stage_state_current.get();
   task.add(std::move(stage_state_current));
 
-  auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_);
+//   auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_);
   auto interpolation_planner = std::make_shared<mtc::solvers::JointInterpolationPlanner>();
 
-  auto cartesian_planner = std::make_shared<mtc::solvers::CartesianPath>();
-  cartesian_planner->setMaxVelocityScalingFactor(1.0);
-  cartesian_planner->setMaxAccelerationScalingFactor(1.0);
-  cartesian_planner->setStepSize(.01);
+//   auto cartesian_planner = std::make_shared<mtc::solvers::CartesianPath>();
+//   cartesian_planner->setMaxVelocityScalingFactor(1.0);
+//   cartesian_planner->setMaxAccelerationScalingFactor(1.0);
+//   cartesian_planner->setStepSize(.01);
 
-  auto stage_open_hand =
-      std::make_unique<mtc::stages::MoveTo>("open hand", interpolation_planner);
-  stage_open_hand->setGroup(hand_group_name);
-  stage_open_hand->setGoal("open");
-  task.add(std::move(stage_open_hand));
+  auto stage_go_to_pose =
+      std::make_unique<mtc::stages::MoveTo>("go to pose", interpolation_planner);
+  stage_go_to_pose->setGroup(GROUP_NAME);
+  stage_go_to_pose->setGoal("home");
+  stage_go_to_pose->setIKFrame("arm_tool0");
+  stage_go_to_pose->setTimeout(5.0);
+
+  task.add(std::move(stage_go_to_pose));
 
   return task;
 }
@@ -101,13 +104,14 @@ void MoveItTaskConstructor::setupPlanningScene()
 {
   moveit_msgs::msg::CollisionObject object;
   object.id = "object";
-  object.header.frame_id = "world";
+  //   object.header.frame_id = "world";
+  object.header.frame_id = BASE_FRAME;
   object.primitives.resize(1);
   object.primitives[0].type = shape_msgs::msg::SolidPrimitive::CYLINDER;
   object.primitives[0].dimensions = { 0.1, 0.02 };
 
   geometry_msgs::msg::Pose pose;
-  pose.position.x = 0.5;
+  pose.position.x = 2.0;
   pose.position.y = -0.25;
   pose.orientation.w = 1.0;
   object.pose = pose;
@@ -124,9 +128,9 @@ void MoveItTaskConstructor::setupPlanningScene()
  */
 BT::NodeStatus MoveItTaskConstructor::onStart()
 {
-    setupPlanningScene();
+    // setupPlanningScene();
     doTask();
-    
+
     return BT::NodeStatus::RUNNING;
 }
 

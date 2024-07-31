@@ -8,6 +8,8 @@
 
 #include <math.h>
 #include "ba_interfaces.h"
+#include "ba_frames_summit_xl.h"
+#include "manipulator.h"
 
 #include "rclcpp/rclcpp.hpp"
 #include <moveit/planning_scene/planning_scene.h>
@@ -56,6 +58,7 @@ public:
 private:
     mtc::Task task_;
     rclcpp::Node::SharedPtr node_;
+    // std::shared_ptr<moveit::planning_interface::MoveGroupInterface> manipulator_;
 };
 
 #pragma endregion
