@@ -26,7 +26,7 @@
   <depend>gazebo_msgs</depend>
   <!-- <depend>gazebo_ros</depend> -->
   <!-- <depend>OGRE</depend> -->
-  <depend>moveit_task_constructor_core</depend>
+  <!-- <depend>moveit_task_constructor_core</depend> -->
   <depend>tf2_eigen</depend>
   
   <test_depend>ament_lint_auto</test_depend>

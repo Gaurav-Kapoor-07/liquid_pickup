@@ -113,32 +113,44 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
     BT::Optional<double> base_footprint_yaw = getInput<double>("target_yaw");
     BT::Optional<double> pregresp_offset = getInput<double>("pregrasp_offset");
 
-    std::string sensor_deploy_frame_names_dynamic_;
+    std::string target_frame;
 
-    getInput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
-
-    std::size_t pos_comma = sensor_deploy_frame_names_dynamic_.find(",");
-
-    std::string target_frame = sensor_deploy_frame_names_dynamic_.substr(0, pos_comma);
-  
     RCLCPP_INFO(node_->get_logger(), "pregrasp started");
-
-    manipulator_.MoveGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
-
-    RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
-
-    sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
-    
-    setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
-
-    int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
 
     int no_of_deploy_sensors_{0};
     getInput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
 
-    RCLCPP_INFO(node_->get_logger(), "%d sensors already deployed!", no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
-    RCLCPP_INFO(node_->get_logger(), "%d sensors yet to be deployed!", no_of_deploy_sensors_dynamic);
+    if (no_of_deploy_sensors_ != 0)
+    {
+        std::string sensor_deploy_frame_names_dynamic_;
 
+        getInput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
+
+        std::size_t pos_comma = sensor_deploy_frame_names_dynamic_.find(",");
+
+        target_frame = sensor_deploy_frame_names_dynamic_.substr(0, pos_comma);
+
+        manipulator_.MoveGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
+
+        RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
+
+        sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
+        
+        setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
+
+        int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
+
+        RCLCPP_INFO(node_->get_logger(), "%d sensors already deployed!", no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
+        RCLCPP_INFO(node_->get_logger(), "%d sensors yet to be deployed!", no_of_deploy_sensors_dynamic);
+    }
+
+    else
+    {
+        manipulator_.MoveGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
+
+        RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
+    }
+    
     return BT::NodeStatus::RUNNING;
 }
 

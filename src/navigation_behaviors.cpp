@@ -10,7 +10,8 @@
  * @param config The node configuration
  */
 // GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config), manipulator_(node)
-GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config), manipulator_(node)
+// GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config), manipulator_(node)
+GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config)
 {
     if (node != nullptr)
     {
@@ -46,26 +47,30 @@ GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config,
 BT::NodeStatus GoToPose::onStart()
 {
     LOG_NAV_START(this->name());
-    manipulator_.MoveToDrivingPosition();
+    // manipulator_.MoveToDrivingPosition();
 
+    std::string package_share_directory = ament_index_cpp::get_package_share_directory("nav2_bt_navigator");
+    std::string path_to_xml = package_share_directory + "/behavior_trees/";
     BT::Optional<std::string> behavior_tree_ = getInput<std::string>("behavior_tree");
-    BT::Optional<bool> pose_from_tf_ = getInput<bool>("pose_from_tf");
+
+    auto nav_msg = nav2_msgs::action::NavigateToPose::Goal(); 
+    nav_msg.behavior_tree = path_to_xml + behavior_tree_.value();
+
     BT::Optional<double> target_x_ = getInput<double>("target_x");
     BT::Optional<double> target_y_ = getInput<double>("target_y");
     BT::Optional<double> target_yaw_ = getInput<double>("target_yaw");
 
+    std::string target_frame;
+    
     std::string sensor_deploy_frame_names_dynamic_;
-
     getInput("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
 
-    std::size_t pos_comma = sensor_deploy_frame_names_dynamic_.find(",");
-
-    std::string target_frame = sensor_deploy_frame_names_dynamic_.substr(0, pos_comma);
-
-    auto nav_msg = nav2_msgs::action::NavigateToPose::Goal(); 
-
-    if (pose_from_tf_.value())
+    if (sensor_deploy_frame_names_dynamic_ != "")
     {
+        std::size_t pos_comma = sensor_deploy_frame_names_dynamic_.find(",");
+
+        target_frame = sensor_deploy_frame_names_dynamic_.substr(0, pos_comma);
+        
         RCLCPP_INFO(node_->get_logger(), "receiving 2D pose goal from TF");
 
         geometry_msgs::msg::TransformStamped map_to_target_frame;
@@ -106,10 +111,6 @@ BT::NodeStatus GoToPose::onStart()
         nav_msg.pose.pose.orientation.z = std::sin(target_yaw_.value() / 2.0);
         nav_msg.pose.pose.orientation.w = std::cos(target_yaw_.value() / 2.0);
     }
-
-    std::string package_share_directory = ament_index_cpp::get_package_share_directory("nav2_bt_navigator");
-    std::string path_to_xml = package_share_directory + "/behavior_trees/";
-    nav_msg.behavior_tree = path_to_xml + behavior_tree_.value();
 
     RCLCPP_INFO(node_->get_logger(), "Sending goal: header.frame_id: %s, target_frame: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", nav_msg.pose.header.frame_id.c_str(), target_frame.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
 
@@ -186,7 +187,7 @@ void GoToPose::onHalted(){};
  */
 BT::PortsList GoToPose::providedPorts()
 {
-    return {BT::InputPort<std::string>("behavior_tree"), BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_yaw")};
+    return {BT::InputPort<std::string>("behavior_tree"), BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_yaw")};
 }
 
 #pragma endregion

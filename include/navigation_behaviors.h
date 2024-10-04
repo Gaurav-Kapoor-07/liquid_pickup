@@ -8,7 +8,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "ba_interfaces.h"
-#include "manipulator.h"
+// #include "manipulator.h"
 
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 
@@ -46,7 +46,7 @@ private:
   // rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
   rclcpp::executors::MultiThreadedExecutor::SharedPtr executor_;
 
-  Manipulator manipulator_;
+  // Manipulator manipulator_;
   rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SharedPtr action_client_;
   rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateToPose>::SharedPtr goal_handle_;
   
