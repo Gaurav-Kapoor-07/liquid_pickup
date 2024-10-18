@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
   BT::BehaviorTreeFactory factory;
   factory.registerNodeType<RobotInitializer>("RobotInitializer", node_);
   factory.registerNodeType<ManipulatorGrasp>("Grasp", node_);
-  factory.registerNodeType<ManipulatorPregrasp>("Pregrasp", node_);
+  factory.registerNodeType<ManipulatorPregraspPlan>("PregraspPlan", node_);
   factory.registerNodeType<ManipulatorDrop>("Drop", node_);
   factory.registerNodeType<ManipulatorPostgraspRetreat>("RetreatZ", node_);
   factory.registerNodeType<ManipulatorScanPose>("ScanPose", node_);
@@ -60,7 +60,6 @@ int main(int argc, char *argv[])
   factory.registerNodeType<GoToPose>("GoToPose", node_, executor);
   factory.registerNodeType<SensorsDeploy>("SensorsDeploy", node_);
   // factory.registerNodeType<MoveItTaskConstructor>("MoveItTaskConstructor", node_);
-  // factory.registerNodeType<ManipulatorPregraspPlan>("Pregrasp", node_);
   factory.registerNodeType<ManipulatorPregraspExecute>("PregraspExecute", node_);
 
   std::string xml_models = BT::writeTreeNodesModelXML(factory);

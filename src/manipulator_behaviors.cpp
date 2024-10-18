@@ -74,15 +74,15 @@ BT::PortsList ManipulatorGrasp::providedPorts()
 
 #pragma endregion
 
-#pragma region ManipulatorPregrasp
+#pragma region ManipulatorPregraspPlan
 
 /**
- * @brief Construct a new Manipulator Pregrasp:: Manipulator Pregrasp object
+ * @brief Construct a new Manipulator ManipulatorPregraspPlan:: ManipulatorPregraspPlan Pregrasp object
  * 
  * @param name The name of the behavior
  * @param config The node configuration
  */
-ManipulatorPregrasp::ManipulatorPregrasp(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
+ManipulatorPregraspPlan::ManipulatorPregraspPlan(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
     : BT::StatefulActionNode(name, config), manipulator_(node)
 {
     if (node != nullptr)
@@ -100,7 +100,7 @@ ManipulatorPregrasp::ManipulatorPregrasp(const std::string &name, const BT::Node
  * 
  * @return BT::NodeStatus The status of the node
  */
-BT::NodeStatus ManipulatorPregrasp::onStart()
+BT::NodeStatus ManipulatorPregraspPlan::onStart()
 {
     LOG_MANI_START(this->name());
 
@@ -126,7 +126,9 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
 
         getInput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
 
-        std::size_t pos_comma = sensor_deploy_frame_names_dynamic_.find(",");
+        int pos_comma = sensor_deploy_frame_names_dynamic_.find(",");
+
+        setOutput<int>("pos_comma", pos_comma);
 
         target_frame = sensor_deploy_frame_names_dynamic_.substr(0, pos_comma);
 
@@ -136,14 +138,14 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
 
         RCLCPP_INFO(node_->get_logger(), "pregrasp plan finished");
 
-        sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
+        // sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
         
-        setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
+        // setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
 
-        int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
+        // int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
 
-        RCLCPP_INFO(node_->get_logger(), "%d sensors already deployed!", no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
-        RCLCPP_INFO(node_->get_logger(), "%d sensors yet to be deployed!", no_of_deploy_sensors_dynamic);
+        // RCLCPP_INFO(node_->get_logger(), "%d sensors already deployed!", no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
+        // RCLCPP_INFO(node_->get_logger(), "%d sensors yet to be deployed!", no_of_deploy_sensors_dynamic);
     }
 
     else
@@ -163,7 +165,7 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
  * 
  * @return BT::NodeStatus The status of the node
  */
-BT::NodeStatus ManipulatorPregrasp::onRunning()
+BT::NodeStatus ManipulatorPregraspPlan::onRunning()
 {
     return BT::NodeStatus::SUCCESS;
 }
@@ -173,16 +175,16 @@ BT::NodeStatus ManipulatorPregrasp::onRunning()
  *        This is a convenient place todo a cleanup, if needed.
  * 
  */
-void ManipulatorPregrasp::onHalted() {}
+void ManipulatorPregraspPlan::onHalted() {}
 
 /**
  * @brief Gets the ports provided by this behavior.
  *
  * @return BT::PortsList The list of the ports
  */
-BT::PortsList ManipulatorPregrasp::providedPorts()
+BT::PortsList ManipulatorPregraspPlan::providedPorts()
 {
-    return {BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::OutputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory")};
+    return {BT::InputPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::OutputPort<int>("pos_comma"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::OutputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory")};
 }
 
 #pragma endregion
@@ -225,6 +227,28 @@ BT::NodeStatus ManipulatorPregraspExecute::onStart()
 
     RCLCPP_INFO(node_->get_logger(), "Error message: %s", error_message_.c_str());
 
+    int no_of_deploy_sensors_{0};
+    getInput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
+    
+    if (error_message_ == "SUCCESS" && no_of_deploy_sensors_ != 0)
+    {
+        std::string sensor_deploy_frame_names_dynamic_;
+
+        getInput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
+
+        int pos_comma{0};
+        getInput<int>("pos_comma", pos_comma);
+        
+        sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
+            
+        setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
+
+        int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
+
+        RCLCPP_INFO(node_->get_logger(), "%d sensors already deployed!", no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
+        RCLCPP_INFO(node_->get_logger(), "%d sensors yet to be deployed!", no_of_deploy_sensors_dynamic);
+    }
+
     return BT::NodeStatus::RUNNING;
 }
 
@@ -260,7 +284,7 @@ void ManipulatorPregraspExecute::onHalted() {}
  */
 BT::PortsList ManipulatorPregraspExecute::providedPorts()
 {
-    return {BT::InputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory")};
+    return {BT::InputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory"), BT::InputPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<int>("pos_comma")};
 }
 
 #pragma endregion

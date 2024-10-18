@@ -17,8 +17,8 @@
             <!-- </Sequence> -->
         
             <Sequence name="pickup_swab_from_palette">
-                <Pregrasp name="pickup_swab_from_palette" sensor_deploy_frame_names_dynamic="" no_of_deploy_sensors="0" pose_from_tf="false" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}"/>
-                <PregraspExecute name="execute_pickup_swab_from_palette" plan_trajectory="{plan_trajectory}"/>
+                <PregraspPlan name="pickup_swab_from_palette" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" pose_from_tf="false" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}"/>
+                <PregraspExecute name="execute_pickup_swab_from_palette" plan_trajectory="{plan_trajectory}" sensor_deploy_frame_names_dynamic="" pos_comma="0"/>
                 <ChangeGripper name="close_gripper" position="0.575" max_effort = "0.0"/>
             </Sequence>
 
@@ -43,9 +43,9 @@
         <Action ID="GoToPose">
             <input_port name="target_yaw" type="double"/>
             <input_port name="target_x" type="double"/>
+            <inout_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
             <input_port name="target_y" type="double"/>
             <input_port name="behavior_tree" type="std::string"/>
-            <inout_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
         </Action>
         <Action ID="Grasp">
             <input_port name="target_roll" type="double"/>
@@ -56,7 +56,13 @@
             <input_port name="target_yaw" type="double"/>
             <input_port name="action" type="std::string"/>
         </Action>
-        <Action ID="Pregrasp">
+        <Action ID="PregraspExecute">
+            <input_port name="pos_comma" type="int"/>
+            <input_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
+            <input_port name="plan_trajectory" type="moveit_msgs::msg::RobotTrajectory_&lt;std::allocator&lt;void&gt; &gt;"/>
+        </Action>
+        <Action ID="PregraspPlan">
+            <output_port name="plan_trajectory" type="moveit_msgs::msg::RobotTrajectory_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="target_yaw" type="double"/>
             <input_port name="target_roll" type="double"/>
             <input_port name="target_pitch" type="double"/>
@@ -65,8 +71,9 @@
             <input_port name="target_y" type="double"/>
             <input_port name="target_x" type="double"/>
             <input_port name="pose_from_tf" type="bool"/>
-            <inout_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
             <input_port name="no_of_deploy_sensors" type="int"/>
+            <output_port name="pos_comma" type="int"/>
+            <input_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
         </Action>
         <Action ID="RetreatZ"/>
         <Action ID="RobotInitializer">
@@ -80,5 +87,10 @@
             <input_port name="swab_x" type="double"/>
         </Action>
         <Action ID="ScanPose"/>
+        <Action ID="SensorsDeploy">
+            <output_port name="no_of_deploy_sensors" type="int"/>
+            <output_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
+            <input_port name="sensor_deploy_frame_names" type="std::string"/>
+        </Action>
     </TreeNodesModel>
 </root>

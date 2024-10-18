@@ -49,16 +49,16 @@ private:
 
 #pragma endregion
 
-#pragma region ManipulatorPregrasp
+#pragma region ManipulatorPregraspPlan
 
 /**
  * @brief Class/Behavior to go into the pregrasp pose
  * 
  */
-class ManipulatorPregrasp : public BT::StatefulActionNode
+class ManipulatorPregraspPlan : public BT::StatefulActionNode
 {
 public:
-    ManipulatorPregrasp(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
+    ManipulatorPregraspPlan(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;
