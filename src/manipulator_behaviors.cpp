@@ -130,9 +130,11 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
 
         target_frame = sensor_deploy_frame_names_dynamic_.substr(0, pos_comma);
 
-        manipulator_.MoveGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
+        moveit_msgs::msg::RobotTrajectory plan_trajectory = manipulator_.PlanGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
 
-        RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
+        setOutput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory", plan_trajectory);
+
+        RCLCPP_INFO(node_->get_logger(), "pregrasp plan finished");
 
         sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
         
@@ -146,9 +148,11 @@ BT::NodeStatus ManipulatorPregrasp::onStart()
 
     else
     {
-        manipulator_.MoveGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
+        moveit_msgs::msg::RobotTrajectory plan_trajectory = manipulator_.PlanGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
 
-        RCLCPP_INFO(node_->get_logger(), "pregrasp finished");
+        setOutput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory", plan_trajectory);
+
+        RCLCPP_INFO(node_->get_logger(), "pregrasp plan finished");
     }
     
     return BT::NodeStatus::RUNNING;
@@ -178,7 +182,85 @@ void ManipulatorPregrasp::onHalted() {}
  */
 BT::PortsList ManipulatorPregrasp::providedPorts()
 {
-    return {BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
+    return {BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::OutputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory")};
+}
+
+#pragma endregion
+
+#pragma region ManipulatorPregraspExecute
+
+/**
+ * @brief Construct a new Manipulator Pregrasp Execute:: Manipulator Pregrasp Execute object
+ * 
+ * @param name The name of the behavior
+ * @param config The node configuration
+ */
+ManipulatorPregraspExecute::ManipulatorPregraspExecute(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
+    : BT::StatefulActionNode(name, config), manipulator_(node)
+{
+    if (node != nullptr)
+    {
+        node_ = node;
+        RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
+    }
+
+    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
+}
+
+/**
+ * @brief method to be called at the beginning.
+ *        If it returns RUNNING, this becomes an asychronous node.
+ * 
+ * @return BT::NodeStatus The status of the node
+ */
+BT::NodeStatus ManipulatorPregraspExecute::onStart()
+{
+    LOG_MANI_START(this->name());
+
+    BT::Optional<moveit_msgs::msg::RobotTrajectory> trajectory = getInput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory");
+
+    moveit::core::MoveItErrorCode error_code = manipulator_.ExecuteGripperToPose(trajectory.value());
+
+    error_message_ = moveit::core::error_code_to_string(error_code);
+
+    RCLCPP_INFO(node_->get_logger(), "Error message: %s", error_message_.c_str());
+
+    return BT::NodeStatus::RUNNING;
+}
+
+/**
+ * @brief method invoked by a RUNNING action.
+ * 
+ * @return BT::NodeStatus The status of the node
+ */
+BT::NodeStatus ManipulatorPregraspExecute::onRunning()
+{
+    if (error_message_ == "SUCCESS")
+    {
+        return BT::NodeStatus::SUCCESS;
+    }
+    
+    else
+    {
+        return BT::NodeStatus::FAILURE;
+    }
+}
+
+/**
+ * @brief when the method halt() is called and the action is RUNNING, this method is invoked.
+ *        This is a convenient place todo a cleanup, if needed.
+ * 
+ */
+void ManipulatorPregraspExecute::onHalted() {}
+
+/**
+ * @brief Gets the ports provided by this behavior.
+ *
+ * @return BT::PortsList The list of the ports
+ */
+BT::PortsList ManipulatorPregraspExecute::providedPorts()
+{
+    return {BT::InputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory")};
 }
 
 #pragma endregion

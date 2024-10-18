@@ -12,6 +12,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 
+#include "moveit/utils/moveit_error_code.h"
+
 #include "time_logger.h"
 #ifdef TIME_LOGGER_ON
 #define LOG_MANI_START(val) BATimeLogger::LogMoveGroup(val, log_start)
@@ -65,6 +67,29 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
+};
+
+#pragma endregion
+
+#pragma region ManipulatorPregraspExecute
+
+/**
+ * @brief Class/Behavior to go into the pregrasp pose
+ * 
+ */
+class ManipulatorPregraspExecute : public BT::StatefulActionNode
+{
+public:
+    ManipulatorPregraspExecute(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
+    BT::NodeStatus onStart() override;
+    BT::NodeStatus onRunning() override;
+    void onHalted() override;
+    static BT::PortsList providedPorts();
+
+private:
+    rclcpp::Node::SharedPtr node_;
+    Manipulator manipulator_;
+    std::string error_message_;
 };
 
 #pragma endregion

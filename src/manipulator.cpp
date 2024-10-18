@@ -23,8 +23,8 @@ Manipulator::Manipulator(const rclcpp::Node::SharedPtr node)
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
-    start_state_publisher_ = node_->create_publisher<moveit_msgs::msg::RobotState>("/summit/move_group/start_state", 10);
-    trajectory__publisher_ = node_->create_publisher<moveit_msgs::msg::RobotTrajectory>("/summit/move_group/trajectory", 10);
+    // start_state_publisher_ = node_->create_publisher<moveit_msgs::msg::RobotState>("/summit/move_group/start_state", 10);
+    // trajectory__publisher_ = node_->create_publisher<moveit_msgs::msg::RobotTrajectory>("/summit/move_group/trajectory", 10);
 
     yaml_file = node_->get_parameter("yaml_file").as_string();
 
@@ -53,7 +53,7 @@ Manipulator::Manipulator(const rclcpp::Node::SharedPtr node)
  * @param offset The offset to the end pose
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToPose(bool pose_from_tf_, std::string target_frame_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset)
+moveit_msgs::msg::RobotTrajectory Manipulator::PlanGripperToPose(bool pose_from_tf_, std::string target_frame_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset)
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_PREGRASP);
 
@@ -122,45 +122,81 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPose(bool pose_from_tf_,
 
     bool success = (manipulator_->plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
 
-    start_state_publisher_->publish(my_plan.start_state_);
-    trajectory__publisher_->publish(my_plan.trajectory_);
+    // start_state_publisher_->publish(my_plan.start_state_);
+    // trajectory__publisher_->publish(my_plan.trajectory_);
 
-    visual_tools_->deleteAllMarkers();
+    // visual_tools_->deleteAllMarkers();
 
-    RCLCPP_INFO(node_->get_logger(), "Visualizing plan as trajectory line");
+    // RCLCPP_INFO(node_->get_logger(), "Visualizing plan as trajectory line");
     
-    geometry_msgs::msg::Pose target_pose;
+    // geometry_msgs::msg::Pose target_pose;
 
-    target_pose.position = target_base_footprint.pose.position;
-    target_pose.orientation = target_base_footprint.pose.orientation;
+    // target_pose.position = target_base_footprint.pose.position;
+    // target_pose.orientation = target_base_footprint.pose.orientation;
 
-    visual_tools_->publishAxisLabeled(target_pose, "pose");
+    // visual_tools_->publishAxisLabeled(target_pose, "pose");
     
     // RViz provides many types of markers, in this demo we will use text, cylinders, and spheres
-    Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
-    text_pose.translation().z() = 1.0;
-    visual_tools_->publishText(text_pose, "Trajectory", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE); 
-    const moveit::core::JointModelGroup* joint_model_group =
-    manipulator_->getCurrentState()->getJointModelGroup(GROUP_NAME);
+    // Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+    // text_pose.translation().z() = 1.0;
+    // visual_tools_->publishText(text_pose, "Trajectory", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE); 
+    // const moveit::core::JointModelGroup* joint_model_group =
+    // manipulator_->getCurrentState()->getJointModelGroup(GROUP_NAME);
     
-    visual_tools_->publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
+    // visual_tools_->publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
 
-    // Batch publishing is used to reduce the number of messages being sent to RViz for large visualizations
-    visual_tools_->trigger();
+    // // Batch publishing is used to reduce the number of messages being sent to RViz for large visualizations
+    // visual_tools_->trigger();
+
+    // // Execute the plan
+    // if (success)
+    // {
+    //     return manipulator_->execute(my_plan);
+    // }
+    
+    // else
+    // {
+    //     return moveit::core::MoveItErrorCode::FAILURE;
+    // }
+    
+    // return manipulator_->asyncMove();
+    // return manipulator_->move();
 
     // Execute the plan
     if (success)
     {
-        return manipulator_->execute(my_plan);
+        RCLCPP_INFO(node_->get_logger(), "planning succesful! visualizing plan as trajectory line");
+        
+        const moveit::core::JointModelGroup* joint_model_group = manipulator_->getCurrentState()->getJointModelGroup(GROUP_NAME);
+        visual_tools_->publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
+        return my_plan.trajectory_;
+    }
+
+    else
+    {
+        RCLCPP_INFO(node_->get_logger(), "planning failed, returning empty trajectory");
+        moveit_msgs::msg::RobotTrajectory empty_trajectory;
+        return empty_trajectory;
+    }
+}
+
+moveit::core::MoveItErrorCode Manipulator::ExecuteGripperToPose(moveit_msgs::msg::RobotTrajectory trajectory)
+{
+    // Execute the plan
+    if (!trajectory.joint_trajectory.header.frame_id.empty())
+    {
+        RCLCPP_INFO(node_->get_logger(), "valid trajectory received! executing");
+        return manipulator_->execute(trajectory);
     }
     
     else
     {
+        RCLCPP_ERROR(node_->get_logger(), "empty trajectory received, returning failure");
         return moveit::core::MoveItErrorCode::FAILURE;
     }
     
     // return manipulator_->asyncMove();
-    // return manipulator_->move();
+    // return manipulator_->move();    
 }
 
 /**

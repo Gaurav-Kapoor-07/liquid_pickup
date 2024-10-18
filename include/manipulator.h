@@ -59,7 +59,10 @@ class Manipulator
 public:
     Manipulator(const rclcpp::Node::SharedPtr node);
 
-    moveit::core::MoveItErrorCode MoveGripperToPose(bool pose_from_tf_, std::string target_frame_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset);
+    moveit_msgs::msg::RobotTrajectory PlanGripperToPose(bool pose_from_tf_, std::string target_frame_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double offset);
+
+    moveit::core::MoveItErrorCode ExecuteGripperToPose(moveit_msgs::msg::RobotTrajectory trajectory);
+
     moveit::core::MoveItErrorCode MoveGripperToPoseLinear(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_);
     double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
     double MoveLinearVec(double x, double y, double z);
@@ -85,8 +88,8 @@ private:
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};    
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
-    rclcpp::Publisher<moveit_msgs::msg::RobotState>::SharedPtr start_state_publisher_;
-    rclcpp::Publisher<moveit_msgs::msg::RobotTrajectory>::SharedPtr trajectory__publisher_;
+    // rclcpp::Publisher<moveit_msgs::msg::RobotState>::SharedPtr start_state_publisher_;
+    // rclcpp::Publisher<moveit_msgs::msg::RobotTrajectory>::SharedPtr trajectory__publisher_;
 
     moveit_visual_tools::MoveItVisualToolsPtr visual_tools_;
 };
