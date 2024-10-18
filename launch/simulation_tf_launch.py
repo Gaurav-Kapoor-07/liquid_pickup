@@ -36,7 +36,7 @@ def generate_launch_description():
             name='port_to_map_frame',
             namespace='summit',
             parameters=[{'use_sim_time': True}],
-            arguments = ['--x', '3.0', '--y', '0.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 'map'],
+            arguments = ['--x', '0.0', '--y', '0.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 'map'],
             remappings=[('/tf_static', '/summit/tf_static')],
         ),
 
@@ -47,7 +47,7 @@ def generate_launch_description():
             name='port_to_s1_frame',
             namespace='summit',
             parameters=[{'use_sim_time': True}],
-            arguments = ['--x', '1.0', '--y', '2.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 's1'],
+            arguments = ['--x', '1.0', '--y', '0.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 's1'],
             remappings=[('/tf', '/summit/tf'), ('/tf_static', '/summit/tf_static')],
         ),
 
@@ -58,7 +58,7 @@ def generate_launch_description():
             name='port_to_s2_frame',
             namespace='summit',
             parameters=[{'use_sim_time': True}],
-            arguments = ['--x', '2.0', '--y', '3.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 's2'],
+            arguments = ['--x', '2.0', '--y', '0.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 's2'],
             remappings=[('/tf_static', '/summit/tf_static')],
         ),
 
@@ -69,7 +69,7 @@ def generate_launch_description():
             name='port_to_s3_frame',
             namespace='summit',
             parameters=[{'use_sim_time': True}],
-            arguments = ['--x', '3.0', '--y', '4.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 's3'],
+            arguments = ['--x', '3.0', '--y', '0.0', '--z', '0.0', '--roll', '0.0', '--pitch', '0.0', '--yaw', '0.0', '--frame-id', 'port', '--child-frame-id', 's3'],
             remappings=[('/tf_static', '/summit/tf_static')],
         ),
     ])

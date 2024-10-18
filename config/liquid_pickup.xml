@@ -5,9 +5,9 @@
             <!-- choose behavior_tree XML from here: https://github.com/ros-navigation/navigation2/tree/main/nav2_bt_navigator/behavior_trees, default: navigate_to_pose_w_replanning_and_recovery.xml -->
             <!-- if pose_from_tf is true then we ignore the target 2D pose given via the XML string and receive it via TF -->
             <!-- <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" pose_from_tf="false" target_x="3.0" target_y="0.01" target_yaw = "1.57"/> -->
-            <!-- <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" pose_from_tf="true" target_x="0.0" target_y="0.0" target_yaw = "0.0"/> -->
 
-            <!-- <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" sensor_deploy_frame_names_dynamic="" target_x="0.0" target_y="0.01" target_yaw = "0.0"/>
+            <!-- <Sequence>
+            <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" sensor_deploy_frame_names_dynamic="" target_x="3.0" target_y="0.01" target_yaw = "1.57"/>
             </Sequence> -->
             
             <!-- <Sequence name="RobotInitializer"> -->
@@ -17,8 +17,9 @@
             <!-- </Sequence> -->
         
             <Sequence name="pickup_swab_from_palette">
+                <!-- <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" sensor_deploy_frame_names_dynamic="" target_x="3.0" target_y="0.01" target_yaw = "1.57"/> -->
                 <PregraspPlan name="pickup_swab_from_palette" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" pose_from_tf="false" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}"/>
-                <PregraspExecute name="execute_pickup_swab_from_palette" plan_trajectory="{plan_trajectory}" sensor_deploy_frame_names_dynamic="" pos_comma="0"/>
+                <PregraspExecute name="execute_pickup_swab_from_palette" plan_trajectory="{plan_trajectory}" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0"/>
                 <ChangeGripper name="close_gripper" position="0.575" max_effort = "0.0"/>
             </Sequence>
 
@@ -58,6 +59,7 @@
         </Action>
         <Action ID="PregraspExecute">
             <input_port name="pos_comma" type="int"/>
+            <input_port name="no_of_deploy_sensors" type="int"/>
             <input_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
             <input_port name="plan_trajectory" type="moveit_msgs::msg::RobotTrajectory_&lt;std::allocator&lt;void&gt; &gt;"/>
         </Action>

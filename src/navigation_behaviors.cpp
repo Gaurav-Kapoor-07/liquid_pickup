@@ -94,6 +94,8 @@ BT::NodeStatus GoToPose::onStart()
         nav_msg.pose.pose.orientation.y = map_to_target_frame.transform.rotation.y;
         nav_msg.pose.pose.orientation.z = map_to_target_frame.transform.rotation.z;
         nav_msg.pose.pose.orientation.w = map_to_target_frame.transform.rotation.w;
+
+        RCLCPP_INFO(node_->get_logger(), "Sending goal: header.frame_id: %s, target_frame: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", nav_msg.pose.header.frame_id.c_str(), target_frame.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
     }
 
     else
@@ -110,9 +112,9 @@ BT::NodeStatus GoToPose::onStart()
         nav_msg.pose.pose.orientation.y = 0.0;
         nav_msg.pose.pose.orientation.z = std::sin(target_yaw_.value() / 2.0);
         nav_msg.pose.pose.orientation.w = std::cos(target_yaw_.value() / 2.0);
-    }
 
-    RCLCPP_INFO(node_->get_logger(), "Sending goal: header.frame_id: %s, target_frame: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", nav_msg.pose.header.frame_id.c_str(), target_frame.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
+        RCLCPP_INFO(node_->get_logger(), "Sending goal: header.frame_id: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", nav_msg.pose.header.frame_id.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
+    }
 
     // Ask server to achieve some goal and wait until it's accepted
     auto goal_handle_future = action_client_->async_send_goal(nav_msg);

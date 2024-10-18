@@ -284,7 +284,7 @@ void ManipulatorPregraspExecute::onHalted() {}
  */
 BT::PortsList ManipulatorPregraspExecute::providedPorts()
 {
-    return {BT::InputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory"), BT::InputPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<int>("pos_comma")};
+    return {BT::InputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory"), BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<int>("pos_comma"), BT::InputPort<int>("no_of_deploy_sensors")};
 }
 
 #pragma endregion
