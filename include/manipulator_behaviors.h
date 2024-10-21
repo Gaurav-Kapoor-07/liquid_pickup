@@ -14,6 +14,8 @@
 
 #include "moveit/utils/moveit_error_code.h"
 
+#include "std_msgs/msg/bool.hpp"
+
 #include "time_logger.h"
 #ifdef TIME_LOGGER_ON
 #define LOG_MANI_START(val) BATimeLogger::LogMoveGroup(val, log_start)
@@ -67,6 +69,11 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
+    int count_{0};
+    bool flag_{false};
+    bool trajectory_execute_{false};
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr trajectory_execute_subscription_;
+    moveit_msgs::msg::RobotTrajectory plan_trajectory_;
 };
 
 #pragma endregion

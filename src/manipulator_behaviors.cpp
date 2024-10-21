@@ -91,6 +91,16 @@ ManipulatorPregraspPlan::ManipulatorPregraspPlan(const std::string &name, const 
         RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
     }
 
+    auto topic_callback =
+      [this](std_msgs::msg::Bool::SharedPtr msg) -> void {
+        
+        flag_ = true;
+        trajectory_execute_ = msg->data;
+        RCLCPP_INFO(node_->get_logger(), "Received trajectory execute (0: False, 1: True): %d", msg->data);
+      };
+    
+    trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>("/summit/trajectory_execute", 10, topic_callback);
+
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
 
@@ -119,7 +129,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
 
     int no_of_deploy_sensors_{0};
     getInput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
-
+    
     if (no_of_deploy_sensors_ != 0)
     {
         std::string sensor_deploy_frame_names_dynamic_;
@@ -132,9 +142,9 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
 
         target_frame = sensor_deploy_frame_names_dynamic_.substr(0, pos_comma);
 
-        moveit_msgs::msg::RobotTrajectory plan_trajectory = manipulator_.PlanGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
+        plan_trajectory_ = manipulator_.PlanGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
 
-        setOutput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory", plan_trajectory);
+        setOutput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory", plan_trajectory_);
 
         RCLCPP_INFO(node_->get_logger(), "pregrasp plan finished");
 
@@ -150,9 +160,9 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
 
     else
     {
-        moveit_msgs::msg::RobotTrajectory plan_trajectory = manipulator_.PlanGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
+        plan_trajectory_ = manipulator_.PlanGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
 
-        setOutput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory", plan_trajectory);
+        setOutput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory", plan_trajectory_);
 
         RCLCPP_INFO(node_->get_logger(), "pregrasp plan finished");
     }
@@ -167,7 +177,58 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
  */
 BT::NodeStatus ManipulatorPregraspPlan::onRunning()
 {
-    return BT::NodeStatus::SUCCESS;
+    if (!plan_trajectory_.joint_trajectory.header.frame_id.empty())
+    {
+        if (count_ == 0)
+        {
+            RCLCPP_INFO(node_->get_logger(), "valid trajectory plan received!");
+            
+            RCLCPP_INFO(node_->get_logger(), "Trajectory OK? Waiting for publisher for at most 2 mins, Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\" --once");
+            count_++;
+            return BT::NodeStatus::RUNNING;
+        }
+
+        // RCLCPP_INFO(node_->get_logger(), "count_ = %d", count_);
+        
+        if (count_ < 2 * 60 * 1000 / 10)
+        {
+            if (flag_)
+            {
+                setOutput<bool>("execute_trajectory", trajectory_execute_);
+                
+                if (trajectory_execute_)
+                {
+                    RCLCPP_INFO(node_->get_logger(), "Trajectory execute approved");
+
+                    trajectory_execute_ = false;
+                    
+                    return BT::NodeStatus::SUCCESS;
+                }
+
+                else
+                {
+                    RCLCPP_ERROR(node_->get_logger(), "Trajectory execute disapproved");
+                    return BT::NodeStatus::FAILURE;
+                }
+            }
+        }
+        
+        else
+        {
+            RCLCPP_ERROR(node_->get_logger(), "Timeout! no response received, returning failure");
+            return BT::NodeStatus::FAILURE;
+        }
+
+        count_++;
+    }
+
+    else
+    {
+        RCLCPP_ERROR(node_->get_logger(), "invalid trajectory plan received, returning failure");
+        return BT::NodeStatus::FAILURE;
+    }
+
+    return BT::NodeStatus::RUNNING;
 }
 
 /**
@@ -184,7 +245,7 @@ void ManipulatorPregraspPlan::onHalted() {}
  */
 BT::PortsList ManipulatorPregraspPlan::providedPorts()
 {
-    return {BT::InputPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::OutputPort<int>("pos_comma"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::OutputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory")};
+    return {BT::InputPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::OutputPort<int>("pos_comma"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::OutputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory"), BT::OutputPort<bool>("execute_trajectory")};
 }
 
 #pragma endregion
@@ -219,34 +280,50 @@ BT::NodeStatus ManipulatorPregraspExecute::onStart()
 {
     LOG_MANI_START(this->name());
 
-    BT::Optional<moveit_msgs::msg::RobotTrajectory> trajectory = getInput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory");
-
-    moveit::core::MoveItErrorCode error_code = manipulator_.ExecuteGripperToPose(trajectory.value());
-
-    error_message_ = moveit::core::error_code_to_string(error_code);
-
-    RCLCPP_INFO(node_->get_logger(), "Error message: %s", error_message_.c_str());
-
-    int no_of_deploy_sensors_{0};
-    getInput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
+    bool execute_trajectory{false};
+    getInput<bool>("execute_trajectory", execute_trajectory);
     
-    if (error_message_ == "SUCCESS" && no_of_deploy_sensors_ != 0)
+    if (execute_trajectory)
     {
-        std::string sensor_deploy_frame_names_dynamic_;
-
-        getInput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
-
-        int pos_comma{0};
-        getInput<int>("pos_comma", pos_comma);
+        RCLCPP_INFO(node_->get_logger(), "signaled to execute trajectory, executing!");
         
-        sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
+        BT::Optional<moveit_msgs::msg::RobotTrajectory> trajectory = getInput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory");
+
+        moveit::core::MoveItErrorCode error_code = manipulator_.ExecuteGripperToPose(trajectory.value());
+
+        error_message_ = moveit::core::error_code_to_string(error_code);
+
+        RCLCPP_INFO(node_->get_logger(), "Error message: %s", error_message_.c_str());
+
+        int no_of_deploy_sensors_{0};
+        getInput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
+        
+        if (error_message_ == "SUCCESS" && no_of_deploy_sensors_ != 0)
+        {
+            std::string sensor_deploy_frame_names_dynamic_;
+
+            getInput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
+
+            int pos_comma{0};
+            getInput<int>("pos_comma", pos_comma);
             
-        setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
+            sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
+                
+            setOutput<std::string>("sensor_deploy_frame_names_dynamic", sensor_deploy_frame_names_dynamic_);
 
-        int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
+            int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
 
-        RCLCPP_INFO(node_->get_logger(), "%d sensors already deployed!", no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
-        RCLCPP_INFO(node_->get_logger(), "%d sensors yet to be deployed!", no_of_deploy_sensors_dynamic);
+            RCLCPP_INFO(node_->get_logger(), "%d sensors already deployed!", no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
+            RCLCPP_INFO(node_->get_logger(), "%d sensors yet to be deployed!", no_of_deploy_sensors_dynamic);
+        }
+
+        execute_trajectory = false;
+    }
+
+    else
+    {
+        RCLCPP_ERROR(node_->get_logger(), "signaled to not execute trajectory, returning failure");
+        return BT::NodeStatus::FAILURE;
     }
 
     return BT::NodeStatus::RUNNING;
@@ -284,7 +361,7 @@ void ManipulatorPregraspExecute::onHalted() {}
  */
 BT::PortsList ManipulatorPregraspExecute::providedPorts()
 {
-    return {BT::InputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory"), BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<int>("pos_comma"), BT::InputPort<int>("no_of_deploy_sensors")};
+    return {BT::InputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory"), BT::BidirectionalPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::InputPort<int>("pos_comma"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("execute_trajectory")};
 }
 
 #pragma endregion
