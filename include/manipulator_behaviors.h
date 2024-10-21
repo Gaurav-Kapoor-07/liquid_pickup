@@ -27,6 +27,8 @@
 
 #pragma endregion
 
+using std::placeholders::_1;
+
 #define UR5_WORKING_RADIUS 0.95
 
 #pragma region ManipulatorGrasp
@@ -61,6 +63,7 @@ class ManipulatorPregraspPlan : public BT::StatefulActionNode
 {
 public:
     ManipulatorPregraspPlan(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node);
+    void topic_callback(const std_msgs::msg::Bool::SharedPtr msg);
     BT::NodeStatus onStart() override;
     BT::NodeStatus onRunning() override;
     void onHalted() override;

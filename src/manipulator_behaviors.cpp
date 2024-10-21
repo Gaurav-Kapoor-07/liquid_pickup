@@ -91,17 +91,35 @@ ManipulatorPregraspPlan::ManipulatorPregraspPlan(const std::string &name, const 
         RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
     }
 
-    auto topic_callback =
-      [this](std_msgs::msg::Bool::SharedPtr msg) -> void {
+    // auto topic_callback =
+    //   [this](std_msgs::msg::Bool::SharedPtr msg) -> void {
         
-        flag_ = true;
-        trajectory_execute_ = msg->data;
-        RCLCPP_INFO(node_->get_logger(), "Received trajectory execute (0: False, 1: True): %d", msg->data);
-      };
+    //     flag_ = true;
+    //     trajectory_execute_ = msg->data;
+    //     RCLCPP_INFO(node_->get_logger(), "Received trajectory execute (0: False, 1: True): %d", msg->data);
+    //   };
     
-    trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>("/summit/trajectory_execute", 10, topic_callback);
+    // trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>("/summit/trajectory_execute", 10, topic_callback);
+
+    trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>(
+      "/summit/trajectory_execute", 10, std::bind(&ManipulatorPregraspPlan::topic_callback, this, _1));
 
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
+}
+
+void ManipulatorPregraspPlan::topic_callback(const std_msgs::msg::Bool::SharedPtr msg)
+{
+    if (flag_ == true)
+    {
+        RCLCPP_ERROR(node_->get_logger(), "flag_ already true, returning!");
+        flag_ = false;
+        trajectory_execute_ = false;
+        return;
+    }
+    
+    flag_ = true;
+    trajectory_execute_ = msg->data;
+    RCLCPP_INFO(node_->get_logger(), "Received trajectory execute (0: False, 1: True): %d", msg->data);
 }
 
 /**
@@ -183,12 +201,14 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
         {
             RCLCPP_INFO(node_->get_logger(), "valid trajectory plan received!");
             
-            RCLCPP_INFO(node_->get_logger(), "Trajectory OK? Waiting for publisher for at most 2 mins, Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\" --once");
+            RCLCPP_INFO(node_->get_logger(), "Trajectory OK? Waiting for publisher for at most 2 mins, Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\"");
             count_++;
             return BT::NodeStatus::RUNNING;
         }
 
         // RCLCPP_INFO(node_->get_logger(), "count_ = %d", count_);
+
+        // RCLCPP_INFO(node_->get_logger(), "flag_ = %d", flag_);
         
         if (count_ < 2 * 60 * 1000 / 10)
         {
@@ -210,6 +230,8 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
                     RCLCPP_ERROR(node_->get_logger(), "Trajectory execute disapproved");
                     return BT::NodeStatus::FAILURE;
                 }
+
+            flag_ = false;
             }
         }
         
