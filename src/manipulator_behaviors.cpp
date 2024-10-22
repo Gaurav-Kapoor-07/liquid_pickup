@@ -101,8 +101,10 @@ ManipulatorPregraspPlan::ManipulatorPregraspPlan(const std::string &name, const 
     
     // trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>("/summit/trajectory_execute", 10, topic_callback);
 
+    const rclcpp::QoS feedback_sub_qos = rclcpp::QoS(1);
+
     trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>(
-      "/summit/trajectory_execute", 10, std::bind(&ManipulatorPregraspPlan::topic_callback, this, _1));
+      "/summit/trajectory_execute", feedback_sub_qos, std::bind(&ManipulatorPregraspPlan::topic_callback, this, _1));
 
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
@@ -201,7 +203,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
         {
             RCLCPP_INFO(node_->get_logger(), "valid trajectory plan received!");
             
-            RCLCPP_INFO(node_->get_logger(), "Trajectory OK? Waiting for publisher for at most 2 mins, Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\"");
+            RCLCPP_WARN(node_->get_logger(), "check: Trajectory OK? Waiting for publisher for at most 2 mins, Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\" --once");
             count_++;
             return BT::NodeStatus::RUNNING;
         }
@@ -218,7 +220,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
                 
                 if (trajectory_execute_)
                 {
-                    RCLCPP_INFO(node_->get_logger(), "Trajectory execute approved");
+                    RCLCPP_WARN(node_->get_logger(), "check: Trajectory execute approved");
 
                     trajectory_execute_ = false;
                     

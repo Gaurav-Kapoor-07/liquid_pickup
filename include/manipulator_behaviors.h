@@ -15,6 +15,7 @@
 #include "moveit/utils/moveit_error_code.h"
 
 #include "std_msgs/msg/bool.hpp"
+#include "rclcpp/qos.hpp"
 
 #include "time_logger.h"
 #ifdef TIME_LOGGER_ON
