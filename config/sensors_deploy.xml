@@ -62,6 +62,7 @@
             <input_port name="pos_comma" type="int"/>
             <inout_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
             <input_port name="plan_trajectory" type="moveit_msgs::msg::RobotTrajectory_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="execute_trajectory" type="bool"/> 
         </Action>
         <Action ID="PregraspPlan">
             <output_port name="plan_trajectory" type="moveit_msgs::msg::RobotTrajectory_&lt;std::allocator&lt;void&gt; &gt;"/>
@@ -76,6 +77,7 @@
             <input_port name="no_of_deploy_sensors" type="int"/>
             <output_port name="pos_comma" type="int"/>
             <input_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
+            <output_port name="execute_trajectory" type="bool"/>
         </Action>
         <Action ID="RetreatZ"/>
         <Action ID="RobotInitializer">

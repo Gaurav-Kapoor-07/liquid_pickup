@@ -91,37 +91,49 @@ ManipulatorPregraspPlan::ManipulatorPregraspPlan(const std::string &name, const 
         RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
     }
 
+    const rclcpp::QoS feedback_sub_qos = rclcpp::QoS(1);
+
+    trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>(
+      "/summit/trajectory_execute", feedback_sub_qos, std::bind(&ManipulatorPregraspPlan::topic_callback, this, _1));
+
+    wait_set_.add_subscription(trajectory_execute_subscription_);
+
     // auto topic_callback =
     //   [this](std_msgs::msg::Bool::SharedPtr msg) -> void {
+
+    //     if (flag_ == true)
+    //     {
+    //         RCLCPP_ERROR(node_->get_logger(), "flag_ already true, returning!");
+    //         flag_ = false;
+    //         trajectory_execute_ = false;
+    //         return;
+    //     }
         
     //     flag_ = true;
     //     trajectory_execute_ = msg->data;
     //     RCLCPP_INFO(node_->get_logger(), "Received trajectory execute (0: False, 1: True): %d", msg->data);
     //   };
     
-    // trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>("/summit/trajectory_execute", 10, topic_callback);
-
-    const rclcpp::QoS feedback_sub_qos = rclcpp::QoS(1);
-
-    trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>(
-      "/summit/trajectory_execute", feedback_sub_qos, std::bind(&ManipulatorPregraspPlan::topic_callback, this, _1));
+    // trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>("/summit/trajectory_execute", feedback_sub_qos, topic_callback);
 
     RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
 }
 
 void ManipulatorPregraspPlan::topic_callback(const std_msgs::msg::Bool::SharedPtr msg)
 {
-    if (flag_ == true)
-    {
-        RCLCPP_ERROR(node_->get_logger(), "flag_ already true, returning!");
-        flag_ = false;
-        trajectory_execute_ = false;
-        return;
-    }
+    // if (flag_ == true)
+    // {
+    //     RCLCPP_ERROR(node_->get_logger(), "flag_ already true, returning!");
+    //     flag_ = false;
+    //     trajectory_execute_ = false;
+    //     return;
+    // }
     
-    flag_ = true;
-    trajectory_execute_ = msg->data;
-    RCLCPP_INFO(node_->get_logger(), "Received trajectory execute (0: False, 1: True): %d", msg->data);
+    // flag_ = true;
+    // trajectory_execute_ = msg->data;
+    // RCLCPP_INFO(node_->get_logger(), "Received trajectory execute (0: False, 1: True): %d", trajectory_execute_);
+
+    return;
 }
 
 /**
@@ -201,9 +213,9 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
     {
         if (count_ == 0)
         {
-            RCLCPP_INFO(node_->get_logger(), "valid trajectory plan received!");
+            RCLCPP_WARN(node_->get_logger(), "valid trajectory plan received!");
             
-            RCLCPP_WARN(node_->get_logger(), "check: Trajectory OK? Waiting for publisher for at most 2 mins, Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\" --once");
+            RCLCPP_WARN(node_->get_logger(), "check: Execute Trajectory? Waiting for publisher for about 2 mins max., Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\" --once");
             count_++;
             return BT::NodeStatus::RUNNING;
         }
@@ -212,29 +224,76 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
 
         // RCLCPP_INFO(node_->get_logger(), "flag_ = %d", flag_);
         
-        if (count_ < 2 * 60 * 1000 / 10)
+        int timeout_secs = 2 * 60;
+        
+        if (count_ <= timeout_secs)
         {
-            if (flag_)
-            {
-                setOutput<bool>("execute_trajectory", trajectory_execute_);
-                
-                if (trajectory_execute_)
+            // Wait for the subscriber event to trigger. Set a 1 ms margin to trigger a timeout.
+            const auto wait_result = wait_set_.wait(std::chrono::milliseconds(1001));
+            switch (wait_result.kind()) {
+                case rclcpp::WaitResultKind::Ready:
                 {
-                    RCLCPP_WARN(node_->get_logger(), "check: Trajectory execute approved");
+                    std_msgs::msg::Bool take_msg;
+                    rclcpp::MessageInfo msg_info;
+                    if (trajectory_execute_subscription_->take(take_msg, msg_info)) {
+                        bool value_received = take_msg.data;
+                        RCLCPP_WARN(node_->get_logger(), "check: Received take trajectory execute (0: False, 1: True): %d", value_received);
 
-                    trajectory_execute_ = false;
-                    
-                    return BT::NodeStatus::SUCCESS;
+                        setOutput<bool>("execute_trajectory", value_received);
+                        
+                        if (value_received)
+                        {
+                            RCLCPP_WARN(node_->get_logger(), "check: Trajectory execute approved");
+
+                            value_received = false;
+                            
+                            return BT::NodeStatus::SUCCESS;
+                        }
+
+                        else
+                        {
+                            RCLCPP_ERROR(node_->get_logger(), "check: Trajectory execute disapproved");
+                            return BT::NodeStatus::FAILURE;
+                        }
+                    }
+                    break;
                 }
 
-                else
+                case rclcpp::WaitResultKind::Timeout:
                 {
-                    RCLCPP_ERROR(node_->get_logger(), "Trajectory execute disapproved");
-                    return BT::NodeStatus::FAILURE;
+                    if (rclcpp::ok()) {
+                        RCLCPP_WARN(node_->get_logger(), "check: Timeout. No message received yet, still waiting for about %d secs", timeout_secs - count_);
+                    }
+                    break;
                 }
 
-            flag_ = false;
+                default:
+                {
+                    RCLCPP_ERROR(node_->get_logger(), "check: Error. Wait-set failed.");
+                }
             }
+            
+            // if (flag_)
+            // {
+            //     setOutput<bool>("execute_trajectory", trajectory_execute_);
+                
+            //     if (trajectory_execute_)
+            //     {
+            //         RCLCPP_WARN(node_->get_logger(), "check: Trajectory execute approved");
+
+            //         trajectory_execute_ = false;
+                    
+            //         return BT::NodeStatus::SUCCESS;
+            //     }
+
+            //     else
+            //     {
+            //         RCLCPP_ERROR(node_->get_logger(), "Trajectory execute disapproved");
+            //         return BT::NodeStatus::FAILURE;
+            //     }
+
+            // flag_ = false;
+            // }
         }
         
         else

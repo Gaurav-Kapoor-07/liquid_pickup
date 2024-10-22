@@ -74,10 +74,11 @@ private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
     int count_{0};
-    bool flag_{false};
-    bool trajectory_execute_{false};
+    // bool flag_{false};
+    // bool trajectory_execute_{false};
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr trajectory_execute_subscription_;
     moveit_msgs::msg::RobotTrajectory plan_trajectory_;
+    rclcpp::WaitSet wait_set_;
 };
 
 #pragma endregion
