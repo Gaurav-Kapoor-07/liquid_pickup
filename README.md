@@ -9,7 +9,7 @@
 
 ![BT](https://github.com/user-attachments/assets/e30ceefb-52ea-4a7c-a49d-a59961adc5d7)
 
-**How to run?:**
+**How to run:**
 
 1. **For simulation only**: After sourcing the `~/colcon_ws` *(usual command `. install/setup.bash`)* in one terminal run `ros2 launch icclab_summit_xl summit_xl_simulation.launch.py`.
 2. In another similar sourced terminal, run `ros2 launch icclab_summit_xl summit_xl_move_it.launch.py use_sim_time:=true | grep -v moveit_robot_model.robot_model`. `use_sim_time:=true` is default for **simulation**, but when working with the **real arm** put `use_sim_time:=false`
