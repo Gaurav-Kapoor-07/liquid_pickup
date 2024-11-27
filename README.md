@@ -7,7 +7,7 @@
 
 **Working example of Behavior Tree:** [https://www.youtube.com/watch?v=NtHkbNBGDB4](https://www.youtube.com/watch?v=NtHkbNBGDB4)
 
-![BT](https://github.com/user-attachments/assets/e30ceefb-52ea-4a7c-a49d-a59961adc5d7)
+![BT_2](https://github.com/user-attachments/assets/704c91b5-5606-4992-aeb4-ca5d3f310832)
 
 **How to run:**
 
