@@ -99,11 +99,11 @@ moveit_msgs::msg::RobotTrajectory Manipulator::PlanGripperToPose(bool pose_from_
 
     // double y_offset = (target_base_footprint.pose.position.y) < 0 ? 0.1 : -0.1;
 
-    // double angle = atan2(target_base_footprint.pose.position.y, target_base_footprint.pose.position.x);
+    double angle = atan2(target_base_footprint.pose.position.y, target_base_footprint.pose.position.x);
 
-    // target_base_footprint.pose.position.x -= cos(angle) * (offset+TCP_OFFSET_XY);
-    // target_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
-    // target_base_footprint.pose.position.z += TCP_OFFSET_Z;
+    target_base_footprint.pose.position.x -= cos(angle) * (offset+TCP_OFFSET_XY);
+    target_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
+    target_base_footprint.pose.position.z += TCP_OFFSET_Z;
 
     RCLCPP_INFO(node_->get_logger(), "going to: header.frame_id: %s, target_frame: %s, x: %f, y: %f, z: %f, rotation qx: %f, qy: %f, qz: %f, qw: %f", target_base_footprint.header.frame_id.c_str(), target_frame_.c_str(), target_base_footprint.pose.position.x, target_base_footprint.pose.position.y, target_base_footprint.pose.position.z, target_base_footprint.pose.orientation.x, target_base_footprint.pose.orientation.y, target_base_footprint.pose.orientation.z, target_base_footprint.pose.orientation.w);
     
@@ -205,53 +205,24 @@ moveit::core::MoveItErrorCode Manipulator::ExecuteGripperToPose(moveit_msgs::msg
  * @param target_pose The endpose to reach
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(std::string action_, double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_)
+moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_)
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_SMALL);
 
-    geometry_msgs::msg::TransformStamped base_footprint_to_target_frame;
-
     geometry_msgs::msg::PoseStamped target_base_footprint;
 
-    RCLCPP_INFO(node_->get_logger(), "Action: %s", action_.c_str());
+    target_base_footprint.header.stamp = node_->get_clock()->now();
+    target_base_footprint.header.frame_id = "base_footprint";
+    target_base_footprint.pose.position.x = target_base_footprint_x_;
+    target_base_footprint.pose.position.y = target_base_footprint_y_;
+    target_base_footprint.pose.position.z = target_base_footprint_z_;
 
-    if (action_ == "collect_liquid_sample")
-    { 
-        try {
-            base_footprint_to_target_frame = tf_buffer_->lookupTransform(
-                BASE_FRAME, LIQUID_FRAME,
-                tf2::TimePointZero);
-        }   catch (const tf2::TransformException & ex) {
-            RCLCPP_INFO(node_->get_logger(),
-                "Could not transform %s to %s: %s",
-                BASE_FRAME, LIQUID_FRAME, ex.what());
-        }
-        
-        target_base_footprint.header = base_footprint_to_target_frame.header;
-        target_base_footprint.pose.position.x = base_footprint_to_target_frame.transform.translation.x;
-        target_base_footprint.pose.position.y = base_footprint_to_target_frame.transform.translation.y;
-        target_base_footprint.pose.position.z = base_footprint_to_target_frame.transform.translation.z;
-        target_base_footprint.pose.orientation.x = base_footprint_to_target_frame.transform.rotation.x;
-        target_base_footprint.pose.orientation.y = base_footprint_to_target_frame.transform.rotation.y;
-        target_base_footprint.pose.orientation.z = base_footprint_to_target_frame.transform.rotation.z;
-        target_base_footprint.pose.orientation.w = base_footprint_to_target_frame.transform.rotation.w;
-    }
+    tf2::Quaternion tf2_quat;
+    tf2_quat.setRPY(target_base_footprint_roll_, target_base_footprint_pitch_, target_base_footprint_yaw_);
+    geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
+    target_base_footprint.pose.orientation = msg_quat;
 
-    else
-    {
-        target_base_footprint.header.stamp = node_->get_clock()->now();
-        target_base_footprint.header.frame_id = "base_footprint";
-        target_base_footprint.pose.position.x = target_base_footprint_x_;
-        target_base_footprint.pose.position.y = target_base_footprint_y_;
-        target_base_footprint.pose.position.z = target_base_footprint_z_;
-
-        tf2::Quaternion tf2_quat;
-        tf2_quat.setRPY(target_base_footprint_roll_, target_base_footprint_pitch_, target_base_footprint_yaw_);
-        geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
-        target_base_footprint.pose.orientation = msg_quat;
-    }
-
-    double y_offset = (target_base_footprint.pose.position.y) < 0 ? 0.1 : -0.1;
+    // double y_offset = (target_base_footprint.pose.position.y) < 0 ? 0.1 : -0.1;
     double angle = atan2(target_base_footprint.pose.position.y, target_base_footprint.pose.position.x);
     target_base_footprint.pose.position.x -= cos(angle) * TCP_OFFSET_XY;
     target_base_footprint.pose.position.y -= sin(angle) * TCP_OFFSET_XY;
@@ -262,7 +233,7 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(std::string a
     // geometry_msgs::msg::Quaternion msg_quat = tf2::toMsg(tf2_quat);
     // target_base_footprint.pose.orientation = msg_quat;
 
-    RCLCPP_INFO(node_->get_logger(), "going to: header.frame_id: %s, x: %f, y: %f, z: %f, rotation qx: %f, qy: %f, qz: %f, qw: %f", target_base_footprint.header.frame_id.c_str(), target_base_footprint.pose.position.x, target_base_footprint.pose.position.y, target_base_footprint.pose.position.z, target_base_footprint.pose.orientation.x, target_base_footprint.pose.orientation.y, target_base_footprint.pose.orientation.z, target_base_footprint.pose.orientation.w);
+    RCLCPP_INFO(node_->get_logger(), "linearly going to: header.frame_id: %s, x: %f, y: %f, z: %f, rotation qx: %f, qy: %f, qz: %f, qw: %f", target_base_footprint.header.frame_id.c_str(), target_base_footprint.pose.position.x, target_base_footprint.pose.position.y, target_base_footprint.pose.position.z, target_base_footprint.pose.orientation.x, target_base_footprint.pose.orientation.y, target_base_footprint.pose.orientation.z, target_base_footprint.pose.orientation.w);
 
     MoveLinear(target_base_footprint.pose, false);
     return moveit::core::MoveItErrorCode::SUCCESS;

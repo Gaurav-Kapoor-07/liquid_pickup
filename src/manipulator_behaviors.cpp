@@ -31,7 +31,6 @@ BT::NodeStatus ManipulatorGrasp::onStart()
 {
     LOG_MANI_START(this->name());
 
-    BT::Optional<std::string> action = getInput<std::string>("action");
     BT::Optional<double> base_footprint_x = getInput<double>("target_x");
     BT::Optional<double> base_footprint_y = getInput<double>("target_y");
     BT::Optional<double> base_footprint_z = getInput<double>("target_z");
@@ -39,9 +38,11 @@ BT::NodeStatus ManipulatorGrasp::onStart()
     BT::Optional<double> base_footprint_pitch = getInput<double>("target_pitch");
     BT::Optional<double> base_footprint_yaw = getInput<double>("target_yaw");
 
-    RCLCPP_INFO(node_->get_logger(), "moving gripper to target");
-    manipulator_.MoveGripperToPoseLinear(action.value(), base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value());
-    RCLCPP_INFO(node_->get_logger(), "moved gripper to target");
+    RCLCPP_INFO(node_->get_logger(), "moving gripper to target linearly");
+    
+    manipulator_.MoveGripperToPoseLinear(base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value());
+    
+    RCLCPP_INFO(node_->get_logger(), "moved gripper to target linearly");
     return BT::NodeStatus::RUNNING;
 }
 
@@ -69,7 +70,7 @@ void ManipulatorGrasp::onHalted() {}
  */
 BT::PortsList ManipulatorGrasp::providedPorts()
 {
-    return {BT::InputPort<std::string>("action"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
+    return {BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
 }
 
 #pragma endregion
