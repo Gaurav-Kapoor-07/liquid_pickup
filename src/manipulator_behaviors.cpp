@@ -37,10 +37,12 @@ BT::NodeStatus ManipulatorGrasp::onStart()
     BT::Optional<double> base_footprint_roll = getInput<double>("target_roll");
     BT::Optional<double> base_footprint_pitch = getInput<double>("target_pitch");
     BT::Optional<double> base_footprint_yaw = getInput<double>("target_yaw");
+    BT::Optional<double> tcp_offset_xy = getInput<double>("tcp_offset_xy"); 
+    BT::Optional<double> tcp_offset_z = getInput<double>("tcp_offset_z");
 
     RCLCPP_INFO(node_->get_logger(), "moving gripper to target linearly");
     
-    manipulator_.MoveGripperToPoseLinear(base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value());
+    manipulator_.MoveGripperToPoseLinear(base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), tcp_offset_xy.value(), tcp_offset_z.value());
     
     RCLCPP_INFO(node_->get_logger(), "moved gripper to target linearly");
     return BT::NodeStatus::RUNNING;
@@ -70,7 +72,7 @@ void ManipulatorGrasp::onHalted() {}
  */
 BT::PortsList ManipulatorGrasp::providedPorts()
 {
-    return {BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw")};
+    return {BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::InputPort<double>("tcp_offset_xy"), BT::InputPort<double>("tcp_offset_z")};
 }
 
 #pragma endregion
@@ -193,6 +195,8 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
 
     else
     {
+        target_frame = "liquid";
+        
         plan_trajectory_ = manipulator_.PlanGripperToPose(pose_from_tf.value(), target_frame, base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), pregresp_offset.value());
 
         setOutput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory", plan_trajectory_);
@@ -210,13 +214,15 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
  */
 BT::NodeStatus ManipulatorPregraspPlan::onRunning()
 {
+    int traj_exec_wait_min{5};
+    
     if (!plan_trajectory_.joint_trajectory.header.frame_id.empty())
     {
         if (count_ == 0)
         {
             RCLCPP_WARN(node_->get_logger(), "valid trajectory plan received!");
             
-            RCLCPP_WARN(node_->get_logger(), "check: Execute Trajectory? Waiting for publisher for about 2 mins max., Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\" --once");
+            RCLCPP_WARN(node_->get_logger(), "check: Execute Trajectory? Waiting for publisher for about %d mins max., Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\" --once", traj_exec_wait_min);
             count_++;
             return BT::NodeStatus::RUNNING;
         }
@@ -225,7 +231,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
 
         // RCLCPP_INFO(node_->get_logger(), "flag_ = %d", flag_);
         
-        int timeout_secs = 2 * 60;
+        int timeout_secs = traj_exec_wait_min * 60;
         
         if (count_ <= timeout_secs)
         {
@@ -480,7 +486,12 @@ BT::NodeStatus ManipulatorPostgraspRetreat::onStart()
 {
     LOG_MANI_START(this->name());
     RCLCPP_INFO(node_->get_logger(), "post grasp started");
-    manipulator_.MoveLinearVec(0, 0, 0.12);
+    
+    BT::Optional<double> add_pos_z = getInput<double>("add_pos_z");
+    
+    // manipulator_.MoveLinearVec(0, 0, 0.12);
+    manipulator_.MoveLinearVec(0, 0, add_pos_z.value());
+    
     RCLCPP_INFO(node_->get_logger(), "post grasp finished");
     return BT::NodeStatus::RUNNING;
 }
@@ -509,8 +520,8 @@ void ManipulatorPostgraspRetreat::onHalted() {}
  */
 BT::PortsList ManipulatorPostgraspRetreat::providedPorts()
 {
-    RCLCPP_WARN(rclcpp::get_logger("ManipulatorPostgraspRetreat"), "returning empty BT::PortsList!");
-    return {};
+    // RCLCPP_WARN(rclcpp::get_logger("ManipulatorPostgraspRetreat"), "returning empty BT::PortsList!");
+    return {BT::InputPort<double>("add_pos_z")};
 }
 
 #pragma endregion

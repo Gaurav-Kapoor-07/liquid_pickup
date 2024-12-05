@@ -205,7 +205,7 @@ moveit::core::MoveItErrorCode Manipulator::ExecuteGripperToPose(moveit_msgs::msg
  * @param target_pose The endpose to reach
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_)
+moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double tcp_offset_xy, double tcp_offset_z)
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_SMALL);
 
@@ -224,9 +224,9 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(double target
 
     // double y_offset = (target_base_footprint.pose.position.y) < 0 ? 0.1 : -0.1;
     double angle = atan2(target_base_footprint.pose.position.y, target_base_footprint.pose.position.x);
-    target_base_footprint.pose.position.x -= cos(angle) * TCP_OFFSET_XY;
-    target_base_footprint.pose.position.y -= sin(angle) * TCP_OFFSET_XY;
-    target_base_footprint.pose.position.z += TCP_OFFSET_Z;
+    target_base_footprint.pose.position.x -= cos(angle) * tcp_offset_xy;
+    target_base_footprint.pose.position.y -= sin(angle) * tcp_offset_xy;
+    target_base_footprint.pose.position.z += tcp_offset_z;
     
     // tf2::Quaternion tf2_quat;
     // tf2_quat.setRPY(0, M_PI / 6, angle);
@@ -301,6 +301,9 @@ double Manipulator::MoveLinearVec(double x, double y, double z){
     ee_base_frame.pose.position.x += x;
     ee_base_frame.pose.position.y += y;
     ee_base_frame.pose.position.z += z;
+    
+    RCLCPP_INFO(node_->get_logger(), "retreating vertically up in z axis by %f meters", z);
+
     double res = MoveLinear(ee_base_frame.pose, false);
     return res;
 }
