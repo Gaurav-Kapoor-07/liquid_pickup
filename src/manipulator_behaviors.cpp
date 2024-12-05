@@ -158,6 +158,13 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
     BT::Optional<double> base_footprint_yaw = getInput<double>("target_yaw");
     BT::Optional<double> pregresp_offset = getInput<double>("pregrasp_offset");
 
+    setOutput<double>("target_x_cp", base_footprint_x.value());
+    setOutput<double>("target_y_cp", base_footprint_y.value());
+    setOutput<double>("target_z_cp", base_footprint_z.value());
+    setOutput<double>("target_roll_cp", base_footprint_roll.value());
+    setOutput<double>("target_pitch_cp", base_footprint_pitch.value());
+    setOutput<double>("target_yaw_cp", base_footprint_yaw.value());
+
     std::string target_frame;
 
     RCLCPP_INFO(node_->get_logger(), "pregrasp started");
@@ -335,7 +342,7 @@ void ManipulatorPregraspPlan::onHalted() {}
  */
 BT::PortsList ManipulatorPregraspPlan::providedPorts()
 {
-    return {BT::InputPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::OutputPort<int>("pos_comma"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::OutputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory"), BT::OutputPort<bool>("execute_trajectory")};
+    return {BT::InputPort<std::string>("sensor_deploy_frame_names_dynamic"), BT::OutputPort<int>("pos_comma"), BT::InputPort<int>("no_of_deploy_sensors"), BT::InputPort<bool>("pose_from_tf"), BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("pregrasp_offset"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::OutputPort<moveit_msgs::msg::RobotTrajectory>("plan_trajectory"), BT::OutputPort<bool>("execute_trajectory"), BT::OutputPort<double>("target_x_cp"), BT::OutputPort<double>("target_y_cp"), BT::OutputPort<double>("target_z_cp"), BT::OutputPort<double>("target_roll_cp"), BT::OutputPort<double>("target_pitch_cp"), BT::OutputPort<double>("target_yaw_cp")};
 }
 
 #pragma endregion

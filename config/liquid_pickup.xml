@@ -23,13 +23,14 @@
             <Sequence name="pickup_swab_from_palette">
                 <!-- <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" sensor_deploy_frame_names_dynamic="" target_x="3.0" target_y="0.01" target_yaw = "1.57"/> -->
                 <RetryUntilSuccessful num_attempts="10">
-                    <PregraspPlan name="plan_pickup_swab_from_palette" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" pose_from_tf="false" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}" execute_trajectory="{execute_trajectory}"/>
+                    <PregraspPlan name="plan_pickup_swab_from_palette" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" pose_from_tf="false" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}" execute_trajectory="{execute_trajectory}" target_x_cp= "{target_x_cp}" target_y_cp= "{target_y_cp}" target_z_cp= "{target_z_cp}" target_roll_cp= "{target_roll_cp}" target_pitch_cp= "{target_pitch_cp}" target_yaw_cp= "{target_yaw_cp}"/>
                 </RetryUntilSuccessful>
 
                 <PregraspExecute name="execute_pickup_swab_from_palette" plan_trajectory="{plan_trajectory}" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" execute_trajectory="{execute_trajectory}"/>
 
                 <RetryUntilSuccessful num_attempts="10">
-                    <Grasp name="grasp_pickup_swab_from_palette" target_x="-0.1" target_y="0.01" target_z="0.6" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" tcp_offset_xy = "0.15" tcp_offset_z = "0.10" />
+                    <!-- <Grasp name="grasp_pickup_swab_from_palette" target_x="-0.1" target_y="0.01" target_z="0.6" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" tcp_offset_xy = "0.15" tcp_offset_z = "0.10" /> -->
+                    <Grasp name="grasp_pickup_swab_from_palette" target_x="{target_x_cp}" target_y="{target_y_cp}" target_z="{target_z_cp}" target_roll="{target_roll_cp}" target_pitch ="{target_pitch_cp}" target_yaw = "{target_yaw_cp}" tcp_offset_xy = "0.15" tcp_offset_z = "0.10" />
                 </RetryUntilSuccessful>
 
                 <RetryUntilSuccessful num_attempts="10">
