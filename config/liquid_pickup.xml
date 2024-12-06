@@ -26,7 +26,9 @@
                     <PregraspPlan name="plan_pickup_swab_from_palette" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" pose_from_tf="false" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}" execute_trajectory="{execute_trajectory}" target_x_cp= "{target_x_cp}" target_y_cp= "{target_y_cp}" target_z_cp= "{target_z_cp}" target_roll_cp= "{target_roll_cp}" target_pitch_cp= "{target_pitch_cp}" target_yaw_cp= "{target_yaw_cp}"/>
                 </RetryUntilSuccessful>
 
+                <RetryUntilSuccessful num_attempts="10">
                 <PregraspExecute name="execute_pickup_swab_from_palette" plan_trajectory="{plan_trajectory}" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" execute_trajectory="{execute_trajectory}"/>
+                </RetryUntilSuccessful>
 
                 <RetryUntilSuccessful num_attempts="10">
                     <!-- <Grasp name="grasp_pickup_swab_from_palette" target_x="-0.1" target_y="0.01" target_z="0.6" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" tcp_offset_xy = "0.15" tcp_offset_z = "0.10" /> -->
@@ -43,13 +45,13 @@
 
             </Sequence>        
 
-            <Sequence name="collect_liquid_sample">
+            <!-- <Sequence name="collect_liquid_sample"> -->
                 <!-- <GoToPose name="GoToPose" behavior_tree="navigate_to_pose_w_replanning_and_recovery.xml" sensor_deploy_frame_names_dynamic="" target_x="3.0" target_y="0.01" target_yaw = "1.57"/> -->
-                <PregraspPlan name="plan_collect_liquid_sample" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" pose_from_tf="false" target_x="0.6" target_y="0.01" target_z="0.5" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}" execute_trajectory="{execute_trajectory}"/>
-                <PregraspExecute name="execute_collect_liquid_sample" plan_trajectory="{plan_trajectory}" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" execute_trajectory="{execute_trajectory}"/>
+                <!-- <PregraspPlan name="plan_collect_liquid_sample" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" pose_from_tf="false" target_x="0.6" target_y="0.01" target_z="0.5" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}" execute_trajectory="{execute_trajectory}"/> -->
+                <!-- <PregraspExecute name="execute_collect_liquid_sample" plan_trajectory="{plan_trajectory}" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" execute_trajectory="{execute_trajectory}"/> -->
 
                 <!-- <ChangeGripper name="close_gripper" position="0.575" max_effort = "0.0"/> -->
-            </Sequence>
+            <!-- </Sequence> -->
 
             <!-- <Sequence name="collect_liquid_sample"> -->
             <!-- The target coordinates do not matter in the action collect_liquid_sample as they are provided in the TF tree -->
@@ -57,11 +59,11 @@
             <!-- <Pregrasp name="collect_liquid_sample" action="collect_liquid_sample_sim" target_x="0.6" target_y="0.01" target_z="0.5" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1"/> -->
             <!-- </Sequence> -->
 
-            <Sequence name="put_swab_back_in_palette">
-                <PregraspPlan name="plan_put_swab_back_in_palette" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" pose_from_tf="false" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}" execute_trajectory="{execute_trajectory}"/>
-                <PregraspExecute name="execute_put_swab_back_in_palette" plan_trajectory="{plan_trajectory}" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" execute_trajectory="{execute_trajectory}"/>
+            <!-- <Sequence name="put_swab_back_in_palette"> -->
+                <!-- <PregraspPlan name="plan_put_swab_back_in_palette" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" pose_from_tf="false" target_x="-0.1" target_y="0.01" target_z="0.8" target_roll="0.01" target_pitch ="3.14" target_yaw = "0.01" pregrasp_offset="0.1" plan_trajectory="{plan_trajectory}" execute_trajectory="{execute_trajectory}"/> -->
+                <!-- <PregraspExecute name="execute_put_swab_back_in_palette" plan_trajectory="{plan_trajectory}" sensor_deploy_frame_names_dynamic="" pos_comma="0" no_of_deploy_sensors="0" execute_trajectory="{execute_trajectory}"/> -->
                 <!-- <ChangeGripper name="open_gripper" position="0.3" max_effort = "0.0"/> -->
-            </Sequence>
+            <!-- </Sequence> -->
 
             <Sequence name="open_gripper">
                 <ChangeGripper name="open_gripper" position="0.3" max_effort = "0.0"/>
@@ -88,7 +90,8 @@
             <input_port name="target_y" type="double"/>
             <input_port name="target_x" type="double"/>
             <input_port name="target_yaw" type="double"/>
-            <input_port name="action" type="std::string"/>
+            <input_port name="tcp_offset_xy" type="double"/>
+            <input_port name="tcp_offset_z" type="double"/>
         </Action>
         <Action ID="PregraspExecute">
             <input_port name="pos_comma" type="int"/>
@@ -110,9 +113,17 @@
             <input_port name="no_of_deploy_sensors" type="int"/>
             <output_port name="pos_comma" type="int"/>
             <input_port name="sensor_deploy_frame_names_dynamic" type="std::string"/>
-            <output_port name="execute_trajectory" type="bool"/>    
+            <output_port name="execute_trajectory" type="bool"/> 
+            <output_port name="target_yaw_cp" type="double"/>
+            <output_port name="target_z_cp" type="double"/>
+            <output_port name="target_y_cp" type="double"/>
+            <output_port name="target_pitch_cp" type="double"/>
+            <output_port name="target_roll_cp" type="double"/>
+            <output_port name="target_x_cp" type="double"/>
         </Action>
-        <Action ID="RetreatZ"/>
+        <Action ID="RetreatZ">
+            <input_port name="add_pos_z" type="double"/>
+        </Action>
         <Action ID="RobotInitializer">
             <input_port name="swab_container_yaw" type="double"/>
             <input_port name="swab_container_y" type="double"/>

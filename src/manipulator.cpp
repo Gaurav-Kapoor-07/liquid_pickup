@@ -99,11 +99,11 @@ moveit_msgs::msg::RobotTrajectory Manipulator::PlanGripperToPose(bool pose_from_
 
     // double y_offset = (target_base_footprint.pose.position.y) < 0 ? 0.1 : -0.1;
 
-    double angle = atan2(target_base_footprint.pose.position.y, target_base_footprint.pose.position.x);
+    // double angle = atan2(target_base_footprint.pose.position.y, target_base_footprint.pose.position.x);
 
-    target_base_footprint.pose.position.x -= cos(angle) * (offset+TCP_OFFSET_XY);
-    target_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
-    target_base_footprint.pose.position.z += TCP_OFFSET_Z;
+    // target_base_footprint.pose.position.x -= cos(angle) * (offset+TCP_OFFSET_XY);
+    // target_base_footprint.pose.position.y -= sin(angle) * (offset+TCP_OFFSET_XY);
+    // target_base_footprint.pose.position.z += TCP_OFFSET_Z;
 
     RCLCPP_INFO(node_->get_logger(), "going to: header.frame_id: %s, target_frame: %s, x: %f, y: %f, z: %f, rotation qx: %f, qy: %f, qz: %f, qw: %f", target_base_footprint.header.frame_id.c_str(), target_frame_.c_str(), target_base_footprint.pose.position.x, target_base_footprint.pose.position.y, target_base_footprint.pose.position.z, target_base_footprint.pose.orientation.x, target_base_footprint.pose.orientation.y, target_base_footprint.pose.orientation.z, target_base_footprint.pose.orientation.w);
     
@@ -212,7 +212,8 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(double target
     geometry_msgs::msg::PoseStamped target_base_footprint;
 
     target_base_footprint.header.stamp = node_->get_clock()->now();
-    target_base_footprint.header.frame_id = "base_footprint";
+    // target_base_footprint.header.frame_id = "base_footprint";
+    target_base_footprint.header.frame_id = BASE_FRAME; 
     target_base_footprint.pose.position.x = target_base_footprint_x_;
     target_base_footprint.pose.position.y = target_base_footprint_y_;
     target_base_footprint.pose.position.z = target_base_footprint_z_;
