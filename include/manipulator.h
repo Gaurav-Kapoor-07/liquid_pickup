@@ -29,6 +29,8 @@
 #include "ba_frames_summit_xl.h"
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+
 #pragma endregion
 
 #pragma region defines
@@ -63,13 +65,18 @@ public:
 
     moveit::core::MoveItErrorCode ExecuteGripperToPose(moveit_msgs::msg::RobotTrajectory trajectory);
 
-    moveit::core::MoveItErrorCode MoveGripperToPoseLinear(double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double tcp_offset_xy, double tcp_offset_z);
+    // moveit::core::MoveItErrorCode MoveGripperToPoseLinear(double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double tcp_offset_xy, double tcp_offset_z);
+    moveit::core::MoveItErrorCode MoveGripperToPoseLinear(double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double tcp_offset_x, double tcp_offset_y, double tcp_offset_z);
+
     double MoveLinear(geometry_msgs::msg::Pose end_pose, bool check_collision = true);
     double MoveLinearVec(double x, double y, double z);
     moveit::core::MoveItErrorCode DropObject(void);
     moveit::core::MoveItErrorCode MoveToInitialPosition(void);
     moveit::core::MoveItErrorCode MoveToDrivingPosition(void);
     moveit::core::MoveItErrorCode MoveToScanningPosition(void);
+
+    bool AttachObjectToGripper();
+    bool DetachObjectFromGripper();
 private:
     // moveit::planning_interface::MoveGroupInterface *manipulator_;
     std::shared_ptr<moveit::planning_interface::MoveGroupInterface> manipulator_;
@@ -84,6 +91,7 @@ private:
     rclcpp::Node::SharedPtr node_;
     std::string yaml_file;
     YAML::Node arm_positions;
+    std::string attach_detach_object = "liquid_swab";
 
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};    
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;

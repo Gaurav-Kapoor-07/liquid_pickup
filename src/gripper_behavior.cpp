@@ -10,7 +10,7 @@
  */
 
 // GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::SingleThreadedExecutor::SharedPtr executor): BT::SyncActionNode(name, config)
-GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor): BT::StatefulActionNode(name, config)
+GripperActuator::GripperActuator(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor): BT::StatefulActionNode(name, config), manipulator_(node)
 {
     if (node != nullptr)
     {
@@ -95,14 +95,17 @@ BT::NodeStatus GripperActuator::onRunning()
         case rclcpp_action::ResultCode::SUCCEEDED:
             break;
         case rclcpp_action::ResultCode::ABORTED:
-            RCLCPP_ERROR(node_->get_logger(), "Goal was aborted");
-            return BT::NodeStatus::FAILURE;
+            // RCLCPP_ERROR(node_->get_logger(), "Goal was aborted");
+            RCLCPP_WARN(node_->get_logger(), "Goal was aborted, but still continuing!");
+            // return BT::NodeStatus::FAILURE;
         case rclcpp_action::ResultCode::CANCELED:
-            RCLCPP_ERROR(node_->get_logger(), "Goal was canceled");
-            return BT::NodeStatus::FAILURE;
+            // RCLCPP_ERROR(node_->get_logger(), "Goal was canceled");
+            RCLCPP_WARN(node_->get_logger(), "Goal was canceled, but still continuing!");
+            // return BT::NodeStatus::FAILURE;
         default:
-            RCLCPP_ERROR(node_->get_logger(), "Unknown result code");
-            return BT::NodeStatus::FAILURE;
+            // RCLCPP_ERROR(node_->get_logger(), "Unknown result code");
+            RCLCPP_WARN(node_->get_logger(), "Unknown result code, but still continuing!");
+            // return BT::NodeStatus::FAILURE;
     }
 
     RCLCPP_INFO(node_->get_logger(), "result received");
@@ -114,16 +117,65 @@ BT::NodeStatus GripperActuator::onRunning()
     bool stalled = wrapped_result.result->stalled;      // True iff the gripper is exerting max effort and not moving
     RCLCPP_INFO(node_->get_logger(), "stalled (0: False, 1: True)? = %d", stalled);
     bool reached_goal = wrapped_result.result->reached_goal; // True iff the gripper position has reached the commanded setpoint
-    if (reached_goal)
+
+    double gripper_cmd_postion{0.0};
+    getInput<double>("position", gripper_cmd_postion);
+    RCLCPP_INFO(node_->get_logger(), "commanded gripper gap size (in meters) = %f", gripper_cmd_postion);
+
+    double gripper_goal_tolerance{0.0}; 
+    getInput<double>("goal_tolerance", gripper_goal_tolerance);
+    RCLCPP_INFO(node_->get_logger(), "maximum unsigned goal tolerance (in meters) = %f", gripper_goal_tolerance);
+
+    double goal_diff{0.0};
+    goal_diff = position - gripper_cmd_postion;
+    RCLCPP_INFO(node_->get_logger(), "gripper goal difference (in meters) = %f", goal_diff);
+
+    if (std::fabs(goal_diff) <= gripper_goal_tolerance)
     {
         RCLCPP_INFO(node_->get_logger(), "goal reached");
+
+        bool attach_detach{false};
+
+        std::string attachordetach;
+        getInput("attach_or_detach", attachordetach);
+        
+        if (attachordetach == "attach")
+        {
+            attach_detach = manipulator_.AttachObjectToGripper();
+            RCLCPP_INFO(node_->get_logger(), "attached (0: False, 1: True)? = %d", attach_detach);
+        }
+
+        else if (attachordetach == "detach")
+        {
+            attach_detach = manipulator_.DetachObjectFromGripper();
+            RCLCPP_INFO(node_->get_logger(), "detached (0: False, 1: True)? = %d", attach_detach);
+        }
+        
+        else
+        {
+            RCLCPP_WARN(node_->get_logger(), "not attaching or detaching anything!");
+        }
+        
         return BT::NodeStatus::SUCCESS;
     }
+
     else
     {
         RCLCPP_ERROR(node_->get_logger(), "goal failed");
         return BT::NodeStatus::FAILURE;
     }
+    
+    
+    // if (reached_goal)
+    // {
+    //     RCLCPP_INFO(node_->get_logger(), "goal reached");
+    //     return BT::NodeStatus::SUCCESS;
+    // }
+    // else
+    // {
+    //     RCLCPP_ERROR(node_->get_logger(), "goal failed");
+    //     return BT::NodeStatus::FAILURE;
+    // }
 }
 
 /**
@@ -140,7 +192,7 @@ void GripperActuator::onHalted(){};
  */
 BT::PortsList GripperActuator::providedPorts()
 {
-    return {BT::InputPort<double>("position"), BT::InputPort<double>("max_effort")};
+    return {BT::InputPort<double>("position"), BT::InputPort<double>("max_effort"), BT::InputPort<double>("goal_tolerance"), BT::InputPort<std::string>("attach_or_detach")};
 }
 
 #pragma endregion

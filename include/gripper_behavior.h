@@ -11,6 +11,10 @@
 #include "ba_interfaces.h"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "control_msgs/action/gripper_command.hpp"
+#include "manipulator.h"
+
+#include <climits>
+#include <cstdlib>
 
 #pragma endregion
 
@@ -36,6 +40,7 @@ private:
     rclcpp::executors::MultiThreadedExecutor::SharedPtr executor_;
     rclcpp_action::Client<control_msgs::action::GripperCommand>::SharedPtr action_client_;
     rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::SharedPtr goal_handle_;
+    Manipulator manipulator_;
 };
 
 #pragma endregion

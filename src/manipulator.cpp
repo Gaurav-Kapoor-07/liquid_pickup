@@ -205,7 +205,8 @@ moveit::core::MoveItErrorCode Manipulator::ExecuteGripperToPose(moveit_msgs::msg
  * @param target_pose The endpose to reach
  * @return moveit::core::MoveItErrorCode The errorcode
  */
-moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double tcp_offset_xy, double tcp_offset_z)
+// moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double tcp_offset_xy, double tcp_offset_z)
+moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(double target_base_footprint_x_, double target_base_footprint_y_, double target_base_footprint_z_, double target_base_footprint_roll_, double target_base_footprint_pitch_, double target_base_footprint_yaw_, double tcp_offset_x, double tcp_offset_y, double tcp_offset_z)
 {
     manipulator_->setGoalPositionTolerance(MANIPULATOR_TOLERANCE_SMALL);
 
@@ -224,9 +225,11 @@ moveit::core::MoveItErrorCode Manipulator::MoveGripperToPoseLinear(double target
     target_base_footprint.pose.orientation = msg_quat;
 
     // double y_offset = (target_base_footprint.pose.position.y) < 0 ? 0.1 : -0.1;
-    double angle = atan2(target_base_footprint.pose.position.y, target_base_footprint.pose.position.x);
-    target_base_footprint.pose.position.x -= cos(angle) * tcp_offset_xy;
-    target_base_footprint.pose.position.y -= sin(angle) * tcp_offset_xy;
+    // double angle = atan2(target_base_footprint.pose.position.y, target_base_footprint.pose.position.x);
+    // target_base_footprint.pose.position.x -= cos(angle) * tcp_offset_xy;
+    // target_base_footprint.pose.position.y -= sin(angle) * tcp_offset_xy;
+    target_base_footprint.pose.position.x += tcp_offset_x;
+    target_base_footprint.pose.position.y += tcp_offset_y;
     target_base_footprint.pose.position.z += tcp_offset_z;
     
     // tf2::Quaternion tf2_quat;
@@ -363,6 +366,66 @@ moveit::core::MoveItErrorCode Manipulator::MoveToScanningPosition(void)
     manipulator_->setJointValueTarget(scanning_position_);
     manipulator_->setPlanningTime(30);
     return manipulator_->move();
+}
+
+bool Manipulator::AttachObjectToGripper()
+{
+    // We will use the
+    // :moveit_codedir:`PlanningSceneInterface<moveit_ros/planning_interface/planning_scene_interface/include/moveit/planning_scene_interface/planning_scene_interface.h>`
+    // class to add and remove collision objects in our "virtual world" scene
+    moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+    
+    // Attaching objects to the robot
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    //
+    // You can attach an object to the robot, so that it moves with the robot geometry.
+    // This simulates picking up the object for the purpose of manipulating it.
+    // The motion planning should avoid collisions between objects as well.
+    moveit_msgs::msg::CollisionObject object_to_attach;
+    object_to_attach.id = attach_detach_object;
+
+    shape_msgs::msg::SolidPrimitive cylinder_primitive;
+    cylinder_primitive.type = cylinder_primitive.CYLINDER;
+    cylinder_primitive.dimensions.resize(2);
+    cylinder_primitive.dimensions[cylinder_primitive.CYLINDER_HEIGHT] = 0.15;
+    cylinder_primitive.dimensions[cylinder_primitive.CYLINDER_RADIUS] = 0.0135;
+
+    // We define the frame/pose for this cylinder so that it appears in the gripper.
+    object_to_attach.header.frame_id = manipulator_->getEndEffectorLink();
+    geometry_msgs::msg::Pose grab_pose;
+    grab_pose.orientation.w = 1.0;
+    grab_pose.position.z = 0.25;
+
+    // First, we add the object to the world (without using a vector).
+    object_to_attach.primitives.push_back(cylinder_primitive);
+    object_to_attach.primitive_poses.push_back(grab_pose);
+    object_to_attach.operation = object_to_attach.ADD;
+    planning_scene_interface.applyCollisionObject(object_to_attach);
+
+    // Then, we "attach" the object to the robot. It uses the frame_id to determine which robot link it is attached to.
+    // We also need to tell MoveIt that the object is allowed to be in collision with the finger links of the gripper.
+    // You could also use applyAttachedCollisionObject to attach an object to the robot directly.
+    RCLCPP_INFO(node_->get_logger(), "Attach the object to the robot");
+    std::vector<std::string> touch_links;
+    touch_links.push_back("left_inner_finger_pad");
+    touch_links.push_back("right_inner_finger_pad");
+    bool result = manipulator_->attachObject(object_to_attach.id, "arm_tool0", touch_links);
+    return result;
+}
+
+bool Manipulator::DetachObjectFromGripper()
+{
+    // Detaching and Removing Objects
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    //
+    // Now, let's detach the cylinder from the robot's gripper.
+    RCLCPP_INFO(node_->get_logger(), "Detach the object from the robot");
+
+    moveit_msgs::msg::CollisionObject object_to_detach;
+    object_to_detach.id = attach_detach_object;
+
+    bool result = manipulator_->detachObject(object_to_detach.id);
+    return result;
 }
 
 #pragma endregion

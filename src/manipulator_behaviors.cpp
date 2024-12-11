@@ -37,12 +37,16 @@ BT::NodeStatus ManipulatorGrasp::onStart()
     BT::Optional<double> base_footprint_roll = getInput<double>("target_roll");
     BT::Optional<double> base_footprint_pitch = getInput<double>("target_pitch");
     BT::Optional<double> base_footprint_yaw = getInput<double>("target_yaw");
-    BT::Optional<double> tcp_offset_xy = getInput<double>("tcp_offset_xy"); 
+    // BT::Optional<double> tcp_offset_xy = getInput<double>("tcp_offset_xy"); 
+    BT::Optional<double> tcp_offset_x = getInput<double>("tcp_offset_x"); 
+    BT::Optional<double> tcp_offset_y = getInput<double>("tcp_offset_y"); 
     BT::Optional<double> tcp_offset_z = getInput<double>("tcp_offset_z");
 
     RCLCPP_INFO(node_->get_logger(), "moving gripper to target linearly");
     
-    manipulator_.MoveGripperToPoseLinear(base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), tcp_offset_xy.value(), tcp_offset_z.value());
+    // manipulator_.MoveGripperToPoseLinear(base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), tcp_offset_xy.value(), tcp_offset_z.value());
+
+    manipulator_.MoveGripperToPoseLinear(base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), tcp_offset_x.value(), tcp_offset_y.value(), tcp_offset_z.value());
     
     RCLCPP_INFO(node_->get_logger(), "moved gripper to target linearly");
     return BT::NodeStatus::RUNNING;
@@ -72,7 +76,9 @@ void ManipulatorGrasp::onHalted() {}
  */
 BT::PortsList ManipulatorGrasp::providedPorts()
 {
-    return {BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::InputPort<double>("tcp_offset_xy"), BT::InputPort<double>("tcp_offset_z")};
+    // return {BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::InputPort<double>("tcp_offset_xy"), BT::InputPort<double>("tcp_offset_z")};
+
+    return {BT::InputPort<double>("target_x"), BT::InputPort<double>("target_y"), BT::InputPort<double>("target_z"), BT::InputPort<double>("target_roll"), BT::InputPort<double>("target_pitch"), BT::InputPort<double>("target_yaw"), BT::InputPort<double>("tcp_offset_x"), BT::InputPort<double>("tcp_offset_y"), BT::InputPort<double>("tcp_offset_z")};
 }
 
 #pragma endregion

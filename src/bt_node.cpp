@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
   std::string behavior_tree_type = node_->get_parameter("behavior_tree_type").as_string();
 
   BT::BehaviorTreeFactory factory;
-  factory.registerNodeType<RobotInitializer>("RobotInitializer", node_);
+  // factory.registerNodeType<RobotInitializer>("RobotInitializer", node_);
   factory.registerNodeType<ManipulatorGrasp>("Grasp", node_);
   factory.registerNodeType<ManipulatorPregraspPlan>("PregraspPlan", node_);
   factory.registerNodeType<ManipulatorDrop>("Drop", node_);
