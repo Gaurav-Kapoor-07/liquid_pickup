@@ -112,7 +112,8 @@ moveit_msgs::msg::RobotTrajectory Manipulator::PlanGripperToPose(bool pose_from_
     
     // manipulator_->setPoseTarget(target_base_footprint, "arm_flange");
     manipulator_->setPoseTarget(target_base_footprint);
-    manipulator_->setPlanningTime(5.0);
+    manipulator_->setPlanningTime(10.0);
+    // manipulator_->setPlanningTime(30.0);
 
     RCLCPP_INFO(node_->get_logger(), "Reference frame: %s", manipulator_->getPlanningFrame().c_str());
     RCLCPP_INFO(node_->get_logger(), "End effector link: %s", manipulator_->getEndEffectorLink().c_str());
@@ -387,14 +388,14 @@ bool Manipulator::AttachObjectToGripper()
     shape_msgs::msg::SolidPrimitive cylinder_primitive;
     cylinder_primitive.type = cylinder_primitive.CYLINDER;
     cylinder_primitive.dimensions.resize(2);
-    cylinder_primitive.dimensions[cylinder_primitive.CYLINDER_HEIGHT] = 0.15;
+    cylinder_primitive.dimensions[cylinder_primitive.CYLINDER_HEIGHT] = 0.1;
     cylinder_primitive.dimensions[cylinder_primitive.CYLINDER_RADIUS] = 0.0135;
 
     // We define the frame/pose for this cylinder so that it appears in the gripper.
     object_to_attach.header.frame_id = manipulator_->getEndEffectorLink();
     geometry_msgs::msg::Pose grab_pose;
     grab_pose.orientation.w = 1.0;
-    grab_pose.position.z = 0.25;
+    grab_pose.position.z = 0.2;
 
     // First, we add the object to the world (without using a vector).
     object_to_attach.primitives.push_back(cylinder_primitive);
@@ -407,6 +408,8 @@ bool Manipulator::AttachObjectToGripper()
     // You could also use applyAttachedCollisionObject to attach an object to the robot directly.
     RCLCPP_INFO(node_->get_logger(), "Attach the object to the robot");
     std::vector<std::string> touch_links;
+    touch_links.push_back("left_inner_finger");
+    touch_links.push_back("right_inner_finger");
     touch_links.push_back("left_inner_finger_pad");
     touch_links.push_back("right_inner_finger_pad");
     bool result = manipulator_->attachObject(object_to_attach.id, "arm_tool0", touch_links);

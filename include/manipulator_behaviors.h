@@ -50,6 +50,7 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
+    std::string action_name;
 };
 
 #pragma endregion
@@ -79,6 +80,7 @@ private:
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr trajectory_execute_subscription_;
     moveit_msgs::msg::RobotTrajectory plan_trajectory_;
     rclcpp::WaitSet wait_set_;
+    std::string action_name;
 };
 
 #pragma endregion
@@ -102,6 +104,7 @@ private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
     std::string error_message_;
+    std::string action_name;
 };
 
 #pragma endregion
@@ -124,6 +127,7 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
+    std::string action_name;
 };
 
 #pragma endregion
@@ -146,6 +150,7 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
+    std::string action_name;
 };
 
 #pragma endregion
@@ -168,6 +173,7 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
+    std::string action_name;
 };
 
 #pragma endregion
