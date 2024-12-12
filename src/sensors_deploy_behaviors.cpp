@@ -11,13 +11,15 @@
  */
 SensorsDeploy::SensorsDeploy(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node) : BT::StatefulActionNode(name, config)
 {
+    action_name_ = this->name();
+
     if (node != nullptr)
     {
         node_ = node;
-        RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Node shared pointer was passed!", action_name_.c_str());
     }
     
-    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: Initialized!", action_name_.c_str());
 }
 
 /**
@@ -28,6 +30,8 @@ SensorsDeploy::SensorsDeploy(const std::string &name, const BT::NodeConfiguratio
  */
 BT::NodeStatus SensorsDeploy::onStart()
 {
+    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name_.c_str());
+
     // Format for sensor_deploy_frame_names: sensor_1_name,sensor_2_name,sensor_3_name,
     
     std::string sensor_deploy_frame_names_;
@@ -38,7 +42,7 @@ BT::NodeStatus SensorsDeploy::onStart()
 
     setOutput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
     
-    RCLCPP_INFO(node_->get_logger(), "%d sensors to be deployed!", no_of_deploy_sensors_); 
+    RCLCPP_INFO(node_->get_logger(), "[%s]: %d sensors to be deployed!", action_name_.c_str(), no_of_deploy_sensors_); 
     
     return BT::NodeStatus::RUNNING;
 }

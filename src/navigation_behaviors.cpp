@@ -13,29 +13,32 @@
 // GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config), manipulator_(node)
 GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node, const rclcpp::executors::MultiThreadedExecutor::SharedPtr executor) : BT::StatefulActionNode(name, config)
 {
+    action_name_ = this->name();
+
     if (node != nullptr)
     {
+        
         node_ = node;
-        RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", this->name().c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Node shared pointer was passed!", action_name_.c_str());
     }
 
     if (executor != nullptr)
     {
         executor_ = executor;
-        RCLCPP_INFO(node_->get_logger(), "[%s] Executor shared pointer was passed!", this->name().c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Executor shared pointer was passed!", action_name_.c_str());
     }
 
     action_client_ = rclcpp_action::create_client<nav2_msgs::action::NavigateToPose>(node_, "/summit/navigate_to_pose");
 
     if (!action_client_->wait_for_action_server(std::chrono::seconds(20))) {
-    RCLCPP_ERROR(node_->get_logger(), "Action server not available after waiting");
+    RCLCPP_ERROR(node_->get_logger(), "[%s]: Action server not available after waiting", action_name_.c_str());
     return;
     }
 
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", this->name().c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: Initialized!", action_name_.c_str());
 }
 
 /**
@@ -46,8 +49,10 @@ GoToPose::GoToPose(const std::string &name, const BT::NodeConfiguration &config,
  */
 BT::NodeStatus GoToPose::onStart()
 {
-    LOG_NAV_START(this->name());
+    // LOG_NAV_START(action_name_);
     // manipulator_.MoveToDrivingPosition();
+
+    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name_.c_str());
 
     std::string package_share_directory = ament_index_cpp::get_package_share_directory("nav2_bt_navigator");
     std::string path_to_xml = package_share_directory + "/behavior_trees/";
@@ -71,7 +76,7 @@ BT::NodeStatus GoToPose::onStart()
 
         target_frame = sensor_deploy_frame_names_dynamic_.substr(0, pos_comma);
         
-        RCLCPP_INFO(node_->get_logger(), "receiving 2D pose goal from TF");
+        RCLCPP_INFO(node_->get_logger(), "[%s]: receiving 2D pose goal from TF", action_name_.c_str());
 
         geometry_msgs::msg::TransformStamped map_to_target_frame;
 
@@ -81,8 +86,8 @@ BT::NodeStatus GoToPose::onStart()
                 tf2::TimePointZero, tf2::durationFromSec(5.0));
         }   catch (const tf2::TransformException & ex) {
             RCLCPP_INFO(node_->get_logger(),
-                "Could not transform %s to %s: %s",
-                MAP_FRAME, target_frame.c_str(), ex.what());
+                "[%s]: Could not transform %s to %s: %s",
+                MAP_FRAME, action_name_.c_str(), target_frame.c_str(), ex.what());
         }
 
         // 2D pose goal
@@ -95,12 +100,12 @@ BT::NodeStatus GoToPose::onStart()
         nav_msg.pose.pose.orientation.z = map_to_target_frame.transform.rotation.z;
         nav_msg.pose.pose.orientation.w = map_to_target_frame.transform.rotation.w;
 
-        RCLCPP_INFO(node_->get_logger(), "Sending goal: header.frame_id: %s, target_frame: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", nav_msg.pose.header.frame_id.c_str(), target_frame.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Sending goal: header.frame_id: %s, target_frame: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", action_name_.c_str(), nav_msg.pose.header.frame_id.c_str(), target_frame.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
     }
 
     else
     {
-        RCLCPP_INFO(node_->get_logger(), "receiving 2D pose goal from XML string");
+        RCLCPP_INFO(node_->get_logger(), "[%s]: receiving 2D pose goal from XML string", action_name_.c_str());
         
         // 2D pose goal
         nav_msg.pose.header.stamp = node_->get_clock()->now();
@@ -113,7 +118,7 @@ BT::NodeStatus GoToPose::onStart()
         nav_msg.pose.pose.orientation.z = std::sin(target_yaw_.value() / 2.0);
         nav_msg.pose.pose.orientation.w = std::cos(target_yaw_.value() / 2.0);
 
-        RCLCPP_INFO(node_->get_logger(), "Sending goal: header.frame_id: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", nav_msg.pose.header.frame_id.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Sending goal: header.frame_id: %s, x: %f, y: %f, z: %f, qx: %f, qy: %f, qz: %f, qw: %f, behavior_tree: %s", action_name_.c_str(), nav_msg.pose.header.frame_id.c_str(), nav_msg.pose.pose.position.x, nav_msg.pose.pose.position.y, nav_msg.pose.pose.position.z, nav_msg.pose.pose.orientation.x, nav_msg.pose.pose.orientation.y, nav_msg.pose.pose.orientation.z, nav_msg.pose.pose.orientation.w, nav_msg.behavior_tree.c_str());
     }
 
     // Ask server to achieve some goal and wait until it's accepted
@@ -129,7 +134,7 @@ BT::NodeStatus GoToPose::onStart()
 
     goal_handle_ = goal_handle_future.get();
     if (!goal_handle_) {
-    RCLCPP_ERROR(node_->get_logger(), "Goal was rejected by server");
+    RCLCPP_ERROR(node_->get_logger(), "[%s]: Goal was rejected by server", action_name_.c_str());
     return BT::NodeStatus::FAILURE;
     }
     
@@ -146,7 +151,7 @@ BT::NodeStatus GoToPose::onRunning()
     // Wait for the server to be done with the goal
     auto result_future = action_client_->async_get_result(goal_handle_);
 
-    RCLCPP_INFO(node_->get_logger(), "Waiting for result");
+    RCLCPP_INFO(node_->get_logger(), "[%s]: Waiting for result", action_name_.c_str());
     // if (rclcpp::spin_until_future_complete(node_, result_future) !=
     // rclcpp::FutureReturnCode::SUCCESS)
     // {
@@ -160,18 +165,18 @@ BT::NodeStatus GoToPose::onRunning()
         case rclcpp_action::ResultCode::SUCCEEDED:
             break;
         case rclcpp_action::ResultCode::ABORTED:
-            RCLCPP_ERROR(node_->get_logger(), "Goal was aborted");
+            RCLCPP_ERROR(node_->get_logger(), "[%s]: Goal was aborted", action_name_.c_str());
             return BT::NodeStatus::FAILURE;
         case rclcpp_action::ResultCode::CANCELED:
-            RCLCPP_ERROR(node_->get_logger(), "Goal was canceled");
+            RCLCPP_ERROR(node_->get_logger(), "[%s]: Goal was canceled", action_name_.c_str());
             return BT::NodeStatus::FAILURE;
         default:
-            RCLCPP_ERROR(node_->get_logger(), "Unknown result code");
+            RCLCPP_ERROR(node_->get_logger(), "[%s]: Unknown result code", action_name_.c_str());
             return BT::NodeStatus::FAILURE;
     }
 
-    RCLCPP_INFO(node_->get_logger(), "result received");
-    LOG_NAV_STOP(this->name());  
+    RCLCPP_INFO(node_->get_logger(), "[%s]: result received", action_name_.c_str());
+    // LOG_NAV_STOP(action_name_);  
     return BT::NodeStatus::SUCCESS;
 }
 

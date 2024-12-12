@@ -12,15 +12,15 @@
 ManipulatorGrasp::ManipulatorGrasp(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
     : BT::StatefulActionNode(name, config), manipulator_(node)
 {
-    action_name = this->name();
+    action_name_ = this->name();
     
     if (node != nullptr)
     {
         node_ = node;
-        RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", action_name.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Node shared pointer was passed!", action_name_.c_str());
     }
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: Initialized!", action_name_.c_str());
 }
 
 /**
@@ -31,9 +31,9 @@ ManipulatorGrasp::ManipulatorGrasp(const std::string &name, const BT::NodeConfig
  */
 BT::NodeStatus ManipulatorGrasp::onStart()
 {
-    LOG_MANI_START(action_name);
+    // LOG_MANI_START(action_name_);
 
-    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name_.c_str());
 
     BT::Optional<double> base_footprint_x = getInput<double>("target_x");
     BT::Optional<double> base_footprint_y = getInput<double>("target_y");
@@ -46,13 +46,13 @@ BT::NodeStatus ManipulatorGrasp::onStart()
     BT::Optional<double> tcp_offset_y = getInput<double>("tcp_offset_y"); 
     BT::Optional<double> tcp_offset_z = getInput<double>("tcp_offset_z");
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] moving gripper to target linearly", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: moving gripper to target linearly", action_name_.c_str());
     
     // manipulator_.MoveGripperToPoseLinear(base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), tcp_offset_xy.value(), tcp_offset_z.value());
 
     manipulator_.MoveGripperToPoseLinear(base_footprint_x.value(), base_footprint_y.value(), base_footprint_z.value(), base_footprint_roll.value(), base_footprint_pitch.value(), base_footprint_yaw.value(), tcp_offset_x.value(), tcp_offset_y.value(), tcp_offset_z.value());
     
-    RCLCPP_INFO(node_->get_logger(), "[%s] moved gripper to target linearly", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: moved gripper to target linearly", action_name_.c_str());
     return BT::NodeStatus::RUNNING;
 }
 
@@ -98,12 +98,12 @@ BT::PortsList ManipulatorGrasp::providedPorts()
 ManipulatorPregraspPlan::ManipulatorPregraspPlan(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
     : BT::StatefulActionNode(name, config), manipulator_(node)
 {
-    action_name = this->name();
+    action_name_ = this->name();
     
     if (node != nullptr)
     {
         node_ = node;
-        RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", action_name.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Node shared pointer was passed!", action_name_.c_str());
     }
 
     const rclcpp::QoS feedback_sub_qos = rclcpp::QoS(1);
@@ -131,7 +131,7 @@ ManipulatorPregraspPlan::ManipulatorPregraspPlan(const std::string &name, const 
     
     // trajectory_execute_subscription_ = node_->create_subscription<std_msgs::msg::Bool>("/summit/trajectory_execute", feedback_sub_qos, topic_callback);
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: Initialized!", action_name_.c_str());
 }
 
 void ManipulatorPregraspPlan::topic_callback(const std_msgs::msg::Bool::SharedPtr msg)
@@ -159,9 +159,9 @@ void ManipulatorPregraspPlan::topic_callback(const std_msgs::msg::Bool::SharedPt
  */
 BT::NodeStatus ManipulatorPregraspPlan::onStart()
 {
-    LOG_MANI_START(action_name);
+    // LOG_MANI_START(action_name_);
 
-    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name_.c_str());
     
     BT::Optional<bool> pose_from_tf = getInput<bool>("pose_from_tf");
     BT::Optional<double> base_footprint_x = getInput<double>("target_x");
@@ -181,7 +181,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
 
     std::string target_frame;
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] pregrasp started", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: pregrasp started", action_name_.c_str());
 
     int no_of_deploy_sensors_{0};
     getInput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
@@ -202,7 +202,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
 
         setOutput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory", plan_trajectory_);
 
-        RCLCPP_INFO(node_->get_logger(), "[%s] pregrasp plan finished", action_name.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: pregrasp plan finished", action_name_.c_str());
 
         // sensor_deploy_frame_names_dynamic_.erase(0, pos_comma + 1);
         
@@ -222,7 +222,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onStart()
 
         setOutput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory", plan_trajectory_);
 
-        RCLCPP_INFO(node_->get_logger(), "[%s] pregrasp plan finished", action_name.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: pregrasp plan finished", action_name_.c_str());
     }
     
     return BT::NodeStatus::RUNNING;
@@ -241,9 +241,9 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
     {
         if (count_ == 0)
         {
-            RCLCPP_WARN(node_->get_logger(), "[%s] valid trajectory plan received!", action_name.c_str());
+            RCLCPP_WARN(node_->get_logger(), "[%s]: valid trajectory plan received!", action_name_.c_str());
             
-            RCLCPP_WARN(node_->get_logger(), "[%s] check: Execute Trajectory? Waiting for publisher for about %d mins max., Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\" --once", action_name.c_str(), traj_exec_wait_min);
+            RCLCPP_WARN(node_->get_logger(), "[%s]: check: Execute Trajectory? Waiting for publisher for about %d mins max., Format: $ ros2 topic pub /summit/trajectory_execute std_msgs/msg/Bool \"data: true\" --once", action_name_.c_str(), traj_exec_wait_min);
             count_++;
             return BT::NodeStatus::RUNNING;
         }
@@ -265,13 +265,13 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
                     rclcpp::MessageInfo msg_info;
                     if (trajectory_execute_subscription_->take(take_msg, msg_info)) {
                         bool value_received = take_msg.data;
-                        RCLCPP_WARN(node_->get_logger(), "[%s] check: Received take trajectory execute (0: False, 1: True): %d", action_name.c_str(), value_received);
+                        RCLCPP_WARN(node_->get_logger(), "[%s]: check: Received take trajectory execute (0: False, 1: True): %d", action_name_.c_str(), value_received);
 
                         setOutput<bool>("execute_trajectory", value_received);
                         
                         if (value_received)
                         {
-                            RCLCPP_WARN(node_->get_logger(), "[%s] check: Trajectory execute approved", action_name.c_str());
+                            RCLCPP_WARN(node_->get_logger(), "[%s]: check: Trajectory execute approved", action_name_.c_str());
 
                             value_received = false;
                             
@@ -280,7 +280,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
 
                         else
                         {
-                            RCLCPP_ERROR(node_->get_logger(), "[%s] check: Trajectory execute disapproved", action_name.c_str());
+                            RCLCPP_ERROR(node_->get_logger(), "[%s]: check: Trajectory execute disapproved", action_name_.c_str());
                             return BT::NodeStatus::FAILURE;
                         }
                     }
@@ -290,14 +290,14 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
                 case rclcpp::WaitResultKind::Timeout:
                 {
                     if (rclcpp::ok()) {
-                        RCLCPP_WARN(node_->get_logger(), "[%s] check: Timeout. No message received yet, still waiting for about %d secs", action_name.c_str(), timeout_secs - count_);
+                        RCLCPP_WARN(node_->get_logger(), "[%s]: check: Timeout. No message received yet, still waiting for about %d secs", action_name_.c_str(), timeout_secs - count_);
                     }
                     break;
                 }
 
                 default:
                 {
-                    RCLCPP_ERROR(node_->get_logger(), "[%s] check: Error. Wait-set failed.", action_name.c_str());
+                    RCLCPP_ERROR(node_->get_logger(), "[%s]: check: Error. Wait-set failed.", action_name_.c_str());
                 }
             }
             
@@ -326,7 +326,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
         
         else
         {
-            RCLCPP_ERROR(node_->get_logger(), "[%s] Timeout! no response received, returning failure", action_name.c_str());
+            RCLCPP_ERROR(node_->get_logger(), "[%s]: Timeout! no response received, returning failure", action_name_.c_str());
             return BT::NodeStatus::FAILURE;
         }
 
@@ -335,7 +335,7 @@ BT::NodeStatus ManipulatorPregraspPlan::onRunning()
 
     else
     {
-        RCLCPP_ERROR(node_->get_logger(), "[%s] invalid trajectory plan received, returning failure", action_name.c_str());
+        RCLCPP_ERROR(node_->get_logger(), "[%s]: invalid trajectory plan received, returning failure", action_name_.c_str());
         return BT::NodeStatus::FAILURE;
     }
 
@@ -372,15 +372,15 @@ BT::PortsList ManipulatorPregraspPlan::providedPorts()
 ManipulatorPregraspExecute::ManipulatorPregraspExecute(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
     : BT::StatefulActionNode(name, config), manipulator_(node)
 {   
-    action_name = this->name();
+    action_name_ = this->name();
     
     if (node != nullptr)
     {
         node_ = node;
-        RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", action_name.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Node shared pointer was passed!", action_name_.c_str());
     }
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: Initialized!", action_name_.c_str());
 }
 
 /**
@@ -391,16 +391,16 @@ ManipulatorPregraspExecute::ManipulatorPregraspExecute(const std::string &name, 
  */
 BT::NodeStatus ManipulatorPregraspExecute::onStart()
 {
-    LOG_MANI_START(action_name);
+    // LOG_MANI_START(action_name_);
 
-    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name_.c_str());
 
     bool execute_trajectory{false};
     getInput<bool>("execute_trajectory", execute_trajectory);
     
     if (execute_trajectory)
     {
-        RCLCPP_INFO(node_->get_logger(), "[%s] signaled to execute trajectory, executing!", action_name.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: signaled to execute trajectory, executing!", action_name_.c_str());
         
         BT::Optional<moveit_msgs::msg::RobotTrajectory> trajectory = getInput<moveit_msgs::msg::RobotTrajectory>("plan_trajectory");
 
@@ -408,7 +408,7 @@ BT::NodeStatus ManipulatorPregraspExecute::onStart()
 
         error_message_ = moveit::core::error_code_to_string(error_code);
 
-        RCLCPP_INFO(node_->get_logger(), "[%s] Error message: %s", action_name.c_str(), error_message_.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Error message: %s", action_name_.c_str(), error_message_.c_str());
 
         int no_of_deploy_sensors_{0};
         getInput<int>("no_of_deploy_sensors", no_of_deploy_sensors_);
@@ -428,8 +428,8 @@ BT::NodeStatus ManipulatorPregraspExecute::onStart()
 
             int no_of_deploy_sensors_dynamic = std::count(sensor_deploy_frame_names_dynamic_.begin(), sensor_deploy_frame_names_dynamic_.end(), ',');
 
-            RCLCPP_INFO(node_->get_logger(), "[%s] %d sensors already deployed!", action_name.c_str(), no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
-            RCLCPP_INFO(node_->get_logger(), "[%s] %d sensors yet to be deployed!", action_name.c_str(), no_of_deploy_sensors_dynamic);
+            RCLCPP_INFO(node_->get_logger(), "[%s]: %d sensors already deployed!", action_name_.c_str(), no_of_deploy_sensors_ - no_of_deploy_sensors_dynamic); 
+            RCLCPP_INFO(node_->get_logger(), "[%s]: %d sensors yet to be deployed!", action_name_.c_str(), no_of_deploy_sensors_dynamic);
         }
 
         execute_trajectory = false;
@@ -437,7 +437,7 @@ BT::NodeStatus ManipulatorPregraspExecute::onStart()
 
     else
     {
-        RCLCPP_ERROR(node_->get_logger(), "[%s] signaled to not execute trajectory, returning failure", action_name.c_str());
+        RCLCPP_ERROR(node_->get_logger(), "[%s]: signaled to not execute trajectory, returning failure", action_name_.c_str());
         return BT::NodeStatus::FAILURE;
     }
 
@@ -492,15 +492,15 @@ BT::PortsList ManipulatorPregraspExecute::providedPorts()
 ManipulatorPostgraspRetreat::ManipulatorPostgraspRetreat(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
     : BT::StatefulActionNode(name, config), manipulator_(node)
 {
-    action_name = this->name();
+    action_name_ = this->name();
 
     if (node != nullptr)
     {
         node_ = node;
-        RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", action_name.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Node shared pointer was passed!", action_name_.c_str());
     }
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: Initialized!", action_name_.c_str());
 }
 
 /**
@@ -511,18 +511,18 @@ ManipulatorPostgraspRetreat::ManipulatorPostgraspRetreat(const std::string &name
  */
 BT::NodeStatus ManipulatorPostgraspRetreat::onStart()
 {
-    LOG_MANI_START(action_name);
+    // LOG_MANI_START(action_name_);
 
-    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name_.c_str());
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] post grasp started", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: post grasp started", action_name_.c_str());
     
     BT::Optional<double> add_pos_z = getInput<double>("add_pos_z");
     
     // manipulator_.MoveLinearVec(0, 0, 0.12);
     manipulator_.MoveLinearVec(0, 0, add_pos_z.value());
     
-    RCLCPP_INFO(node_->get_logger(), "[%s] post grasp finished", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: post grasp finished", action_name_.c_str());
     return BT::NodeStatus::RUNNING;
 }
 
@@ -566,15 +566,15 @@ BT::PortsList ManipulatorPostgraspRetreat::providedPorts()
 ManipulatorDrop::ManipulatorDrop(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
     : BT::StatefulActionNode(name, config), manipulator_(node)
 {
-    action_name = this->name();
+    action_name_ = this->name();
 
     if (node != nullptr)
     {
         node_ = node;
-        RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", action_name.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Node shared pointer was passed!", action_name_.c_str());
     }
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: Initialized!", action_name_.c_str());
 }
 
 /**
@@ -585,13 +585,13 @@ ManipulatorDrop::ManipulatorDrop(const std::string &name, const BT::NodeConfigur
  */
 BT::NodeStatus ManipulatorDrop::onStart()
 {
-    LOG_MANI_START(action_name);
+    // LOG_MANI_START(action_name_);
 
-    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "action start: %s", action_name_.c_str());
 
-    RCLCPP_INFO(node_->get_logger(), "[%s]: going to drop object", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: going to drop object", action_name_.c_str());
     manipulator_.DropObject();
-    RCLCPP_INFO(node_->get_logger(), "[%s]: object dropped", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: object dropped", action_name_.c_str());
     return BT::NodeStatus::RUNNING;
 }
 
@@ -636,15 +636,15 @@ BT::PortsList ManipulatorDrop::providedPorts()
 ManipulatorScanPose::ManipulatorScanPose(const std::string &name, const BT::NodeConfiguration &config, const rclcpp::Node::SharedPtr node)
     : BT::StatefulActionNode(name, config), manipulator_(node)
 {
-    action_name = this->name();
+    action_name_ = this->name();
     
     if (node != nullptr)
     {
         node_ = node;
-        RCLCPP_INFO(node_->get_logger(), "[%s] Node shared pointer was passed!", action_name.c_str());
+        RCLCPP_INFO(node_->get_logger(), "[%s]: Node shared pointer was passed!", action_name_.c_str());
     }
 
-    RCLCPP_INFO(node_->get_logger(), "[%s] Initialized!", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: Initialized!", action_name_.c_str());
 }
 
 /**
@@ -655,10 +655,10 @@ ManipulatorScanPose::ManipulatorScanPose(const std::string &name, const BT::Node
  */
 BT::NodeStatus ManipulatorScanPose::onStart()
 {
-    LOG_MANI_START(action_name);
-    RCLCPP_INFO(node_->get_logger(), "[%s] moving EE to scan position", action_name.c_str());
+    // LOG_MANI_START(action_name_);
+    RCLCPP_INFO(node_->get_logger(), "[%s]: moving EE to scan position", action_name_.c_str());
     manipulator_.MoveToScanningPosition();
-    RCLCPP_INFO(node_->get_logger(), "[%s] moved EE to scan position", action_name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "[%s]: moved EE to scan position", action_name_.c_str());
     return BT::NodeStatus::RUNNING;
 }
 

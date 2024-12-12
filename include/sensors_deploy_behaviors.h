@@ -27,6 +27,7 @@ public:
 
 private:
   rclcpp::Node::SharedPtr node_;
+  std::string action_name_;
 };
 
 #pragma endregion

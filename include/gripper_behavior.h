@@ -41,6 +41,7 @@ private:
     rclcpp_action::Client<control_msgs::action::GripperCommand>::SharedPtr action_client_;
     rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::SharedPtr goal_handle_;
     Manipulator manipulator_;
+    std::string action_name_;
 };
 
 #pragma endregion

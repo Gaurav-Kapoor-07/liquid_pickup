@@ -17,14 +17,14 @@
 #include "std_msgs/msg/bool.hpp"
 #include "rclcpp/qos.hpp"
 
-#include "time_logger.h"
-#ifdef TIME_LOGGER_ON
-#define LOG_MANI_START(val) BATimeLogger::LogMoveGroup(val, log_start)
-#define LOG_MANI_STOP(val) BATimeLogger::LogMoveGroup(val, log_stop)
-#else
-#define LOG_MANI_START(val)
-#define LOG_MANI_STOP(val)
-#endif
+// #include "time_logger.h"
+// #ifdef TIME_LOGGER_ON
+// #define LOG_MANI_START(val) BATimeLogger::LogMoveGroup(val, log_start)
+// #define LOG_MANI_STOP(val) BATimeLogger::LogMoveGroup(val, log_stop)
+// #else
+// #define LOG_MANI_START(val)
+// #define LOG_MANI_STOP(val)
+// #endif
 
 #pragma endregion
 
@@ -50,7 +50,7 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
-    std::string action_name;
+    std::string action_name_;
 };
 
 #pragma endregion
@@ -80,7 +80,7 @@ private:
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr trajectory_execute_subscription_;
     moveit_msgs::msg::RobotTrajectory plan_trajectory_;
     rclcpp::WaitSet wait_set_;
-    std::string action_name;
+    std::string action_name_;
 };
 
 #pragma endregion
@@ -104,7 +104,7 @@ private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
     std::string error_message_;
-    std::string action_name;
+    std::string action_name_;
 };
 
 #pragma endregion
@@ -127,7 +127,7 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
-    std::string action_name;
+    std::string action_name_;
 };
 
 #pragma endregion
@@ -150,7 +150,7 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
-    std::string action_name;
+    std::string action_name_;
 };
 
 #pragma endregion
@@ -173,7 +173,7 @@ public:
 private:
     rclcpp::Node::SharedPtr node_;
     Manipulator manipulator_;
-    std::string action_name;
+    std::string action_name_;
 };
 
 #pragma endregion
